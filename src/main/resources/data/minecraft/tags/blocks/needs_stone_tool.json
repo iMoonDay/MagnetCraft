@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:magnetite",
+    "magnetcraft:deepslate_magnetite",
+    "magnetcraft:magnet_block",
+    "magnetcraft:raw_magnet_block"
+  ]
+}

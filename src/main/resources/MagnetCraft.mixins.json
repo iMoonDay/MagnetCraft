@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.imoonday.magnetcraft.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "BrewingMixin",
+    "LivingEntityMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

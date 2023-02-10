@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:blasting",
+  "ingredient": {
+    "item": "magnetcraft:magnetite"
+  },
+  "result": "magnetcraft:magnet_fragment",
+  "experience": 1,
+  "cookingtime": 100
+}

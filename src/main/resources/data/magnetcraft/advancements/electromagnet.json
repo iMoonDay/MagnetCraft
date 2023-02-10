@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "magnetcraft:electromagnet"
+    },
+    "title": {
+      "translate": "advancement.magnetcraft.electromagnet"
+    },
+    "description": {
+      "translate": "advancement.magnetcraft.electromagnet.tooltip"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "magnetcraft:polar_magnet",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:electromagnet"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

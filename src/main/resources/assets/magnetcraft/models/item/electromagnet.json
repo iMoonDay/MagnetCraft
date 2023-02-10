@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "predicate": {
+        "enabled": 0
+      },
+      "model": "magnetcraft:item/electromagnet_off"
+    },
+    {
+      "predicate": {
+        "enabled": 1
+      },
+      "model": "magnetcraft:item/electromagnet_on"
+    }
+  ]
+}

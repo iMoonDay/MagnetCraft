@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "magnetcraft:magnet_fragment"
+    },
+    "title": {
+      "translate": "advancement.magnetcraft.magnet_fragment"
+    },
+    "description": {
+      "translate": "advancement.magnetcraft.magnet_fragment.tooltip"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "minecraft:story/upgrade_tools",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:magnet_fragment"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

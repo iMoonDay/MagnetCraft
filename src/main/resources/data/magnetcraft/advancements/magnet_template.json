@@ -1,0 +1,39 @@
+{
+  "display": {
+    "icon": {
+      "item": "magnetcraft:magnet_template"
+    },
+    "title": {
+      "translate": "advancement.magnetcraft.magnet_template"
+    },
+    "description": {
+      "translate": "advancement.magnetcraft.magnet_template.tooltip"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "magnetcraft:magnet_fragment",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:magnet_template"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "magnetcraft:polar_magnet",
+      "magnetcraft:electromagnet",
+      "magnetcraft:magnet_controller"
+    ]
+  }
+}

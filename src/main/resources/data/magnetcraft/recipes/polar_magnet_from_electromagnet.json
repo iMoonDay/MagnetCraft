@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:electromagnet"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:polar_magnet"
+  }
+}

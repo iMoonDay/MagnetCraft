@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "magnetcraft:permanent_magnet"
+    },
+    "title": {
+      "translate": "advancement.magnetcraft.permanent_magnet"
+    },
+    "description": {
+      "translate": "advancement.magnetcraft.permanent_magnet.tooltip"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "parent": "magnetcraft:electromagnet",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:permanent_magnet"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

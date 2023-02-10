@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "magnetcraft:block/raw_magnet_block"
+    }
+  }
+}

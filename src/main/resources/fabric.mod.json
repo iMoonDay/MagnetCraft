@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "magnetcraft",
+  "version": "${version}",
+  "name": "MagnetCraft",
+  "description": "Magnet Craft Mod",
+  "authors": [
+    "iMoonDay"
+  ],
+  "contact": {},
+  "license": "MIT",
+  "icon": "assets/MagnetCraft/icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "com.imoonday.magnetcraft.MagnetCraftClient"
+    ],
+    "main": [
+      "com.imoonday.magnetcraft.MagnetCraft"
+    ]
+  },
+  "mixins": [
+    "MagnetCraft.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.14.14",
+    "fabric": "*",
+    "minecraft": "1.19.3"
+  }
+}

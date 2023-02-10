@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.events;
 
+import com.imoonday.magnetcraft.MagnetCraft;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -13,7 +14,7 @@ public class TeleportEvent {
 
     public static void teleportItems(World world, PlayerEntity entity, double dis, Hand hand) {
 
-        boolean emptyDamage = NbtEvent.checkEmptyDamage(entity,hand);
+        boolean emptyDamage = NbtEvent.checkEmptyDamage(entity, hand);
         boolean mainhand = hand == Hand.MAIN_HAND;
 
         String feedback;
@@ -51,11 +52,12 @@ public class TeleportEvent {
                 .forEach(e -> {
                     NbtEvent.addDamage(entity, hand, 1);
 
-                    if (e instanceof ExperienceOrbEntity) e.teleport(
-                            entity.getPos().getX(),
-                            entity.getPos().getY() + 1,
-                            entity.getPos().getZ());
-                    else {
+                    if (e instanceof ExperienceOrbEntity) {
+                        e.teleport(
+                                entity.getPos().getX(),
+                                entity.getPos().getY() + 1,
+                                entity.getPos().getZ());
+                    } else {
                         if (entity.getInventory().getEmptySlot() != -1) {
                             entity.giveItemStack(((ItemEntity) e).getStack());
                             e.kill();
@@ -66,6 +68,7 @@ public class TeleportEvent {
                                     entity.getPos().getZ());
                         }
                     }
+                    entity.incrementStat(MagnetCraft.ITEMS_TELEPORTED_TO_PLAYER);
                     entity.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
                 });
         if (!world.isClient) entity.sendMessage(Text.literal(feedback));

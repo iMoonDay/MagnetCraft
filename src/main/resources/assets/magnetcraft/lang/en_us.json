@@ -41,5 +41,6 @@
   "advancement.magnetcraft.electromagnet": "Magnet Upgrade!",
   "advancement.magnetcraft.electromagnet.tooltip": "Gives magnet teleport items function",
   "advancement.magnetcraft.permanent_magnet": "Eternity is the best",
-  "advancement.magnetcraft.permanent_magnet.tooltip": "Magnets no longer need to be durable"
+  "advancement.magnetcraft.permanent_magnet.tooltip": "Magnets no longer need to be durable",
+  "stat.magnetcraft.items_teleported_to_player": "The number of items obtained through the magnet"
 }

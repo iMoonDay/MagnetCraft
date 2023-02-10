@@ -41,5 +41,6 @@
   "advancement.magnetcraft.electromagnet": "磁铁升级!",
   "advancement.magnetcraft.electromagnet.tooltip": "赋予磁铁传送物品功能",
   "advancement.magnetcraft.permanent_magnet": "永恒才是最好的",
-  "advancement.magnetcraft.permanent_magnet.tooltip": "磁铁不再需要耐久"
+  "advancement.magnetcraft.permanent_magnet.tooltip": "磁铁不再需要耐久",
+  "stat.magnetcraft.items_teleported_to_player": "通过磁铁获取的物品数量"
 }

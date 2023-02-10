@@ -22,6 +22,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.potion.Potion;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.stat.StatFormatter;
+import net.minecraft.stat.Stats;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
@@ -60,9 +62,12 @@ public class MagnetCraft implements ModInitializer {
     //附魔
     public static final Enchantment ATTRACT_ENCHANTMENT = new AttractEnchantment();
 
+    //统计信息
+    public static final Identifier ITEMS_TELEPORTED_TO_PLAYER = new Identifier(MOD_ID, "items_teleported_to_player");
+
     //分组
     public static final ItemGroup ITEM_GROUP = FabricItemGroup.builder(new Identifier(
-                    "magnetcraft", "magnet"))
+                    MOD_ID, "magnet"))
             .displayName(Text.translatable("group.magnetcraft.magnet"))
             .icon(() -> new ItemStack(ELECTROMAGNET_ITEM))
             .entries((enabledFeatures, entries, operatorEnabled) -> {
@@ -133,5 +138,8 @@ public class MagnetCraft implements ModInitializer {
         Registry.register(Registries.ENCHANTMENT, new Identifier(
                 MOD_ID, "attract"), ATTRACT_ENCHANTMENT);
 
+        //统计信息
+        Registry.register(Registries.CUSTOM_STAT, "items_teleported_to_player", ITEMS_TELEPORTED_TO_PLAYER);
+        Stats.CUSTOM.getOrCreateStat(ITEMS_TELEPORTED_TO_PLAYER, StatFormatter.DEFAULT);
     }
 }

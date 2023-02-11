@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.effects;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.events.AttractEvent;
+import com.imoonday.magnetcraft.registries.EffectRegistries;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
@@ -37,7 +37,7 @@ public class AttractEffect extends StatusEffect {
                         entity.getPos().getX() - dis,
                         entity.getPos().getY() - dis,
                         entity.getPos().getZ() - dis),
-                e -> e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(MagnetCraft.ATTRACT_EFFECT)
+                e -> e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.ATTRACT_EFFECT)
                         && e.distanceTo(entity) <= dis && !e.isSpectator()).isEmpty();
 
         if (!nobodyAttract) return;

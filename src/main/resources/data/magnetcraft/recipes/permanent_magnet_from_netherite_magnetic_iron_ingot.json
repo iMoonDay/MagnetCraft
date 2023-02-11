@@ -4,7 +4,7 @@
     "item": "magnetcraft:electromagnet"
   },
   "addition": {
-    "item": "minecraft:netherite_ingot"
+    "item": "magnetcraft:netherite_magnetic_iron_ingot"
   },
   "result": {
     "item": "magnetcraft:permanent_magnet"

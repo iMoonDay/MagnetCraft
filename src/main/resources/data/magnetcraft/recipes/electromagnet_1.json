@@ -15,7 +15,7 @@
       "item": "minecraft:diamond"
     },
     "4": {
-      "item": "minecraft:iron_ingot"
+      "item": "magnetcraft:magnetic_iron_ingot"
     }
   },
   "result": {

@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.items;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.events.NbtEvent;
+import com.imoonday.magnetcraft.registries.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -21,7 +21,7 @@ public class PolorMagnetItem extends Item {
     }
 
     public static void register() {
-        ModelPredicateProviderRegistry.register(MagnetCraft.POLAR_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
+        ModelPredicateProviderRegistry.register(ItemRegistries.POLAR_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
             if (livingEntity == null || !itemStack.hasNbt()) return 0.0F;
             return itemStack.getOrCreateNbt().getBoolean("enabled") ? 1.0F : 0.0F;
         });

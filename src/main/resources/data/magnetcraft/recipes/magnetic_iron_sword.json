@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "minecraft:iron_sword"
+  },
+  "addition": {
+    "item": "magnetcraft:magnetic_iron_ingot"
+  },
+  "result": {
+    "item": "magnetcraft:magnetic_iron_sword"
+  }
+}

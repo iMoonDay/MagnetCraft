@@ -1,17 +1,26 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "111",
-    "111",
-    "111"
+    "121",
+    "131",
+    "141"
   ],
   "key": {
     "1": {
-      "item": "magnetcraft:magnet_fragment"
+      "item": "magnetcraft:magnetic_iron_ingot"
+    },
+    "2": {
+      "item": "minecraft:redstone"
+    },
+    "3": {
+      "item": "minecraft:emerald"
+    },
+    "4": {
+      "item": "minecraft:flint"
     }
   },
   "result": {
-    "item": "magnetcraft:magnet_block",
+    "item": "magnetcraft:magnet_controller",
     "count": 1
   }
 }

@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.events;
 
-import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.registries.EffectRegistries;
+import com.imoonday.magnetcraft.registries.ItemRegistries;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -31,12 +32,12 @@ public class AttractEvent {
 
         if (selected && mainhandStack != ItemStack.EMPTY) {
             assert mainhandStack != null;
-            entityMainhandAllowed = mainhandStack.isOf(MagnetCraft.PERMANENT_MAGNET_ITEM);
+            entityMainhandAllowed = mainhandStack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM);
         } else entityMainhandAllowed = false;
 
         if (selected && offhandStack != ItemStack.EMPTY) {
             assert offhandStack != null;
-            entityOffhandAllowed = offhandStack.isOf(MagnetCraft.PERMANENT_MAGNET_ITEM);
+            entityOffhandAllowed = offhandStack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM);
         } else entityOffhandAllowed = false;
 
         int degaussingDis = 15;//消磁距离
@@ -49,7 +50,7 @@ public class AttractEvent {
                                 entity.getPos().getY() - degaussingDis,
                                 entity.getPos().getZ() - degaussingDis),
                         e -> (e instanceof LivingEntity && ((LivingEntity) e)
-                                .hasStatusEffect(MagnetCraft.DEGAUSSING_EFFECT)
+                                .hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)
                                 && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()))
                 .isEmpty();
 

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "minecraft:iron_shovel"
+  },
+  "addition": {
+    "item": "magnetcraft:magnetic_iron_ingot"
+  },
+  "result": {
+    "item": "magnetcraft:magnetic_iron_shovel"
+  }
+}

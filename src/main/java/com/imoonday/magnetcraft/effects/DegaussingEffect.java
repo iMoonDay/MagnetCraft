@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.effects;
 
-import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.registries.EffectRegistries;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
@@ -23,7 +23,7 @@ public class DegaussingEffect extends StatusEffect {
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
 
-        entity.removeStatusEffect(MagnetCraft.ATTRACT_EFFECT);
+        entity.removeStatusEffect(EffectRegistries.ATTRACT_EFFECT);
 
     }
 }

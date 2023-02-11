@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.events.AttractEvent;
 import com.imoonday.magnetcraft.events.NbtEvent;
+import com.imoonday.magnetcraft.registries.ItemRegistries;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -34,15 +34,15 @@ public abstract class LivingEntityMixin {
             boolean mainhandEnabled = entity.getMainHandStack().getOrCreateNbt().getBoolean("enabled");
             boolean offhandEnabled = entity.getOffHandStack().getOrCreateNbt().getBoolean("enabled");
 
-            boolean mainhandElectromagnet = entity.getMainHandStack().getItem() == MagnetCraft.ELECTROMAGNET_ITEM && mainhandEnabled;
-            boolean mainhandPermanent = entity.getMainHandStack().getItem() == MagnetCraft.PERMANENT_MAGNET_ITEM && mainhandEnabled;
-            boolean mainhandPolar = entity.getMainHandStack().getItem() == MagnetCraft.POLAR_MAGNET_ITEM && mainhandEnabled;
+            boolean mainhandElectromagnet = entity.getMainHandStack().getItem() == ItemRegistries.ELECTROMAGNET_ITEM && mainhandEnabled;
+            boolean mainhandPermanent = entity.getMainHandStack().getItem() == ItemRegistries.PERMANENT_MAGNET_ITEM && mainhandEnabled;
+            boolean mainhandPolar = entity.getMainHandStack().getItem() == ItemRegistries.POLAR_MAGNET_ITEM && mainhandEnabled;
 
             boolean mainhandMagnet = mainhandElectromagnet || mainhandPermanent || mainhandPolar;
 
-            boolean offhandElectromagnet = entity.getOffHandStack().getItem() == MagnetCraft.ELECTROMAGNET_ITEM && offhandEnabled;
-            boolean offhandPermanent = entity.getOffHandStack().getItem() == MagnetCraft.PERMANENT_MAGNET_ITEM && offhandEnabled;
-            boolean offhandPolar = entity.getOffHandStack().getItem() == MagnetCraft.POLAR_MAGNET_ITEM && offhandEnabled;
+            boolean offhandElectromagnet = entity.getOffHandStack().getItem() == ItemRegistries.ELECTROMAGNET_ITEM && offhandEnabled;
+            boolean offhandPermanent = entity.getOffHandStack().getItem() == ItemRegistries.PERMANENT_MAGNET_ITEM && offhandEnabled;
+            boolean offhandPolar = entity.getOffHandStack().getItem() == ItemRegistries.POLAR_MAGNET_ITEM && offhandEnabled;
 
             boolean offhandMagnet = offhandElectromagnet || offhandPermanent || offhandPolar;
 

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "111",
+    "121",
+    "111"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnet_fragment"
+    },
+    "2": {
+      "item": "minecraft:iron_ingot"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:magnetic_iron_ingot"
+  }
+}

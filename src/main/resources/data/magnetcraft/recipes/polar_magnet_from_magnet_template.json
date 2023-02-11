@@ -12,7 +12,7 @@
       "item": "magnetcraft:magnet_template"
     },
     "3": {
-      "item": "minecraft:iron_ingot"
+      "item": "magnetcraft:magnetic_iron_ingot"
     }
   },
   "result": {

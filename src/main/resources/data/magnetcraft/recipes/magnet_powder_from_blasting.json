@@ -1,0 +1,9 @@
+{
+  "type": "minecraft:blasting",
+  "ingredient": {
+    "item": "magnetcraft:magnetic_iron_ingot"
+  },
+  "result": "magnetcraft:magnet_powder",
+  "experience": 0.1,
+  "cookingtime": 100
+}

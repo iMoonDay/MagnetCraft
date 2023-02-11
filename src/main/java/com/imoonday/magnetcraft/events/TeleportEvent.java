@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.events;
 
-import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.registries.CustomStatRegistries;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -68,7 +68,7 @@ public class TeleportEvent {
                                     entity.getPos().getZ());
                         }
                     }
-                    entity.incrementStat(MagnetCraft.ITEMS_TELEPORTED_TO_PLAYER);
+                    entity.incrementStat(CustomStatRegistries.ITEMS_TELEPORTED_TO_PLAYER);
                     entity.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
                 });
         if (!world.isClient) entity.sendMessage(Text.literal(feedback));

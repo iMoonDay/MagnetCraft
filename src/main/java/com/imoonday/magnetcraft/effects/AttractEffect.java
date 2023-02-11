@@ -6,6 +6,7 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Box;
 
 public class AttractEffect extends StatusEffect {
@@ -28,17 +29,19 @@ public class AttractEffect extends StatusEffect {
 
         if (entity instanceof PlayerEntity && entity.isSpectator()) return;
 
-        int dis = 20 + amplifier * 2;
-        if (!entity.getWorld().getOtherEntities(entity, new Box(entity.getPos().getX() + dis,
+        int dis = 20 + amplifier * 2;//药水默认范围
+
+        boolean nobodyAttract = entity.getWorld().getOtherEntities(entity, new Box(entity.getPos().getX() + dis,
                         entity.getPos().getY() + dis,
                         entity.getPos().getZ() + dis,
                         entity.getPos().getX() - dis,
                         entity.getPos().getY() - dis,
                         entity.getPos().getZ() - dis),
                 e -> e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(MagnetCraft.ATTRACT_EFFECT)
-                        && e.distanceTo(entity) <= dis && !e.isSpectator()).isEmpty())
-            return;
-        AttractEvent.attractItems(null,null, entity, false, dis,null);
+                        && e.distanceTo(entity) <= dis && !e.isSpectator()).isEmpty();
+
+        if (!nobodyAttract) return;
+        AttractEvent.attractItems(ItemStack.EMPTY,ItemStack.EMPTY, entity, false, dis,null);
 
     }
 }

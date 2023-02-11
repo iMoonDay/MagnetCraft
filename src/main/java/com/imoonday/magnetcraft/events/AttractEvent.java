@@ -50,7 +50,7 @@ public class AttractEvent {
                                 entity.getPos().getZ() - degaussingDis),
                         e -> (e instanceof LivingEntity && ((LivingEntity) e)
                                 .hasStatusEffect(MagnetCraft.DEGAUSSING_EFFECT)
-                                && e.distanceTo(entity) <= degaussingDis))
+                                && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()))
                 .isEmpty();
 
         if (magnetOff || !canAttract) return;//BUG:客户端和服务端不同步返回

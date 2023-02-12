@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "minecraft:netherite_helmet"
+  },
+  "addition": {
+    "item": "magnetcraft:netherite_magnetic_iron_ingot"
+  },
+  "result": {
+    "item": "magnetcraft:netherite_magnetic_iron_helmet"
+  }
+}

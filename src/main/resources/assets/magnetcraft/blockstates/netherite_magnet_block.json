@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "magnetcraft:block/netherite_magnet_block"
+    }
+  }
+}

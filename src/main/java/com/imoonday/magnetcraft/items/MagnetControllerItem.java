@@ -6,11 +6,13 @@ import com.imoonday.magnetcraft.registries.EffectRegistries;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
@@ -26,8 +28,10 @@ public class MagnetControllerItem extends Item {
 
     public static void register() {
         ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (livingEntity == null) return 1.0F;
-            return livingEntity.getScoreboardTags().contains("MagnetOFF") ? 0.0F : 1.0F;
+
+            if (livingEntity == null || !itemStack.hasNbt()) return 0.0F;
+            return itemStack.getOrCreateNbt().getBoolean("enabled") ? 1.0F : 0.0F;
+
         });
     }
 
@@ -65,7 +69,7 @@ public class MagnetControllerItem extends Item {
 
         boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
 
-        boolean server = !world.isClient;
+        boolean server = !user.world.isClient;
 
         if (user.isSneaking()&&selected) {
 
@@ -101,4 +105,15 @@ public class MagnetControllerItem extends Item {
             register();
         }
     }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
+        super.inventoryTick(stack, world, user, slot, selected);
+
+            NbtCompound nbt = new NbtCompound();
+            nbt.putBoolean("enabled",!user.getScoreboardTags().contains("MagnetOFF"));
+            stack.setNbt(nbt);
+
+    }
 }
+

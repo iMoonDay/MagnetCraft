@@ -6,5 +6,6 @@ import static com.imoonday.magnetcraft.MagnetCraft.MOD_ID;
 
 public class IdentifierRegistries {
     public static final Identifier KEYBINDINGS_PACKET_ID = new Identifier(MOD_ID, "keybindings");
-    public static final Identifier PLAYER_TAG_PACKET_ID = new Identifier(MOD_ID, "player_tag");
+    public static final Identifier GET_OTHER_ENTITIES_PACKET_ID = new Identifier(MOD_ID, "get_other_entities");
+    public static final Identifier USE_CONTROLLER_PACKET_ID = new Identifier(MOD_ID, "use_controller");
 }

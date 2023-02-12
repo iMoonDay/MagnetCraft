@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.keybindings;
 
 import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.registries.EffectRegistries;
 import com.imoonday.magnetcraft.registries.IdentifierRegistries;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
@@ -8,9 +9,11 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.StickyKeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -34,21 +37,26 @@ public class KeyBindings {
                         () -> true));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            ClientPlayerEntity player = client.player;
+            ClientWorld world = client.world;
             PacketByteBuf buf = PacketByteBufs.create();
-            while (attractEnchantmentsSwitch.wasPressed() && client.player != null) {
-                boolean hasController = client.player.getInventory().contains(ItemRegistries.MAGNET_CONTROLLER_ITEM.getDefaultStack());
-                if (hasController) {
-                    buf.writeInt(0);
-                    buf.retain();
-                    ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, buf);
+            while (attractEnchantmentsSwitch.wasPressed() && player != null && world != null) {
+                if (!player.getItemCooldownManager().isCoolingDown(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
+                    for (int i = 0; i < 40; i++) {
+                        if (player.getInventory().getStack(i).isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
+                            MagnetControllerItem.useTask(world, player, null, false);
+                            buf.writeInt(0);
+                            buf.retain();
+                            ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, buf);
+                            break;
+                        }
+                    }
                 }
-//                if (MagnetCraft.TEST_MODE)
-//                    client.player.sendMessage(Text.literal("[调试]" + hasController), false);
             }
 
-            if (StickyKey.isPressed() && client.player != null) {
+            if (StickyKey.isPressed() && player != null) {
                 if (MagnetCraft.TEST_MODE)
-                    client.player.sendMessage(Text.translatable("key.magnetcraft.sticky"), false);
+                    player.sendMessage(Text.translatable("key.magnetcraft.sticky"), false);
                 buf.writeInt(1);
                 buf.retain();
                 ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, buf);
@@ -56,8 +64,8 @@ public class KeyBindings {
         });
     }
 
-    public static void stickyKeyServerTask(ServerPlayerEntity player){
+    public static void stickyKeyServerTask(ServerPlayerEntity player) {
         player.addStatusEffect(new StatusEffectInstance
-                (EffectRegistries.ATTRACT_EFFECT,20,0,false,false,true));
+                (EffectRegistries.ATTRACT_EFFECT, 20, 0, false, false, true));
     }
 }

@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:raw_magnet_block"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:raw_magnet",
+    "count": 9
+  }
+}

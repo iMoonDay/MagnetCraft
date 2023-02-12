@@ -31,9 +31,23 @@ public class ItemGroupRegistries {
                 entries.add(MAGNETIC_IRON_AXE);
                 entries.add(MAGNETIC_IRON_SHOVEL);
                 entries.add(MAGNETIC_IRON_HOE);
+                entries.add(MAGNETIC_IRON_HELMET);
+                entries.add(MAGNETIC_IRON_CHESTPLATE);
+                entries.add(MAGNETIC_IRON_LEGGINGS);
+                entries.add(MAGNETIC_IRON_BOOTS);
                 entries.add(NETHERITE_MAGNETIC_IRON_INGOT);
+                entries.add(NETHERITE_MAGNETIC_IRON_SWORD);
+                entries.add(NETHERITE_MAGNETIC_IRON_PICKAXE);
+                entries.add(NETHERITE_MAGNETIC_IRON_AXE);
+                entries.add(NETHERITE_MAGNETIC_IRON_SHOVEL);
+                entries.add(NETHERITE_MAGNETIC_IRON_HOE);
+                entries.add(NETHERITE_MAGNETIC_IRON_HELMET);
+                entries.add(NETHERITE_MAGNETIC_IRON_CHESTPLATE);
+                entries.add(NETHERITE_MAGNETIC_IRON_LEGGINGS);
+                entries.add(NETHERITE_MAGNETIC_IRON_BOOTS);
                 entries.add(MAGNET_POWDER);
                 entries.add(MAGNET_BLOCK);
+                entries.add(NETHERITE_MAGNET_BLOCK);
                 entries.add(MAGNET_TEMPLATE_ITEM);
                 entries.add(POLAR_MAGNET_ITEM);
                 entries.add(ELECTROMAGNET_ITEM);
@@ -59,6 +73,7 @@ public class ItemGroupRegistries {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(content -> {
             content.addAfter(Items.IRON_BLOCK, MAGNET_BLOCK);
+            content.addAfter(Items.NETHERITE_BLOCK, NETHERITE_MAGNET_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
@@ -67,6 +82,11 @@ public class ItemGroupRegistries {
             content.addAfter(MAGNETIC_IRON_PICKAXE, MAGNETIC_IRON_AXE);
             content.addAfter(MAGNETIC_IRON_AXE, MAGNETIC_IRON_SHOVEL);
             content.addAfter(MAGNETIC_IRON_SHOVEL, MAGNETIC_IRON_HOE);
+            content.addAfter(Items.NETHERITE_HOE, NETHERITE_MAGNETIC_IRON_SHOVEL);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_SHOVEL, NETHERITE_MAGNETIC_IRON_PICKAXE);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_PICKAXE, NETHERITE_MAGNETIC_IRON_AXE);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_AXE, NETHERITE_MAGNETIC_IRON_SHOVEL);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_SHOVEL, NETHERITE_MAGNETIC_IRON_HOE);
             content.add(MAGNET_TEMPLATE_ITEM);
             content.add(POLAR_MAGNET_ITEM);
             content.add(ELECTROMAGNET_ITEM);
@@ -76,6 +96,15 @@ public class ItemGroupRegistries {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
             content.addAfter(Items.IRON_SWORD, MAGNETIC_IRON_SWORD);
+            content.addAfter(Items.NETHERITE_SWORD, NETHERITE_MAGNETIC_IRON_SWORD);
+            content.addAfter(Items.IRON_BOOTS, MAGNETIC_IRON_HELMET);
+            content.addAfter(MAGNETIC_IRON_HELMET, MAGNETIC_IRON_CHESTPLATE);
+            content.addAfter(MAGNETIC_IRON_CHESTPLATE, MAGNETIC_IRON_LEGGINGS);
+            content.addAfter(MAGNETIC_IRON_LEGGINGS, MAGNETIC_IRON_BOOTS);
+            content.addAfter(Items.NETHERITE_BOOTS, NETHERITE_MAGNETIC_IRON_HELMET);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_HELMET, NETHERITE_MAGNETIC_IRON_CHESTPLATE);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_CHESTPLATE, NETHERITE_MAGNETIC_IRON_LEGGINGS);
+            content.addAfter(NETHERITE_MAGNETIC_IRON_LEGGINGS, NETHERITE_MAGNETIC_IRON_BOOTS);
         });
 
     }

@@ -1,13 +1,18 @@
 package com.imoonday.magnetcraft.events;
 
 import com.imoonday.magnetcraft.registries.EffectRegistries;
+import com.imoonday.magnetcraft.registries.IdentifierRegistries;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.*;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +20,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Objects;
 
 public class AttractEvent {
+
+    public static boolean EntityCanAttract = false;
+
     public static void attractItems(@Nullable ItemStack mainhandStack, @Nullable ItemStack offhandStack, LivingEntity entity, boolean selected, double dis, @Nullable String hand) {
 
         boolean magnetOff = entity.getScoreboardTags().contains("MagnetOFF");
@@ -42,19 +50,39 @@ public class AttractEvent {
 
         int degaussingDis = 15;//消磁距离
 
-        boolean canAttract = entity.getWorld().getOtherEntities(null, new Box(
-                                entity.getPos().getX() + degaussingDis,
-                                entity.getPos().getY() + degaussingDis,
-                                entity.getPos().getZ() + degaussingDis,
-                                entity.getPos().getX() - degaussingDis,
-                                entity.getPos().getY() - degaussingDis,
-                                entity.getPos().getZ() - degaussingDis),
-                        e -> (e instanceof LivingEntity && ((LivingEntity) e)
-                                .hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)
-                                && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()))
-                .isEmpty();
+        if (entity instanceof PlayerEntity && entity.getWorld().isClient) {
 
-        if (magnetOff || !canAttract) return;//BUG:客户端和服务端不同步返回
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeInt(degaussingDis);
+            buf.writeDouble(dis);
+            buf.retain();
+            ClientPlayNetworking.send(IdentifierRegistries.GET_OTHER_ENTITIES_PACKET_ID, buf);
+
+        } else {
+
+            EntityCanAttract = entity.getWorld().getOtherEntities(null, new Box(
+                            entity.getPos().getX() + degaussingDis,
+                            entity.getPos().getY() + degaussingDis,
+                            entity.getPos().getZ() + degaussingDis,
+                            entity.getPos().getX() - degaussingDis,
+                            entity.getPos().getY() - degaussingDis,
+                            entity.getPos().getZ() - degaussingDis),
+                    e -> (e instanceof LivingEntity && ((LivingEntity) e)
+                            .hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT))
+                            && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty()
+                    && entity.getWorld().getOtherEntities(entity, new Box(
+                            entity.getPos().getX() + degaussingDis,
+                            entity.getPos().getY() + degaussingDis,
+                            entity.getPos().getZ() + degaussingDis,
+                            entity.getPos().getX() - degaussingDis,
+                            entity.getPos().getY() - degaussingDis,
+                            entity.getPos().getZ() - degaussingDis),
+                    e -> (e instanceof LivingEntity && e.getScoreboardTags().contains("isAttracting")
+                            && e.distanceTo(entity) <= dis && !e.isSpectator())).isEmpty();
+
+        }
+
+        if (magnetOff || !EntityCanAttract) return;//BUG:客户端和服务端不同步返回
 
         if (selected && !equipmentsHasEnch && !offhandHasEnch
                 && mainhandStack == ItemStack.EMPTY

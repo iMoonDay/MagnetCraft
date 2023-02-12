@@ -1,15 +1,17 @@
 package com.imoonday.magnetcraft.registries;
 
+import com.imoonday.magnetcraft.events.AttractEvent;
 import com.imoonday.magnetcraft.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.keybindings.KeyBindings;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 import static com.imoonday.magnetcraft.MagnetCraft.TEST_MODE;
+import static com.imoonday.magnetcraft.registries.IdentifierRegistries.GET_OTHER_ENTITIES_PACKET_ID;
 import static com.imoonday.magnetcraft.registries.IdentifierRegistries.KEYBINDINGS_PACKET_ID;
-import static com.imoonday.magnetcraft.registries.IdentifierRegistries.PLAYER_TAG_PACKET_ID;
 
 public class GlobalReceiverRegistries {
     public static void register() {
@@ -31,8 +33,29 @@ public class GlobalReceiverRegistries {
             buf.release();
         }));
 
-        ClientPlayNetworking.registerGlobalReceiver(PLAYER_TAG_PACKET_ID, (client, handler, buf, responseSender) -> client.execute(() -> {
-
+        ServerPlayNetworking.registerGlobalReceiver(GET_OTHER_ENTITIES_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            int degaussingDis = buf.readInt();
+            double dis = buf.readDouble();
+            AttractEvent.EntityCanAttract = player.getWorld().getOtherEntities(null, new Box(
+                            player.getPos().getX() + degaussingDis,
+                            player.getPos().getY() + degaussingDis,
+                            player.getPos().getZ() + degaussingDis,
+                            player.getPos().getX() - degaussingDis,
+                            player.getPos().getY() - degaussingDis,
+                            player.getPos().getZ() - degaussingDis),
+                    e -> (e instanceof LivingEntity && ((LivingEntity) e)
+                            .hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)
+                            && e.distanceTo(player) <= degaussingDis && !e.isSpectator())).isEmpty()
+                    && player.getWorld().getOtherEntities(player, new Box(
+                            player.getPos().getX() + degaussingDis,
+                            player.getPos().getY() + degaussingDis,
+                            player.getPos().getZ() + degaussingDis,
+                            player.getPos().getX() - degaussingDis,
+                            player.getPos().getY() - degaussingDis,
+                            player.getPos().getZ() - degaussingDis),
+                    e -> (e instanceof LivingEntity && e.getScoreboardTags().contains("isAttracting")
+                            && e.distanceTo(player) <= dis && !e.isSpectator())).isEmpty();
+            buf.release();
         }));
     }
 }

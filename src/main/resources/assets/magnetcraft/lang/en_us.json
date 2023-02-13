@@ -34,6 +34,8 @@
   "item.magnetcraft.netherite_magnetic_iron_chestplate": "Netherite Magnetic Iron Chestplate",
   "item.magnetcraft.netherite_magnetic_iron_leggings": "Netherite Magnetic Iron Leggings",
   "item.magnetcraft.netherite_magnetic_iron_boots": "Netherite Magnetic Iron Boots",
+  "item.magnetcraft.magnetic_armor.tooltip": "Magnet set effect: Attract range * 1.5",
+  "item.magnetcraft.netherite_magnetic_armor.tooltip": "Netherite Magnet set effect: Attract range * 2",
   "item.minecraft.potion.effect.attract": "Potion of Attract",
   "item.minecraft.splash_potion.effect.attract": "Splash Potion of Attract",
   "item.minecraft.lingering_potion.effect.attract": "Lingering Potion of Attract",

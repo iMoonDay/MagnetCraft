@@ -1,9 +1,10 @@
 package com.imoonday.magnetcraft.items;
 
-import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.events.NbtEvent;
 import com.imoonday.magnetcraft.registries.EffectRegistries;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -22,6 +23,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class MagnetControllerItem extends Item {
+    
     public MagnetControllerItem(Settings settings) {
         super(settings);
     }
@@ -45,7 +47,7 @@ public class MagnetControllerItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        useTask(world, user, hand,true);
+        useTask(user, hand,true);
         return super.use(world, user, hand);
     }
 
@@ -54,7 +56,9 @@ public class MagnetControllerItem extends Item {
         return ActionResult.PASS;
     }
 
-    public static void useTask(World world, PlayerEntity user, @Nullable Hand hand, boolean selected) {
+    public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
+
+        boolean debugMode = AutoConfig.getConfigHolder(ModConfig.class).getConfig().debugMode;
 
         boolean creative = user.isCreative();
 
@@ -95,11 +99,11 @@ public class MagnetControllerItem extends Item {
             if (user.getScoreboardTags().contains("MagnetOFF")) {
                 user.removeScoreboardTag("MagnetOFF");
                 user.playSound(SoundEvents.BLOCK_BEACON_ACTIVATE, 1, 1);
-                if (server && MagnetCraft.TEST_MODE) user.sendMessage(Text.literal("[调试] 所有磁铁:开"));
+                if (server && debugMode) user.sendMessage(Text.literal("[调试] 所有磁铁:开"));
             } else {
                 user.addScoreboardTag("MagnetOFF");
                 user.playSound(SoundEvents.BLOCK_BEACON_DEACTIVATE, 1, 1);
-                if (server && MagnetCraft.TEST_MODE) user.sendMessage(Text.literal("[调试] 所有磁铁:关"));
+                if (server && debugMode) user.sendMessage(Text.literal("[调试] 所有磁铁:关"));
             }
             user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
             register();

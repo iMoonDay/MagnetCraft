@@ -1,3 +1,4 @@
+//file:noinspection GroovyAssignabilityCheck
 plugins {
     id 'fabric-loom' version '1.1.8'
     id 'maven-publish'
@@ -27,6 +28,7 @@ dependencies {
     modApi("me.shedaniel.cloth:cloth-config-fabric:9.0.94") {
         exclude(group: "net.fabricmc.fabric-api")
     }
+    modApi "com.terraformersmc:modmenu:5.0.2"
 }
 
 processResources {

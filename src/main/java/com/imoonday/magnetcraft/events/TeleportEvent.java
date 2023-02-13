@@ -1,6 +1,8 @@
 package com.imoonday.magnetcraft.events;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.CustomStatRegistries;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -14,13 +16,15 @@ public class TeleportEvent {
 
     public static void teleportItems(World world, PlayerEntity entity, double dis, Hand hand) {
 
+        ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+
         boolean emptyDamage = NbtEvent.checkEmptyDamage(entity, hand);
         boolean mainhand = hand == Hand.MAIN_HAND;
 
         String feedback;
 
         if (emptyDamage) return;
-        if (mainhand) dis += 5;//主副手范围差距
+        if (mainhand) dis += config.value.magnetHandSpacing;//主副手范围差距
 
         double finalDis = dis;
 

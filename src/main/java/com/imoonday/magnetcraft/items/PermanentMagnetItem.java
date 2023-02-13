@@ -1,8 +1,10 @@
 package com.imoonday.magnetcraft.items;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.events.NbtEvent;
 import com.imoonday.magnetcraft.events.TeleportEvent;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -44,9 +46,11 @@ public class PermanentMagnetItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
 
+        ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+
         boolean sneaking = user.isSneaking();
 
-        int dis = 25;//副手传送距离 主手+5
+        int dis = config.value.permanentMagnetTeleportMinDis;//副手传送距离 主手+5
 
         if (sneaking) NbtEvent.enabledSwitch(world, user, hand);//潜行
         else TeleportEvent.teleportItems(world, user, dis, hand);//站立

@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.events;
 
-import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.config.ModConfig;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,6 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 
 public class NbtEvent {
+
+    static boolean debugMode = AutoConfig.getConfigHolder(ModConfig.class).getConfig().debugMode;
+    
     public static void enabledSwitch(World world, PlayerEntity player, Hand hand) {
 
         boolean mainhand = player.getMainHandStack().getOrCreateNbt().getBoolean("enabled");
@@ -30,11 +34,11 @@ public class NbtEvent {
             mainhand = player.getMainHandStack().getOrCreateNbt().getBoolean("enabled");
             if (mainhand) {
                 if (client) player.playSound(SoundEvents.BLOCK_BEACON_ACTIVATE, 1, 1);
-                if (!client && MagnetCraft.TEST_MODE) player.sendMessage(Text.literal("[调试] 主手磁铁:开"));
+                if (!client && debugMode) player.sendMessage(Text.literal("[调试] 主手磁铁:开"));
             }
             if (!mainhand) {
                 if (client) player.playSound(SoundEvents.BLOCK_BEACON_DEACTIVATE, 1, 1);
-                if (!client && MagnetCraft.TEST_MODE) player.sendMessage(Text.literal("[调试] 主手磁铁:关"));
+                if (!client && debugMode) player.sendMessage(Text.literal("[调试] 主手磁铁:关"));
             }
 //            if (!client) player.sendMessage(Text.literal(String.valueOf(player.getMainHandStack().getOrCreateNbt().getBoolean("enabled"))));
         } else {
@@ -44,11 +48,11 @@ public class NbtEvent {
             offhand = player.getOffHandStack().getOrCreateNbt().getBoolean("enabled");
             if (offhand) {
                 if (client) player.playSound(SoundEvents.BLOCK_BEACON_ACTIVATE, 1, 1);
-                if (!client && MagnetCraft.TEST_MODE) player.sendMessage(Text.literal("[调试] 副手磁铁:开"));
+                if (!client && debugMode) player.sendMessage(Text.literal("[调试] 副手磁铁:开"));
             }
             if (!offhand) {
                 if (client) player.playSound(SoundEvents.BLOCK_BEACON_DEACTIVATE, 1, 1);
-                if (!client && MagnetCraft.TEST_MODE) player.sendMessage(Text.literal("[调试] 副手磁铁:关"));
+                if (!client && debugMode) player.sendMessage(Text.literal("[调试] 副手磁铁:关"));
             }
         }
     }
@@ -62,7 +66,7 @@ public class NbtEvent {
             NbtCompound nbt = new NbtCompound();
             nbt.putBoolean("enabled", true);
             player.getInventory().getStack(slot).setNbt(nbt);
-            if (!client && MagnetCraft.TEST_MODE)
+            if (!client && debugMode)
                 player.sendMessage(Text.literal("[调试] 背包磁铁:初始化"));
         }
     }

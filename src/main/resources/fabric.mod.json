@@ -17,6 +17,9 @@
     ],
     "main": [
       "com.imoonday.magnetcraft.MagnetCraft"
+    ],
+    "modmenu": [
+      "com.imoonday.magnetcraft.config.ModMenuIntegration"
     ]
   },
   "mixins": [

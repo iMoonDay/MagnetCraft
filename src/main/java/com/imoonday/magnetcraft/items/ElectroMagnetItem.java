@@ -1,8 +1,10 @@
 package com.imoonday.magnetcraft.items;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.events.NbtEvent;
 import com.imoonday.magnetcraft.events.TeleportEvent;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -44,10 +46,12 @@ public class ElectroMagnetItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
 
+        ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+
         boolean sneaking = user.isSneaking();
         boolean emptyDamage = NbtEvent.checkEmptyDamage(user,hand);
 
-        int dis = 15;//副手传送距离 主手+5
+        int dis = config.value.electromagnetTeleportMinDis;//副手传送距离 主手+5
 
         if (sneaking) NbtEvent.enabledSwitch(world, user, hand);
         else {

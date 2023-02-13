@@ -1,10 +1,11 @@
 package com.imoonday.magnetcraft.keybindings;
 
-import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.registries.EffectRegistries;
 import com.imoonday.magnetcraft.registries.IdentifierRegistries;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -44,7 +45,7 @@ public class KeyBindings {
                 if (!player.getItemCooldownManager().isCoolingDown(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
                     for (int i = 0; i < 40; i++) {
                         if (player.getInventory().getStack(i).isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
-                            MagnetControllerItem.useTask(world, player, null, false);
+                            MagnetControllerItem.useTask(player, null, false);
                             buf.writeInt(0);
                             buf.retain();
                             ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, buf);
@@ -55,7 +56,8 @@ public class KeyBindings {
             }
 
             if (StickyKey.isPressed() && player != null) {
-                if (MagnetCraft.TEST_MODE)
+                boolean debugMode = AutoConfig.getConfigHolder(ModConfig.class).getConfig().debugMode;
+                if (debugMode)
                     player.sendMessage(Text.translatable("key.magnetcraft.sticky"), false);
                 buf.writeInt(1);
                 buf.retain();

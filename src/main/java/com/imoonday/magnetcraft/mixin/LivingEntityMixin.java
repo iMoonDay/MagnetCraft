@@ -1,9 +1,12 @@
 package com.imoonday.magnetcraft.mixin;
 
+//import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.events.AttractEvent;
 import com.imoonday.magnetcraft.events.NbtEvent;
 import com.imoonday.magnetcraft.registries.EffectRegistries;
 import com.imoonday.magnetcraft.registries.ItemRegistries;
+import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
@@ -17,7 +20,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class LivingEntityMixin {
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
-    public void checkEquipmentAttractEnchantments(CallbackInfo info) {
+    public void checkAttract(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity != null) {
             World world = ((LivingEntity) (Object) this).getWorld();
@@ -25,23 +28,31 @@ public abstract class LivingEntityMixin {
                 return;
 
             //数值设置
-            int[] minDis = new int[]{10, 30, 20};//电磁铁,永磁铁,无极磁铁最小范围
-            int magnetHandSpacing = 5;//手持范围差距
-            int enchDefaultDis = 10;//附魔初始范围
-            int disPerLvl = 2;//附魔每级提升的范围
+            ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+            int[] minDis = new int[]{config.value.electromagnetAttractMinDis,config.value.permanentMagnetAttractMinDis,config.value.polarMagnetAttractMinDis};//电磁铁,永磁铁,无极磁铁最小范围
+            int magnetHandSpacing = config.value.magnetHandSpacing;//手持范围差距
+            int enchDefaultDis = config.value.enchDefaultDis;//附魔初始范围
+            int disPerLvl = config.value.disPerLvl;//附魔每级提升的范围
 
-            boolean mainhandEnabled = entity.getMainHandStack().getOrCreateNbt().getBoolean("enabled");
-            boolean offhandEnabled = entity.getOffHandStack().getOrCreateNbt().getBoolean("enabled");
+            ItemStack head = entity.getEquippedStack(EquipmentSlot.HEAD);
+            ItemStack chest = entity.getEquippedStack(EquipmentSlot.CHEST);
+            ItemStack feet = entity.getEquippedStack(EquipmentSlot.FEET);
+            ItemStack legs = entity.getEquippedStack(EquipmentSlot.LEGS);
+            ItemStack mainhand = entity.getEquippedStack(EquipmentSlot.MAINHAND);
+            ItemStack offhand = entity.getEquippedStack(EquipmentSlot.OFFHAND);
 
-            boolean mainhandElectromagnet = entity.getMainHandStack().getItem() == ItemRegistries.ELECTROMAGNET_ITEM && mainhandEnabled;
-            boolean mainhandPermanent = entity.getMainHandStack().getItem() == ItemRegistries.PERMANENT_MAGNET_ITEM && mainhandEnabled;
-            boolean mainhandPolar = entity.getMainHandStack().getItem() == ItemRegistries.POLAR_MAGNET_ITEM && mainhandEnabled;
+            boolean mainhandEnabled = mainhand.getOrCreateNbt().getBoolean("enabled");
+            boolean offhandEnabled = offhand.getOrCreateNbt().getBoolean("enabled");
+
+            boolean mainhandElectromagnet = mainhand.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && mainhandEnabled;
+            boolean mainhandPermanent = mainhand.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && mainhandEnabled;
+            boolean mainhandPolar = mainhand.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && mainhandEnabled;
 
             boolean mainhandMagnet = mainhandElectromagnet || mainhandPermanent || mainhandPolar;
 
-            boolean offhandElectromagnet = entity.getOffHandStack().getItem() == ItemRegistries.ELECTROMAGNET_ITEM && offhandEnabled;
-            boolean offhandPermanent = entity.getOffHandStack().getItem() == ItemRegistries.PERMANENT_MAGNET_ITEM && offhandEnabled;
-            boolean offhandPolar = entity.getOffHandStack().getItem() == ItemRegistries.POLAR_MAGNET_ITEM && offhandEnabled;
+            boolean offhandElectromagnet = offhand.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && offhandEnabled;
+            boolean offhandPermanent = offhand.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && offhandEnabled;
+            boolean offhandPolar = offhand.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && offhandEnabled;
 
             boolean offhandMagnet = offhandElectromagnet || offhandPermanent || offhandPolar;
 
@@ -62,15 +73,15 @@ public abstract class LivingEntityMixin {
 
             boolean isAttracting = (hasEnch || handMagnet || hasEffect) && !hasTag;
 
-            boolean hasMagneticIronHelmet = entity.getEquippedStack(EquipmentSlot.HEAD).isOf(ItemRegistries.MAGNETIC_IRON_HELMET);
-            boolean hasMagneticIronChestcplate = entity.getEquippedStack(EquipmentSlot.CHEST).isOf(ItemRegistries.MAGNETIC_IRON_CHESTPLATE);
-            boolean hasMagneticIronLeggings = entity.getEquippedStack(EquipmentSlot.LEGS).isOf(ItemRegistries.MAGNETIC_IRON_LEGGINGS);
-            boolean hasMagneticIronBoots = entity.getEquippedStack(EquipmentSlot.FEET).isOf(ItemRegistries.MAGNETIC_IRON_BOOTS);
+            boolean hasMagneticIronHelmet = head.isOf(ItemRegistries.MAGNETIC_IRON_HELMET);
+            boolean hasMagneticIronChestcplate = chest.isOf(ItemRegistries.MAGNETIC_IRON_CHESTPLATE);
+            boolean hasMagneticIronLeggings = feet.isOf(ItemRegistries.MAGNETIC_IRON_LEGGINGS);
+            boolean hasMagneticIronBoots = legs.isOf(ItemRegistries.MAGNETIC_IRON_BOOTS);
 
-            boolean hasNetheriteMagneticIronHelmet = entity.getEquippedStack(EquipmentSlot.HEAD).isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_HELMET);
-            boolean hasNetheriteMagneticIronChestcplate = entity.getEquippedStack(EquipmentSlot.CHEST).isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_CHESTPLATE);
-            boolean hasNetheriteMagneticIronLeggings = entity.getEquippedStack(EquipmentSlot.LEGS).isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_LEGGINGS);
-            boolean hasNetheriteMagneticIronBoots = entity.getEquippedStack(EquipmentSlot.FEET).isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
+            boolean hasNetheriteMagneticIronHelmet = head.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_HELMET);
+            boolean hasNetheriteMagneticIronChestcplate = chest.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_CHESTPLATE);
+            boolean hasNetheriteMagneticIronLeggings = feet.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_LEGGINGS);
+            boolean hasNetheriteMagneticIronBoots = legs.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
 
             boolean hasMagneticIronSuit = hasMagneticIronHelmet && hasMagneticIronChestcplate && hasMagneticIronLeggings && hasMagneticIronBoots;
             boolean hasNetheriteMagneticIronSuit = hasNetheriteMagneticIronHelmet && hasNetheriteMagneticIronChestcplate && hasNetheriteMagneticIronLeggings && hasNetheriteMagneticIronBoots;

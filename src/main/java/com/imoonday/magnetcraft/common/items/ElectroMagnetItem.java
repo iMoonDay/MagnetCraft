@@ -30,14 +30,12 @@ public class ElectroMagnetItem extends Item {
         });
     }
 
-//    @Override
-//    public ItemStack getDefaultStack() {
-//        ItemStack stack = new ItemStack(this);
-//        NbtCompound nbt = new NbtCompound();
-//        nbt.putBoolean("enabled", true);
-//        stack.setNbt(nbt);
-//        return stack;
-//    }
+    @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putBoolean("enabled",true);
+        return stack;
+    }
 
     @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
@@ -76,7 +74,7 @@ public class ElectroMagnetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
 
-        NbtClassMethod.enabledCheck(stack);
+//        NbtClassMethod.enabledCheck(stack);
 
     }
 
@@ -84,4 +82,11 @@ public class ElectroMagnetItem extends Item {
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         return ActionResult.PASS;
     }
+
+    public static ItemStack getStack() {
+        ItemStack stack = new ItemStack(ItemRegistries.ELECTROMAGNET_ITEM);
+        stack.getOrCreateNbt().putBoolean("enabled",true);
+        return stack;
+    }
+
 }

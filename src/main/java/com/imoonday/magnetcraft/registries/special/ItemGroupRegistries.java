@@ -54,11 +54,11 @@ public class ItemGroupRegistries {
                 entries.add(PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
                 entries.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
                 entries.add(MAGNET_TEMPLATE_ITEM);
-                entries.add(POLAR_MAGNET_ITEM);
-                entries.add(ELECTROMAGNET_ITEM);
-                entries.add(PERMANENT_MAGNET_ITEM);
-                entries.add(CREATURE_MAGNET_ITEM);
-                entries.add(MAGNET_CONTROLLER_ITEM);
+                entries.add(POLAR_MAGNET_ITEM.getDefaultStack());
+                entries.add(ELECTROMAGNET_ITEM.getDefaultStack());
+                entries.add(PERMANENT_MAGNET_ITEM.getDefaultStack());
+                entries.add(CREATURE_MAGNET_ITEM.getDefaultStack());
+                entries.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             }).build();
 
     public static void register(){
@@ -99,11 +99,11 @@ public class ItemGroupRegistries {
             content.add(PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(MAGNET_TEMPLATE_ITEM);
-            content.add(POLAR_MAGNET_ITEM);
-            content.add(ELECTROMAGNET_ITEM);
-            content.add(PERMANENT_MAGNET_ITEM);
-            content.add(CREATURE_MAGNET_ITEM);
-            content.add(MAGNET_CONTROLLER_ITEM);
+            content.add(POLAR_MAGNET_ITEM.getDefaultStack());
+            content.add(ELECTROMAGNET_ITEM.getDefaultStack());
+            content.add(PERMANENT_MAGNET_ITEM.getDefaultStack());
+            content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
+            content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {

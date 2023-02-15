@@ -16,7 +16,7 @@ public class CraftingModuleItem extends Item {
 
 //    @Override
 //    public ItemStack getDefaultStack() {
-//        ItemStack stack = super.getDefaultStack();
+//        ItemStack stack = new ItemStack(this);
 //        NbtCompound nbt = new NbtCompound();
 //        nbt.putString("Module", "Empty");
 //        stack.setNbt(nbt);

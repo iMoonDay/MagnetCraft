@@ -28,6 +28,13 @@ public class CreatureMagnetItem extends Item {
     }
 
     @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putBoolean("enabled",true);
+        return stack;
+    }
+
+    @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
         NbtClassMethod.enabledSet(stack);
         NbtClassMethod.usedTickSet(stack);

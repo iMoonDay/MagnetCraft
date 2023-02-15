@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.materials;
+package com.imoonday.magnetcraft.common.items.materials;
 
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.EquipmentSlot;

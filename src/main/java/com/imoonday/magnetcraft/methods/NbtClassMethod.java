@@ -29,9 +29,7 @@ public class NbtClassMethod {
         double dis = ModConfig.getConfig().value.creatureMagnetAttractDis;
 
         if (hand == Hand.MAIN_HAND) {
-            NbtCompound nbt = player.getMainHandStack().getOrCreateNbt();
-            nbt.putBoolean("enabled", !mainhand);
-            player.getMainHandStack().setNbt(nbt);
+            player.getMainHandStack().getOrCreateNbt().putBoolean("enabled", !mainhand);
             mainhand = player.getMainHandStack().getOrCreateNbt().getBoolean("enabled");
             if (mainhand) {
                 if (client) {
@@ -62,9 +60,7 @@ public class NbtClassMethod {
                 }
             }
         } else {
-            NbtCompound nbt = player.getOffHandStack().getOrCreateNbt();
-            nbt.putBoolean("enabled", !offhand);
-            player.getOffHandStack().setNbt(nbt);
+            player.getOffHandStack().getOrCreateNbt().putBoolean("enabled", !offhand);
             offhand = player.getOffHandStack().getOrCreateNbt().getBoolean("enabled");
             if (offhand) {
                 if (client) {
@@ -104,9 +100,7 @@ public class NbtClassMethod {
     }
 
     public static void enabledSet(ItemStack stack) {
-        NbtCompound nbt = stack.getOrCreateNbt();
-        nbt.putBoolean("enabled", true);
-        stack.setNbt(nbt);
+        stack.getOrCreateNbt().putBoolean("enabled", true);
     }
 
     public static void usedTickCheck(ItemStack stack) {
@@ -116,9 +110,7 @@ public class NbtClassMethod {
     }
 
     public static void usedTickSet(ItemStack stack) {
-        NbtCompound nbt = stack.getOrCreateNbt();
-        nbt.putInt("usedTick", 0);
-        stack.setNbt(nbt);
+        stack.getOrCreateNbt().putInt("usedTick", 0);
     }
 
     public static void addDamage(LivingEntity user, Hand hand, int damage) {

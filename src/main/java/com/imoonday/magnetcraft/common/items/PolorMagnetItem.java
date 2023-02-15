@@ -27,14 +27,12 @@ public class PolorMagnetItem extends Item {
         });
     }
 
-//    @Override
-//    public ItemStack getDefaultStack() {
-//        ItemStack stack=super.getDefaultStack();
-//        NbtCompound nbt = new NbtCompound();
-//        nbt.putBoolean("enabled",true);
-//        stack.setNbt(nbt);
-//        return stack;
-//    }
+    @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putBoolean("enabled",true);
+        return stack;
+    }
 
     @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {

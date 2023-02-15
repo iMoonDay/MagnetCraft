@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "324",
+    " 5 "
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:diamond"
+    },
+    "2": {
+      "item": "magnetcraft:empty_crafting_module"
+    },
+    "3": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "4": {
+      "item": "minecraft:redstone"
+    },
+    "5": {
+      "item": "minecraft:ender_pearl"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:electromagnet_crafting_module",
+    "count": 1
+  }
+}

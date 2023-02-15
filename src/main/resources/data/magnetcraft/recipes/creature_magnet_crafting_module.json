@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "324",
+    " 5 "
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:golden_apple"
+    },
+    "2": {
+      "item": "magnetcraft:empty_crafting_module"
+    },
+    "3": {
+      "item": "minecraft:golden_carrot"
+    },
+    "4": {
+      "item": "minecraft:glistering_melon_slice"
+    },
+    "5": {
+      "item": "minecraft:honey_bottle"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:creature_magnet_crafting_module",
+    "count": 1
+  }
+}

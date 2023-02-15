@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.registries.ItemRegistries;
-import com.imoonday.magnetcraft.registries.PotionRegistries;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
+import com.imoonday.magnetcraft.registries.common.PotionRegistries;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;

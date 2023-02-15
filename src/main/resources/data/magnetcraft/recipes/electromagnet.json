@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "magnetcraft:magnet_template"
+  },
+  "addition": {
+    "item": "magnetcraft:electromagnet_crafting_module"
+  },
+  "result": {
+    "item": "magnetcraft:electromagnet",
+    "count": 1
+  }
+}

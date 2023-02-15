@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "323",
+    " 4 "
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:netherite_magnetic_iron_ingot"
+    },
+    "2": {
+      "item": "magnetcraft:empty_crafting_module"
+    },
+    "3": {
+      "item": "minecraft:diamond"
+    },
+    "4": {
+      "item": "minecraft:ender_pearl"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:permanent_magnet_crafting_module",
+    "count": 1
+  }
+}

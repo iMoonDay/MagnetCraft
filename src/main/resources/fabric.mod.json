@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "magnetcraft",
   "version": "${version}",
-  "name": "MagnetCraft",
+  "name": "Magnet Craft",
   "description": "Magnet Craft Mod",
   "authors": [
     "iMoonDay"

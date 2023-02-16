@@ -8,12 +8,14 @@ import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -33,7 +35,7 @@ public class ElectroMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled",true);
+        stack.getOrCreateNbt().putBoolean("enabled", true);
         return stack;
     }
 
@@ -52,17 +54,17 @@ public class ElectroMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-
         ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-
         boolean sneaking = user.isSneaking();
         boolean emptyDamage = NbtClassMethod.checkEmptyDamage(user, hand);
-
-        double dis = config.value.electromagnetTeleportMinDis;//副手传送距离 主手+5
-
-        if (sneaking) NbtClassMethod.enabledSwitch(world, user, hand);
-        else {
-            if (emptyDamage) return super.use(world, user, hand);
+        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        double dis = config.value.electromagnetTeleportMinDis;
+        if (sneaking) {
+            if (!enableSneakToSwitch) {
+                return super.use(world, user, hand);
+            }
+            NbtClassMethod.enabledSwitch(world, user, hand);
+        } else if (!emptyDamage) {
             NbtClassMethod.addDamage(user, hand, 1);
             TeleportMethod.teleportItems(world, user, dis, hand);
         }
@@ -73,19 +75,12 @@ public class ElectroMagnetItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-
-//        NbtClassMethod.enabledCheck(stack);
-
-    }
-
-    @Override
-    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        return ActionResult.PASS;
+        NbtClassMethod.enabledCheck(stack);
     }
 
     public static ItemStack getStack() {
         ItemStack stack = new ItemStack(ItemRegistries.ELECTROMAGNET_ITEM);
-        stack.getOrCreateNbt().putBoolean("enabled",true);
+        stack.getOrCreateNbt().putBoolean("enabled", true);
         return stack;
     }
 

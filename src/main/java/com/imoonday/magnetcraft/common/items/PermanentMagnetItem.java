@@ -35,7 +35,7 @@ public class PermanentMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled",true);
+        stack.getOrCreateNbt().putBoolean("enabled", true);
         return stack;
     }
 
@@ -54,15 +54,18 @@ public class PermanentMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-
         ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-
         boolean sneaking = user.isSneaking();
-
-        double dis = config.value.permanentMagnetTeleportMinDis;//副手传送距离 主手+5
-
-        if (sneaking) NbtClassMethod.enabledSwitch(world, user, hand);//潜行
-        else TeleportMethod.teleportItems(world, user, dis, hand);//站立
+        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        double dis = config.value.permanentMagnetTeleportMinDis;
+        if (sneaking) {
+            if (!enableSneakToSwitch) {
+                return super.use(world, user, hand);
+            }
+            NbtClassMethod.enabledSwitch(world, user, hand);
+        } else {
+            TeleportMethod.teleportItems(world, user, dis, hand);
+        }
         user.getItemCooldownManager().set(this, 10);
         return super.use(world, user, hand);
     }
@@ -70,9 +73,7 @@ public class PermanentMagnetItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-
         NbtClassMethod.enabledCheck(stack);
-
     }
 
 }

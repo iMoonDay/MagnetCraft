@@ -17,9 +17,7 @@ public class MagnetCraft implements ModInitializer {
 
     @Override
     public void onInitialize() {
-
         ModConfig.register();
-
         ItemRegistries.register();
         BlockRegistries.register();
         EffectRegistries.register();
@@ -28,6 +26,5 @@ public class MagnetCraft implements ModInitializer {
         ItemGroupRegistries.register();
         GlobalReceiverRegistries.register();
         CustomStatRegistries.register();
-
     }
 }

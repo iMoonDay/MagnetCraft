@@ -17,17 +17,11 @@ public static final Block MAGNETITE_BLOCK = new Block(FabricBlockSettings.copy(B
     public static final Block NETHERITE_MAGNET_BLOCK = new Block(FabricBlockSettings.copy(Blocks.NETHERITE_BLOCK));
     public static final Block RAW_MAGNET_BLOCK = new Block(FabricBlockSettings.copy(Blocks.RAW_IRON_BLOCK));
 
-    public static void register(){
-        Registry.register(Registries.BLOCK, new Identifier(
-                MOD_ID, "magnetite"), MAGNETITE_BLOCK);
-        Registry.register(Registries.BLOCK, new Identifier(
-                MOD_ID, "deepslate_magnetite"), DEEPSLATE_MAGNETITE_BLOCK);
-        Registry.register(Registries.BLOCK, new Identifier(
-                MOD_ID, "magnet_block"), MAGNET_BLOCK);
-        Registry.register(Registries.BLOCK, new Identifier(
-                MOD_ID, "netherite_magnet_block"), NETHERITE_MAGNET_BLOCK);
-        Registry.register(Registries.BLOCK, new Identifier(
-                MOD_ID, "raw_magnet_block"), RAW_MAGNET_BLOCK);
-
+    public static void register() {
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "magnetite"), MAGNETITE_BLOCK);
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "deepslate_magnetite"), DEEPSLATE_MAGNETITE_BLOCK);
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "magnet_block"), MAGNET_BLOCK);
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "netherite_magnet_block"), NETHERITE_MAGNET_BLOCK);
+        Registry.register(Registries.BLOCK, new Identifier(MOD_ID, "raw_magnet_block"), RAW_MAGNET_BLOCK);
     }
 }

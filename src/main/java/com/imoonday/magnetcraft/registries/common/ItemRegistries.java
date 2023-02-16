@@ -61,92 +61,51 @@ public class ItemRegistries {
     public static final Item NETHERITE_MAGNETIC_IRON_BOOTS = new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.FEET, new Item.Settings().fireproof());
 
     public static void register() {
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "raw_magnet"), RAW_MAGNET_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnet_fragment"), MAGNET_FRAGMENT_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_ingot"), MAGNETIC_IRON_INGOT);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_ingot"), NETHERITE_MAGNETIC_IRON_INGOT);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnet_powder"), MAGNET_POWDER);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnet_template"), MAGNET_TEMPLATE_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "empty_crafting_module"), EMPTY_CRAFTING_MODULE_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "electromagnet_crafting_module"), ELECTROMAGNET_CRAFTING_MODULE_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "permanent_magnet_crafting_module"), PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "polar_magnet_crafting_module"), POLAR_MAGNET_CRAFTING_MODULE_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "creature_magnet_crafting_module"), CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "raw_magnet"), RAW_MAGNET_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnet_fragment"), MAGNET_FRAGMENT_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_ingot"), MAGNETIC_IRON_INGOT);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_ingot"), NETHERITE_MAGNETIC_IRON_INGOT);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnet_powder"), MAGNET_POWDER);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnet_template"), MAGNET_TEMPLATE_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "empty_crafting_module"), EMPTY_CRAFTING_MODULE_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "electromagnet_crafting_module"), ELECTROMAGNET_CRAFTING_MODULE_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "permanent_magnet_crafting_module"), PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "polar_magnet_crafting_module"), POLAR_MAGNET_CRAFTING_MODULE_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "creature_magnet_crafting_module"), CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "polar_magnet"), POLAR_MAGNET_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "electromagnet"), ELECTROMAGNET_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "permanent_magnet"), PERMANENT_MAGNET_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "creature_magnet"), CREATURE_MAGNET_ITEM);
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "polar_magnet"), POLAR_MAGNET_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "electromagnet"), ELECTROMAGNET_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "permanent_magnet"), PERMANENT_MAGNET_ITEM);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "creature_magnet"), CREATURE_MAGNET_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnet_controller"), MAGNET_CONTROLLER_ITEM);
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnet_controller"), MAGNET_CONTROLLER_ITEM);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetite"), new BlockItem(MAGNETITE_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "deepslate_magnetite"), new BlockItem(DEEPSLATE_MAGNETITE_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnet_block"), new BlockItem(MAGNET_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnet_block"), new BlockItem(NETHERITE_MAGNET_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "raw_magnet_block"), new BlockItem(RAW_MAGNET_BLOCK, new FabricItemSettings()));
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetite"), new BlockItem(MAGNETITE_BLOCK, new FabricItemSettings()));
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "deepslate_magnetite"), new BlockItem(DEEPSLATE_MAGNETITE_BLOCK, new FabricItemSettings()));
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnet_block"), new BlockItem(MAGNET_BLOCK, new FabricItemSettings()));
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnet_block"), new BlockItem(NETHERITE_MAGNET_BLOCK, new FabricItemSettings()));
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "raw_magnet_block"), new BlockItem(RAW_MAGNET_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_sword"), MAGNETIC_IRON_SWORD);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_pickaxe"), MAGNETIC_IRON_PICKAXE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_axe"), MAGNETIC_IRON_AXE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_shovel"), MAGNETIC_IRON_SHOVEL);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_hoe"), MAGNETIC_IRON_HOE);
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_sword"), MAGNETIC_IRON_SWORD);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_pickaxe"), MAGNETIC_IRON_PICKAXE);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_axe"), MAGNETIC_IRON_AXE);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_shovel"), MAGNETIC_IRON_SHOVEL);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_hoe"), MAGNETIC_IRON_HOE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_sword"), NETHERITE_MAGNETIC_IRON_SWORD);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_pickaxe"), NETHERITE_MAGNETIC_IRON_PICKAXE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_axe"), NETHERITE_MAGNETIC_IRON_AXE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_shovel"), NETHERITE_MAGNETIC_IRON_SHOVEL);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_hoe"), NETHERITE_MAGNETIC_IRON_HOE);
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_sword"), NETHERITE_MAGNETIC_IRON_SWORD);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_pickaxe"), NETHERITE_MAGNETIC_IRON_PICKAXE);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_axe"), NETHERITE_MAGNETIC_IRON_AXE);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_shovel"), NETHERITE_MAGNETIC_IRON_SHOVEL);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_hoe"), NETHERITE_MAGNETIC_IRON_HOE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_helmet"), MAGNETIC_IRON_HELMET);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_chestplate"), MAGNETIC_IRON_CHESTPLATE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_leggings"), MAGNETIC_IRON_LEGGINGS);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "magnetic_iron_boots"), MAGNETIC_IRON_BOOTS);
 
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_helmet"), MAGNETIC_IRON_HELMET);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_chestplate"), MAGNETIC_IRON_CHESTPLATE);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_leggings"), MAGNETIC_IRON_LEGGINGS);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "magnetic_iron_boots"), MAGNETIC_IRON_BOOTS);
-
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_helmet"), NETHERITE_MAGNETIC_IRON_HELMET);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_chestplate"), NETHERITE_MAGNETIC_IRON_CHESTPLATE);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_leggings"), NETHERITE_MAGNETIC_IRON_LEGGINGS);
-        Registry.register(Registries.ITEM, new Identifier(
-                MOD_ID, "netherite_magnetic_iron_boots"), NETHERITE_MAGNETIC_IRON_BOOTS);
-
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_helmet"), NETHERITE_MAGNETIC_IRON_HELMET);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_chestplate"), NETHERITE_MAGNETIC_IRON_CHESTPLATE);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_leggings"), NETHERITE_MAGNETIC_IRON_LEGGINGS);
+        Registry.register(Registries.ITEM, new Identifier(MOD_ID, "netherite_magnetic_iron_boots"), NETHERITE_MAGNETIC_IRON_BOOTS);
     }
 }

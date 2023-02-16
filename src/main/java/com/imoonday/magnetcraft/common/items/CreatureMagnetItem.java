@@ -1,11 +1,14 @@
 package com.imoonday.magnetcraft.common.items;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.NbtClassMethod;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.boss.WitherEntity;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -30,7 +33,7 @@ public class CreatureMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled",true);
+        stack.getOrCreateNbt().putBoolean("enabled", true);
         return stack;
     }
 
@@ -50,10 +53,12 @@ public class CreatureMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-
         boolean sneaking = user.isSneaking();
-
+        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         if (sneaking) {
+            if (!enableSneakToSwitch) {
+                return super.use(world, user, hand);
+            }
             NbtClassMethod.enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 20);
         }
@@ -63,24 +68,26 @@ public class CreatureMagnetItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-
         NbtClassMethod.enabledCheck(stack);
         NbtClassMethod.usedTickCheck(stack);
-
     }
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-
         boolean sneaking = user.isSneaking();
         boolean enabled = stack.getOrCreateNbt().getBoolean("enabled");
         boolean cooling = user.getItemCooldownManager().isCoolingDown(this);
-
-        if (!sneaking && enabled && !cooling) {
-            if (!entity.addScoreboardTag(user.getEntityName())) entity.removeScoreboardTag(user.getEntityName());
-            user.getItemCooldownManager().set(this, 20);
+        boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
+        boolean creative = user.isCreative();
+        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        if ((!sneaking || !enableSneakToSwitch) && enabled && !cooling && entityCanAttract) {
+            if (!entity.addScoreboardTag(user.getEntityName())) {
+                entity.removeScoreboardTag(user.getEntityName());
+            }
+            if (!creative) {
+                user.getItemCooldownManager().set(this, 20);
+            }
         }
-
         return ActionResult.PASS;
     }
 

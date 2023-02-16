@@ -12,8 +12,7 @@ public class EnchantmentRegistries{
 
         public static final Enchantment ATTRACT_ENCHANTMENT = new AttractEnchantment();
 
-        public static void register() {
-            Registry.register(Registries.ENCHANTMENT, new Identifier(
-                    MOD_ID, "attract"), ATTRACT_ENCHANTMENT);
-        }
+    public static void register() {
+        Registry.register(Registries.ENCHANTMENT, new Identifier(MOD_ID, "attract"), ATTRACT_ENCHANTMENT);
+    }
 }

@@ -14,15 +14,6 @@ public class CraftingModuleItem extends Item {
         super(settings);
     }
 
-//    @Override
-//    public ItemStack getDefaultStack() {
-//        ItemStack stack = new ItemStack(this);
-//        NbtCompound nbt = new NbtCompound();
-//        nbt.putString("Module", "Empty");
-//        stack.setNbt(nbt);
-//        return stack;
-//    }
-
     @Override
     public void appendTooltip(ItemStack itemStack, World world, List<Text> tooltip, TooltipContext tooltipContext) {
         String key = itemStack.getTranslationKey() + "_tooltip";

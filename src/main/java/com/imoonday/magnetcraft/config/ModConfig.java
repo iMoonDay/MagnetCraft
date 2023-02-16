@@ -11,6 +11,7 @@ public class ModConfig implements ConfigData {
 
     public boolean displayActionBar = true;
     public boolean displayQuantityFeedback = true;
+    public boolean enableSneakToSwitch = true;
 
     @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
     public DefaultValue value = new DefaultValue();
@@ -28,6 +29,8 @@ public class ModConfig implements ConfigData {
         public int electromagnetTeleportMinDis = 15;
         @ConfigEntry.BoundedDiscrete(max = 250)
         public int permanentMagnetTeleportMinDis = 25;
+        @ConfigEntry.BoundedDiscrete(max = 150)
+        public int degaussingDis = 15;
         @ConfigEntry.BoundedDiscrete(max = 50)
         public int magnetHandSpacing = 5;
         @ConfigEntry.BoundedDiscrete(max = 100)

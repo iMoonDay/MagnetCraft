@@ -1,16 +1,19 @@
 package com.imoonday.magnetcraft.common.items;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.NbtClassMethod;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -47,28 +50,21 @@ public class PolorMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-
         boolean sneaking = user.isSneaking();
-
+        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         if (sneaking) {
-
+            if (!enableSneakToSwitch) {
+                return super.use(world, user, hand);
+            }
             NbtClassMethod.enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 30);
         }
-
         return super.use(world, user, hand);
     }
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-
         NbtClassMethod.enabledCheck(stack);
-
-    }
-
-    @Override
-    public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        return ActionResult.PASS;
     }
 }

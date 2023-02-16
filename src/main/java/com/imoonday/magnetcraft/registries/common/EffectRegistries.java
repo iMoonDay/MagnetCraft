@@ -13,11 +13,8 @@ public class EffectRegistries {
     public static final AttractEffect ATTRACT_EFFECT = new AttractEffect();
     public static final DegaussingEffect DEGAUSSING_EFFECT = new DegaussingEffect();
 
-    public static void register(){
-        Registry.register(Registries.STATUS_EFFECT, new Identifier(
-                MOD_ID, "attract"), ATTRACT_EFFECT);
-        Registry.register(Registries.STATUS_EFFECT, new Identifier(
-                MOD_ID, "degaussing"), DEGAUSSING_EFFECT);
-
+    public static void register() {
+        Registry.register(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "attract"), ATTRACT_EFFECT);
+        Registry.register(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "degaussing"), DEGAUSSING_EFFECT);
     }
 }

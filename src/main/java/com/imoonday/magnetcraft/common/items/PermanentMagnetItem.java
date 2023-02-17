@@ -35,7 +35,7 @@ public class PermanentMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled", true);
+        NbtClassMethod.enabledSet(stack);
         return stack;
     }
 
@@ -57,8 +57,9 @@ public class PermanentMagnetItem extends Item {
         ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
         boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         double dis = config.value.permanentMagnetTeleportMinDis;
-        if (sneaking) {
+        if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);
             }

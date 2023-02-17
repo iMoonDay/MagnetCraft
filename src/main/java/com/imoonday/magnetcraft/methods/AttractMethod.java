@@ -5,15 +5,17 @@ import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.special.IdentifierRegistries;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.ExperienceOrbEntity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -21,9 +23,15 @@ import java.util.Objects;
 public class AttractMethod {
 
     public static boolean entityCanAttract = false;
+    public static boolean hasNearerEntity = false;
+    public static double getEntitiesDis = 0;
+    public static Entity expectEntity;
+    public static BlockPos blockPos;
+    public static float blockDistance;
+    static int degaussingDis = ModConfig.getConfig().value.degaussingDis;
 
     public static void attractItems(@Nullable ItemStack mainhandStack, @Nullable ItemStack offhandStack, LivingEntity entity, boolean selected, double dis, @Nullable String hand) {
-        boolean magnetOff = entity.getScoreboardTags().contains("MagnetOFF");
+        boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, "magnetcraft:attract");
         boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, "magnetcraft:attract");
         boolean equipmentsHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.HEAD, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.CHEST, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.FEET, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.LEGS, "magnetcraft:attract");
@@ -33,28 +41,98 @@ public class AttractMethod {
         boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
         boolean player = entity instanceof PlayerEntity;
         boolean client = entity.getWorld().isClient;
-        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         if (player && client) {
-            ClientPlayNetworking.send(IdentifierRegistries.GET_OTHER_ENTITIES_PACKET_ID, PacketByteBufs.empty());
+            ClientPlayNetworking.send(IdentifierRegistries.GET_DEGAUSSING_ENTITIES_PACKET_ID, PacketByteBufs.empty());
         } else {
-            entityCanAttract = entity.getWorld().getOtherEntities(null, new Box(entity.getPos().getX() + degaussingDis, entity.getPos().getY() + degaussingDis, entity.getPos().getZ() + degaussingDis, entity.getPos().getX() - degaussingDis, entity.getPos().getY() - degaussingDis, entity.getPos().getZ() - degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
+            entityCanAttract = entity.getWorld().getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
         }
         if (!magnetOff && entityCanAttract && !isEmpty) {
-            entity.getWorld().getOtherEntities(entity, new Box(entity.getPos().getX() + dis, entity.getPos().getY() + dis, entity.getPos().getZ() + dis, entity.getPos().getX() - dis, entity.getPos().getY() - dis, entity.getPos().getZ() - dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
-                boolean nearest = e.getWorld().getOtherEntities(entity, new Box(entity.getPos().getX() + dis, entity.getPos().getY() + dis, entity.getPos().getZ() + dis, entity.getPos().getX() - dis, entity.getPos().getY() - dis, entity.getPos().getZ() - dis), o -> (o instanceof LivingEntity && o.getScoreboardTags().contains("isAttracting") && e.distanceTo(o) < e.distanceTo(entity))).isEmpty();
-                if (nearest) {
-                    double move_x = (entity.getX() - e.getX()) * 0.05;
-                    double move_y = (entity.getY() + 1 - e.getY()) * 0.05;
-                    double move_z = (entity.getZ() - e.getZ()) * 0.05;
-                    boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
-                    if (stop) {
-                        e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                    } else {
-                        e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                    }
-                }
-            });
+            attracting(entity, dis);
         }
+    }
+
+    public static void attractItems(Entity entity, double dis) {
+        entityCanAttract = entity.getWorld().getOtherEntities(entity, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
+        if (entityCanAttract) {
+            attracting(entity, dis);
+        }
+    }
+
+    public static void attractItems(World world, BlockPos pos, double dis) {
+        entityCanAttract = world.getOtherEntities(null, new Box(pos.getX() - degaussingDis, pos.getY() - degaussingDis, pos.getZ() - degaussingDis, pos.getX() + degaussingDis, pos.getY() + degaussingDis, pos.getZ() + degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= degaussingDis && !e.isSpectator())).isEmpty();
+        if (entityCanAttract) {
+            attracting(world, pos, dis);
+        }
+    }
+
+    public static void attracting(Entity entity, double dis) {
+        entity.getWorld().getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && e.distanceTo(entity) <= dis && e.distanceTo(entity) > 0.5)).forEach(e -> {
+            boolean hasNearerPlayer;
+            boolean hasNearerEntity = false;
+            boolean client = entity.getWorld().isClient;
+            if (entity instanceof PlayerEntity) {
+                hasNearerPlayer = e.getWorld().getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != entity;
+            } else {
+                hasNearerPlayer = e.getWorld().getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != null;
+                hasNearerEntity = !e.getWorld().getOtherEntities(e, entity.getBoundingBox().expand(dis), o -> (!(o instanceof PlayerEntity) && o.distanceTo(e) < entity.distanceTo(e) && o.getScoreboardTags().contains("MagnetCraft.isAttracting"))).isEmpty();
+            }
+            if (!hasNearerPlayer && !hasNearerEntity) {
+                double move_x = (entity.getX() - e.getX()) * 0.05;
+                double move_y = (entity.getY() + 1 - e.getY()) * 0.05;
+                double move_z = (entity.getZ() - e.getZ()) * 0.05;
+                boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
+                if (stop) {
+                    e.setVelocity(new Vec3d(move_x, 0.25, move_z));
+                } else {
+                    e.setVelocity(new Vec3d(move_x, move_y, move_z));
+                }
+                if (!client) {
+                    entity.getWorld().getPlayers().forEach(o -> {
+                        if (o.canSee(e)) {
+                            ((ServerPlayerEntity) o).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e));
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    public static void attracting(World world, BlockPos pos, double dis) {
+        world.getOtherEntities(null, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= dis && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) > 0.5)).forEach(e -> {
+            float f = (float) (pos.getX() - e.getX());
+            float g = (float) (pos.getY() - e.getY());
+            float h = (float) (pos.getZ() - e.getZ());
+            float blockDistanceTo = MathHelper.sqrt(f * f + g * g + h * h);
+            boolean client = world.isClient;
+            boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != null;
+            if (client) {
+                getEntitiesDis = dis;
+                expectEntity = e;
+                blockPos = pos;
+                blockDistance = blockDistanceTo;
+                ClientPlayNetworking.send(IdentifierRegistries.GET_ENTITIES_PACKET_ID, PacketByteBufs.empty());
+            } else {
+                hasNearerEntity = !world.getOtherEntities(e, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), o -> (!(o instanceof PlayerEntity) && o.distanceTo(e) < blockDistanceTo && o.getScoreboardTags().contains("MagnetCraft.isAttracting"))).isEmpty();
+            }
+            if (!hasNearerPlayer && !hasNearerEntity) {
+                double move_x = (pos.getX() - e.getX()) * 0.05;
+                double move_y = (pos.getY() + 1 - e.getY()) * 0.05;
+                double move_z = (pos.getZ() - e.getZ()) * 0.05;
+                boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
+                if (stop) {
+                    e.setVelocity(new Vec3d(move_x, 0.25, move_z));
+                } else {
+                    e.setVelocity(new Vec3d(move_x, move_y, move_z));
+                }
+                if (!client) {
+                    world.getPlayers().forEach(o -> {
+                        if (o.canSee(e)) {
+                            ((ServerPlayerEntity) o).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e));
+                        }
+                    });
+                }
+            }
+        });
     }
 }
 

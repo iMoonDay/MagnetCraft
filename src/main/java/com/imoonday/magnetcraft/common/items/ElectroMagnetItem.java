@@ -35,7 +35,7 @@ public class ElectroMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled", true);
+        NbtClassMethod.enabledSet(stack);
         return stack;
     }
 
@@ -58,8 +58,9 @@ public class ElectroMagnetItem extends Item {
         boolean sneaking = user.isSneaking();
         boolean emptyDamage = NbtClassMethod.checkEmptyDamage(user, hand);
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         double dis = config.value.electromagnetTeleportMinDis;
-        if (sneaking) {
+        if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);
             }
@@ -76,12 +77,6 @@ public class ElectroMagnetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
         NbtClassMethod.enabledCheck(stack);
-    }
-
-    public static ItemStack getStack() {
-        ItemStack stack = new ItemStack(ItemRegistries.ELECTROMAGNET_ITEM);
-        stack.getOrCreateNbt().putBoolean("enabled", true);
-        return stack;
     }
 
 }

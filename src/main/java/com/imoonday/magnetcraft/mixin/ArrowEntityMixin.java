@@ -1,0 +1,37 @@
+package com.imoonday.magnetcraft.mixin;
+
+import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.AttractMethod;
+import com.imoonday.magnetcraft.registries.common.PotionRegistries;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.potion.Potion;
+import net.minecraft.world.World;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+@Mixin(ArrowEntity.class)
+public class ArrowEntityMixin {
+
+    @Shadow
+    private Potion potion;
+
+    @Inject(at = @At(value = "HEAD"), method = "tick")
+    public void checkAttract(CallbackInfo info) {
+        ArrowEntity entity = (ArrowEntity) (Object) this;
+        if (entity != null) {
+            World world = ((ArrowEntity) (Object) this).getWorld();
+            if (world == null) return;
+            boolean isAttracting = this.potion == PotionRegistries.ATTRACT_POTION;
+            double dis = ModConfig.getConfig().value.arrowAttractDis;
+            if (isAttracting) {
+                entity.addScoreboardTag("MagnetCraft.isAttracting");
+                if (!world.isClient) {
+                    AttractMethod.attractItems(entity, dis);
+                }
+            }
+        }
+    }
+}

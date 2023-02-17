@@ -10,6 +10,7 @@ import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -42,7 +43,10 @@ public abstract class LivingEntityMixin {
             ModConfig config = ModConfig.getConfig();
             double[] minDis = new double[]{config.value.electromagnetAttractMinDis, config.value.permanentMagnetAttractMinDis, config.value.polarMagnetAttractMinDis};//电磁铁,永磁铁,无极磁铁最小范围
             double creatureDis = config.value.creatureMagnetAttractDis;
+            double horseArmorAttractDis = config.value.horseArmorAttractDis;
             double magnetHandSpacing = config.value.magnetHandSpacing;
+            double attractDefaultDis = config.value.attractDefaultDis;
+            double disPerAmplifier = config.value.disPerAmplifier;
             double enchDefaultDis = config.value.enchDefaultDis;
             double disPerLvl = config.value.disPerLvl;
             double magnetSetMultiplier = config.value.magnetSetMultiplier;
@@ -72,13 +76,14 @@ public abstract class LivingEntityMixin {
             boolean handPolar = mainhandPolar || offhandPolar;
             boolean handCreature = mainhandCreature || offhandCreature;
             boolean handMagnet = mainhandMagnet || offhandMagnet;
-            boolean hasEnch = (NbtClassMethod.hasEnchantment(entity, null, "magnetcraft:attract"));
-            boolean hasTag = entity.getScoreboardTags().contains("MagnetOFF");
+            boolean hasEnch = (NbtClassMethod.hasEnchantment(entity,"magnetcraft:attract"));
+            boolean hasTag = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
             boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
             boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, "magnetcraft:attract");
             boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, "magnetcraft:attract");
             boolean selected = mainhandMagnet || mainhandHasEnch || offhandMagnet || offhandHasEnch || mainhandCreature || offhandCreature;
-            boolean isAttracting = (hasEnch || handMagnet || hasEffect) && !hasTag;
+            boolean horseArmorAttracting = entity instanceof HorseEntity && ((HorseEntity) entity).getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
+            boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && !hasTag;
             boolean hasMagneticIronHelmet = head.isOf(ItemRegistries.MAGNETIC_IRON_HELMET);
             boolean hasMagneticIronChestcplate = chest.isOf(ItemRegistries.MAGNETIC_IRON_CHESTPLATE);
             boolean hasMagneticIronLeggings = legs.isOf(ItemRegistries.MAGNETIC_IRON_LEGGINGS);
@@ -97,7 +102,7 @@ public abstract class LivingEntityMixin {
             boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
             boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
             boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
-            int enchLvl = NbtClassMethod.getEnchantmentLvl(entity, null, "magnetcraft:attract");
+            int enchLvl = NbtClassMethod.getEnchantmentLvl(entity,"magnetcraft:attract");
             int mainhandUsedTick = entity.getMainHandStack().getOrCreateNbt().getInt("usedTick");
             int offhandUsedTick = entity.getOffHandStack().getOrCreateNbt().getInt("usedTick");
             double enchMinDis = enchDefaultDis + disPerLvl;
@@ -139,7 +144,7 @@ public abstract class LivingEntityMixin {
                 int amplifier;
                 double dis;
                 if (handMagnet || hasEnch) {
-                    for (int i = 0; i <= 2; i++) {
+                    for (int i = 0; i < handItems.length; i++) {
                         if (handItems[i]) {
                             dis = minDis[i];
                             if (mainhandItems[i]) {
@@ -156,7 +161,13 @@ public abstract class LivingEntityMixin {
                 }
                 if (hasEffect) {
                     amplifier = Objects.requireNonNull(entity.getStatusEffect(EffectRegistries.ATTRACT_EFFECT)).getAmplifier();
-                    dis = 20 + amplifier * 2;
+                    dis = attractDefaultDis + amplifier * disPerAmplifier;
+                    if (dis > finalDis) {
+                        finalDis = dis;
+                    }
+                }
+                if (horseArmorAttracting) {
+                    dis = horseArmorAttractDis;
                     if (dis > finalDis) {
                         finalDis = dis;
                     }
@@ -164,9 +175,9 @@ public abstract class LivingEntityMixin {
                 if (hasMagneticIronSuit) finalDis *= magnetSetMultiplier;
                 if (hasNetheriteMagneticIronSuit) finalDis *= netheriteMagnetSetMultiplier;
                 AttractMethod.attractItems(mainhandStack, offhandStack, entity, selected, finalDis, playerHand);
-                entity.addScoreboardTag("isAttracting");
+                entity.addScoreboardTag("MagnetCraft.isAttracting");
             } else {
-                entity.removeScoreboardTag("isAttracting");
+                entity.removeScoreboardTag("MagnetCraft.isAttracting");
             }
             if ((isAttracting || handCreature) && display && player) {
                 String message;

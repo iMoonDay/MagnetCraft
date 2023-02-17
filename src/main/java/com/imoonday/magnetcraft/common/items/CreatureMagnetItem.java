@@ -33,7 +33,8 @@ public class CreatureMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled", true);
+        NbtClassMethod.enabledSet(stack);
+        NbtClassMethod.usedTickSet(stack);
         return stack;
     }
 
@@ -55,7 +56,8 @@ public class CreatureMagnetItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        if (sneaking) {
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);
             }
@@ -80,7 +82,8 @@ public class CreatureMagnetItem extends Item {
         boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
         boolean creative = user.isCreative();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        if ((!sneaking || !enableSneakToSwitch) && enabled && !cooling && entityCanAttract) {
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        if ((((!sneaking && !rightClickReversal) || (sneaking && rightClickReversal)) || !enableSneakToSwitch) && enabled && !cooling && entityCanAttract) {
             if (!entity.addScoreboardTag(user.getEntityName())) {
                 entity.removeScoreboardTag(user.getEntityName());
             }

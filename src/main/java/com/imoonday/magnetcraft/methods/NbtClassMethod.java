@@ -16,7 +16,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -66,7 +65,6 @@ public class NbtClassMethod {
         if (display && !client) {
             ((ServerPlayerEntity) player).networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.literal(message)));
         }
-
     }
 
     public static void enabledCheck(ItemStack stack) {
@@ -131,21 +129,42 @@ public class NbtClassMethod {
         return (isDamageable && isEmptyDamage);
     }
 
-    public static boolean hasEnchantment(LivingEntity entity, @Nullable EquipmentSlot equipmentSlot, String id) {
-        return getEnchantmentLvl(entity, equipmentSlot, id) > 0;
+    public static boolean hasEnchantment(LivingEntity entity, EquipmentSlot equipmentSlot, String id) {
+        if (equipmentSlot != null) {
+            return getEnchantmentLvl(entity, equipmentSlot, id) > 0;
+        } else {
+            return getEnchantmentLvl(entity, id) > 0;
+        }
     }
 
-    public static int getEnchantmentLvl(LivingEntity entity, @Nullable EquipmentSlot equipmentSlot, String id) {
-        short lvl = 0;
-        if (equipmentSlot == null) {
-            for (EquipmentSlot slot : EquipmentSlot.values()) {
-                Optional<Short> lvlCount = entity.getEquippedStack(slot).getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
-                if (lvlCount.isPresent()) lvl += lvlCount.get();
-            }
-        } else {
+    public static boolean hasEnchantment(LivingEntity entity, String id) {
+        return getEnchantmentLvl(entity, id) > 0;
+    }
+
+    public static int getEnchantmentLvl(LivingEntity entity, EquipmentSlot equipmentSlot, String id) {
+        if (equipmentSlot != null) {
+            short lvl = 0;
             Optional<Short> lvlCount = entity.getEquippedStack(equipmentSlot).getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
             if (lvlCount.isPresent()) lvl = lvlCount.get();
+            return lvl;
+        } else {
+            return getEnchantmentLvl(entity,id);
         }
+    }
+
+    public static int getEnchantmentLvl(LivingEntity entity, String id) {
+        short lvl = 0;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            Optional<Short> lvlCount = entity.getEquippedStack(slot).getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
+            if (lvlCount.isPresent()) lvl += lvlCount.get();
+        }
+        return lvl;
+    }
+
+    public static int getEnchantmentLvl(ItemStack stack, String id) {
+        short lvl = 0;
+        Optional<Short> lvlCount = stack.getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
+        if (lvlCount.isPresent()) lvl = lvlCount.get();
         return lvl;
     }
 }

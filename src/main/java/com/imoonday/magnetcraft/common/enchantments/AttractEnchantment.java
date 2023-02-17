@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.enchantments;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
@@ -22,7 +23,7 @@ public class AttractEnchantment extends Enchantment {
 
     @Override
     public int getMaxLevel() {
-        return 5;
+        return ModConfig.getConfig().value.maxEnchLvl;
     }
 
     @Override

@@ -4,8 +4,10 @@
   "package": "com.imoonday.magnetcraft.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ArrowEntityMixin",
     "BrewingMixin",
-    "LivingEntityMixin"
+    "LivingEntityMixin",
+    "TridentEntityMixin"
   ],
   "client": [
   ],

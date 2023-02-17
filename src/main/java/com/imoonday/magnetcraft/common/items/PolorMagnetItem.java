@@ -33,7 +33,7 @@ public class PolorMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled",true);
+        NbtClassMethod.enabledSet(stack);
         return stack;
     }
 
@@ -52,7 +52,8 @@ public class PolorMagnetItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        if (sneaking) {
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);
             }

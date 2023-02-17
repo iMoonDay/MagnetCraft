@@ -12,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -29,8 +30,8 @@ public class MagnetControllerItem extends Item {
         super(settings);
     }
 
-    boolean ClientOFF = false;
-    boolean ServerOFF = false;
+    boolean ClientOFF;
+    boolean ServerOFF;
 
     public static void register() {
         ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
@@ -42,7 +43,7 @@ public class MagnetControllerItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("enabled", true);
+        NbtClassMethod.enabledSet(stack);
         return stack;
     }
 
@@ -66,7 +67,8 @@ public class MagnetControllerItem extends Item {
         boolean isEmptyDamage = NbtClassMethod.checkEmptyDamage(user, hand);
         boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
         boolean sneaking = user.isSneaking();
-        if (sneaking && selected) {
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal) && selected) {
             if (!creative && isEmptyDamage) {
                 return;
             }
@@ -81,22 +83,27 @@ public class MagnetControllerItem extends Item {
                 user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 6 * 20);
             }
         } else {
-            boolean hasTag = user.getScoreboardTags().contains("MagnetOFF");
+            boolean hasTag = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
+            boolean isClient = user.getWorld().isClient;
             String message;
+            SoundEvent sound;
             if (hasTag) {
-                user.removeScoreboardTag("MagnetOFF");
-                user.playSound(SoundEvents.BLOCK_BEACON_ACTIVATE, 1, 1);
+                user.removeScoreboardTag("MagnetCraft.MagnetOFF");
+                sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
                 message = "所有磁铁:开";
             } else {
-                user.addScoreboardTag("MagnetOFF");
-                user.playSound(SoundEvents.BLOCK_BEACON_DEACTIVATE, 1, 1);
+                user.addScoreboardTag("MagnetCraft.MagnetOFF");
+                sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
                 message = "所有磁铁:关";
+            }
+            if (isClient) {
+                user.playSound(sound, 1, 1);
             }
             if (display) {
                 MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.literal(message), false);
             }
             user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
-//            register();
+            user.getInventory().updateItems();
         }
     }
 
@@ -105,20 +112,20 @@ public class MagnetControllerItem extends Item {
         super.inventoryTick(stack, world, user, slot, selected);
         boolean client = user.getWorld().isClient;
         if (client) {
-            ClientOFF = user.getScoreboardTags().contains("MagnetOFF");
+            ClientOFF = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         } else {
-            ServerOFF = user.getScoreboardTags().contains("MagnetOFF");
+            ServerOFF = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         }
         if (ClientOFF != ServerOFF) {
             if (client) {
                 if (ServerOFF) {
-                    user.addScoreboardTag("MagnetOFF");
+                    user.addScoreboardTag("MagnetCraft.MagnetOFF");
                 } else {
-                    user.removeScoreboardTag("MagnetOFF");
+                    user.removeScoreboardTag("MagnetCraft.MagnetOFF");
                 }
             }
         }
-        boolean enabled = !user.getScoreboardTags().contains("MagnetOFF");
+        boolean enabled = !user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         stack.getOrCreateNbt().putBoolean("enabled", enabled);
     }
 }

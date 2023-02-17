@@ -2,17 +2,21 @@ package com.imoonday.magnetcraft.registries.special;
 
 import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.AttractMethod;
 import com.imoonday.magnetcraft.methods.CreatureMethod;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.GET_OTHER_ENTITIES_PACKET_ID;
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.KEYBINDINGS_PACKET_ID;
+import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
 public class GlobalReceiverRegistries {
 
@@ -29,7 +33,7 @@ public class GlobalReceiverRegistries {
             }
         }));
 
-        ServerPlayNetworking.registerGlobalReceiver(GET_OTHER_ENTITIES_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+        ServerPlayNetworking.registerGlobalReceiver(GET_DEGAUSSING_ENTITIES_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             int degaussingDis = ModConfig.getConfig().value.degaussingDis;
             CreatureMethod.entityCanAttract = player.getWorld().getOtherEntities(null, new Box(
                             player.getPos().getX() + degaussingDis,
@@ -43,9 +47,18 @@ public class GlobalReceiverRegistries {
                             && e.distanceTo(player) <= degaussingDis && !e.isSpectator())).isEmpty();
         }));
 
-        ClientPlayNetworking.registerGlobalReceiver(IdentifierRegistries.USE_CONTROLLER_PACKET_ID, (client, handler, buf, responseSender) -> client.execute(() -> {
-            if (client.player != null) {
-                MagnetControllerItem.useTask(client.player, null, false);
+        ServerPlayNetworking.registerGlobalReceiver(GET_ENTITIES_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            double dis = AttractMethod.getEntitiesDis;
+            BlockPos pos = AttractMethod.blockPos;
+            Entity e = AttractMethod.expectEntity;
+            float blockDistanceTo = AttractMethod.blockDistance;
+            AttractMethod.hasNearerEntity = !e.getWorld().getOtherEntities(e, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), o -> (!(o instanceof PlayerEntity) && o.distanceTo(e) < blockDistanceTo && o.getScoreboardTags().contains("MagnetCraft.isAttracting"))).isEmpty();
+        }));
+
+        ClientPlayNetworking.registerGlobalReceiver(USE_CONTROLLER_PACKET_ID, (client, handler, buf, responseSender) -> client.execute(() -> {
+            ClientPlayerEntity player = client.player;
+            if (player != null) {
+                MagnetControllerItem.useTask(player, null, false);
             }
         }));
 

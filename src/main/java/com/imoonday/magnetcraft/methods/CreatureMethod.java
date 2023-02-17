@@ -13,6 +13,8 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
@@ -23,7 +25,7 @@ public class CreatureMethod {
     public static boolean entityCanAttract = false;
 
     public static void attractCreatures(ItemStack mainhandStack, ItemStack offhandStack, LivingEntity entity, double dis, String hand) {
-        boolean magnetOff = entity.getScoreboardTags().contains("MagnetOFF");
+        boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, "magnetcraft:attract");
         boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, "magnetcraft:attract");
         boolean equipmentsHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.HEAD, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.CHEST, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.FEET, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.LEGS, "magnetcraft:attract");
@@ -36,11 +38,10 @@ public class CreatureMethod {
         boolean spectator = entity.isSpectator();
         boolean creative = player && ((PlayerEntity) entity).isCreative();
         boolean isMainhand = Objects.equals(hand, "mainhand");
-        boolean isOffhand = Objects.equals(hand, "offhand");
         boolean isHand = Objects.equals(hand, "hand");
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         if (player && client) {
-            ClientPlayNetworking.send(IdentifierRegistries.GET_OTHER_ENTITIES_PACKET_ID, PacketByteBufs.empty());
+            ClientPlayNetworking.send(IdentifierRegistries.GET_DEGAUSSING_ENTITIES_PACKET_ID, PacketByteBufs.empty());
         } else {
             entityCanAttract = entity.getWorld().getOtherEntities(null, new Box(entity.getPos().getX() + degaussingDis, entity.getPos().getY() + degaussingDis, entity.getPos().getZ() + degaussingDis, entity.getPos().getX() - degaussingDis, entity.getPos().getY() - degaussingDis, entity.getPos().getZ() - degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
         }
@@ -58,14 +59,20 @@ public class CreatureMethod {
                 } else {
                     e.setVelocity(new Vec3d(move_x, move_y, move_z));
                 }
+                if (!client) {
+                    entity.getWorld().getPlayers().forEach(o -> {
+                        if (o.canSee(e)) {
+                            ((ServerPlayerEntity) o).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e));
+                        }
+                    });
+                }
                 if (!spectator && !creative) {
                     ItemStack stack;
                     if (isMainhand || isHand) {
                         stack = entity.getMainHandStack();
                         int tick = stack.getOrCreateNbt().getInt("usedTick") + 1;
                         stack.getOrCreateNbt().putInt("usedTick", tick);
-                    }
-                    if (isOffhand || isHand) {
+                    } else {
                         stack = entity.getOffHandStack();
                         int tick = stack.getOrCreateNbt().getInt("usedTick") + 1;
                         stack.getOrCreateNbt().putInt("usedTick", tick);

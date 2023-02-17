@@ -4,9 +4,8 @@ import com.imoonday.magnetcraft.common.effects.AttractEffect;
 import com.imoonday.magnetcraft.common.effects.DegaussingEffect;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
-import net.minecraft.util.Identifier;
 
-import static com.imoonday.magnetcraft.MagnetCraft.MOD_ID;
+import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
 public class EffectRegistries {
 
@@ -14,7 +13,7 @@ public class EffectRegistries {
     public static final DegaussingEffect DEGAUSSING_EFFECT = new DegaussingEffect();
 
     public static void register() {
-        Registry.register(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "attract"), ATTRACT_EFFECT);
-        Registry.register(Registries.STATUS_EFFECT, new Identifier(MOD_ID, "degaussing"), DEGAUSSING_EFFECT);
+        Registry.register(Registries.STATUS_EFFECT, id("attract"), ATTRACT_EFFECT);
+        Registry.register(Registries.STATUS_EFFECT, id("degaussing"), DEGAUSSING_EFFECT);
     }
 }

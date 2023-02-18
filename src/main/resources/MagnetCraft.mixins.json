@@ -8,6 +8,7 @@
     "BrewingMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
+    "MiningBlockMixin",
     "TridentEntityMixin"
   ],
   "client": [

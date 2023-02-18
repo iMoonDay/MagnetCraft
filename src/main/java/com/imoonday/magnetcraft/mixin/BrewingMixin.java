@@ -24,6 +24,5 @@ public class BrewingMixin {
 
     @Invoker("registerPotionRecipe")
     public static void registerPotionRecipe(Potion input, Item item, Potion output) {
-
     }
 }

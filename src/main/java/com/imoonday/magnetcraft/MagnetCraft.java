@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.*;
+import com.imoonday.magnetcraft.registries.special.CallbackRegistries;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
 import com.imoonday.magnetcraft.registries.special.GlobalReceiverRegistries;
 import com.imoonday.magnetcraft.registries.special.ItemGroupRegistries;
@@ -26,5 +27,6 @@ public class MagnetCraft implements ModInitializer {
         ItemGroupRegistries.register();
         GlobalReceiverRegistries.register();
         CustomStatRegistries.register();
+        CallbackRegistries.register();
     }
 }

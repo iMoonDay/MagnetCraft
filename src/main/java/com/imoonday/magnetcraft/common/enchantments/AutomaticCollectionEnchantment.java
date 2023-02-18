@@ -1,29 +1,27 @@
 package com.imoonday.magnetcraft.common.enchantments;
 
-import com.imoonday.magnetcraft.config.ModConfig;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
 
-public class AttractEnchantment extends Enchantment {
-
-    public AttractEnchantment() {
-        super(Enchantment.Rarity.UNCOMMON, EnchantmentTarget.BREAKABLE, new EquipmentSlot[]{});
+public class AutomaticCollectionEnchantment extends Enchantment {
+    public AutomaticCollectionEnchantment() {
+        super(Enchantment.Rarity.VERY_RARE, EnchantmentTarget.DIGGER, new EquipmentSlot[]{EquipmentSlot.MAINHAND});
     }
 
     @Override
     public int getMinPower(int level) {
-        return 5 + (level - 1) * 8;
+        return 15;
     }
 
     @Override
     public int getMaxPower(int level) {
-        return this.getMinPower(level) + 20;
+        return super.getMinPower(level) + 50;
     }
 
     @Override
     public int getMaxLevel() {
-        return ModConfig.getConfig().value.maxEnchLvl;
+        return 1;
     }
 
 }

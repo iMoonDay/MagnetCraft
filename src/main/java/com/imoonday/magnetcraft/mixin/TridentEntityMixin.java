@@ -2,7 +2,8 @@ package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethod;
-import com.imoonday.magnetcraft.methods.NbtClassMethod;
+import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -27,7 +28,7 @@ public abstract class TridentEntityMixin {
             if (world == null) return;
             ModConfig config = ModConfig.getConfig();
             ItemStack stack = this.asItemStack();
-            int enchLvl = NbtClassMethod.getEnchantmentLvl(stack, "magnetcraft:attract");
+            int enchLvl = EnchantmentHelper.getLevel(EnchantmentRegistries.ATTRACT_ENCHANTMENT,stack);
             boolean isAttracting = enchLvl > 0;
             double enchDefaultDis = config.value.enchDefaultDis;
             double disPerLvl = config.value.disPerLvl;

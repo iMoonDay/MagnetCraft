@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.methods;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
+import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.special.IdentifierRegistries;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
@@ -26,9 +27,9 @@ public class CreatureMethod {
 
     public static void attractCreatures(ItemStack mainhandStack, ItemStack offhandStack, LivingEntity entity, double dis, String hand) {
         boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, "magnetcraft:attract");
-        boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, "magnetcraft:attract");
-        boolean equipmentsHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.HEAD, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.CHEST, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.FEET, "magnetcraft:attract") || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.LEGS, "magnetcraft:attract");
+        boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean equipmentsHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.HEAD, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.FEET, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.LEGS, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
         boolean mainhandEmpty = !equipmentsHasEnch && !offhandHasEnch && mainhandStack == ItemStack.EMPTY && Objects.equals(hand, "mainhand") && entity.getMainHandStack().getItem() == Items.AIR;
         boolean offhandEmpty = !equipmentsHasEnch && !mainhandHasEnch && offhandStack == ItemStack.EMPTY && Objects.equals(hand, "offhand") && entity.getOffHandStack().getItem() == Items.AIR;
         boolean handEmpty = !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && Objects.equals(hand, "hand") && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;

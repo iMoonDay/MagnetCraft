@@ -1,0 +1,13 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:magnetic_iron_pickaxe",
+    "magnetcraft:magnetic_iron_axe",
+    "magnetcraft:magnetic_iron_shovel",
+    "magnetcraft:magnetic_iron_hoe",
+    "magnetcraft:netherite_magnetic_iron_pickaxe",
+    "magnetcraft:netherite_magnetic_iron_axe",
+    "magnetcraft:netherite_magnetic_iron_shovel",
+    "magnetcraft:netherite_magnetic_iron_hoe"
+  ]
+}

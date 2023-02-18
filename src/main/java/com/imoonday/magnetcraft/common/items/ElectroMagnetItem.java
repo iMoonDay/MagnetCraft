@@ -11,6 +11,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -66,7 +67,13 @@ public class ElectroMagnetItem extends Item {
             }
             NbtClassMethod.enabledSwitch(world, user, hand);
         } else if (!emptyDamage) {
-            NbtClassMethod.addDamage(user, hand, 1);
+            if (!world.isClient) {
+                if (hand == Hand.MAIN_HAND) {
+                    user.getMainHandStack().damage(1, user.world.random, (ServerPlayerEntity) user);
+                } else {
+                    user.getOffHandStack().damage(1, user.world.random, (ServerPlayerEntity) user);
+                }
+            }
             TeleportMethod.teleportItems(world, user, dis, hand);
         }
         user.getItemCooldownManager().set(this, 20);

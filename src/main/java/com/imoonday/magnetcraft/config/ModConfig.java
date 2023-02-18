@@ -31,6 +31,8 @@ public class ModConfig implements ConfigData {
         public int horseArmorAttractDis = 5;
         @ConfigEntry.BoundedDiscrete(max = 100)
         public int arrowAttractDis = 10;
+        @ConfigEntry.BoundedDiscrete(max = 100)
+        public int droppedMagnetAttractDis = 10;
         //传送距离
         @ConfigEntry.BoundedDiscrete(max = 150)
         public int electromagnetTeleportMinDis = 15;

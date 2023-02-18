@@ -3,11 +3,12 @@ package com.imoonday.magnetcraft.methods;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import me.shedaniel.autoconfig.AutoConfig;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
@@ -16,8 +17,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
-
-import java.util.Optional;
 
 public class NbtClassMethod {
 
@@ -43,19 +42,15 @@ public class NbtClassMethod {
         enabled = !enabled;
         if (enabled) {
             if (isMainhand) {
-//                message = "主手磁铁:开";
                 message = Text.translatable("text.magnetcraft.message.mainhand_on");
             } else {
-//                message = "副手磁铁:开";
                 message = Text.translatable("text.magnetcraft.message.offhand_on");
             }
             sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
         } else {
             if (isMainhand) {
-//                message = "主手磁铁:关";
                 message = Text.translatable("text.magnetcraft.message.mainhand_off");
             } else {
-//                message = "副手磁铁:关";
                 message = Text.translatable("text.magnetcraft.message.offhand_off");
             }
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
@@ -92,30 +87,28 @@ public class NbtClassMethod {
     }
 
     public static void addDamage(LivingEntity user, Hand hand, int damage) {
-        boolean creative = false;
         boolean mainhand = hand == Hand.MAIN_HAND;
         boolean offhand = hand == Hand.OFF_HAND;
         boolean mainhandDamageable = user.getMainHandStack().isDamageable();
         boolean offhandDamageable = user.getOffHandStack().isDamageable();
+        boolean creative = user.isPlayer() && ((PlayerEntity) user).isCreative();
         int mainhandDamage = user.getMainHandStack().getDamage();
         int offhandDamage = user.getOffHandStack().getDamage();
         int mainhandMaxDamage = user.getMainHandStack().getMaxDamage();
         int offhandMaxDamage = user.getOffHandStack().getMaxDamage();
         int mainhandSetDamage = mainhandDamage + damage;
         int offhandSetDamage = offhandDamage + damage;
-        if (user instanceof PlayerEntity) {
-            creative = ((PlayerEntity) user).isCreative();
-        }
-        if (!creative && mainhand && mainhandDamageable) {
-            user.getMainHandStack().setDamage(mainhandSetDamage);
-            if (mainhandDamage > mainhandMaxDamage) {
-                user.getMainHandStack().setDamage(mainhandMaxDamage);
-            }
-        }
-        if (!creative && offhand && offhandDamageable) {
-            user.getOffHandStack().setDamage(offhandSetDamage);
-            if (offhandDamage > offhandMaxDamage) {
-                user.getOffHandStack().setDamage(offhandMaxDamage);
+        if (!creative) {
+            if (mainhand && mainhandDamageable) {
+                user.getMainHandStack().setDamage(mainhandSetDamage);
+                if (mainhandDamage > mainhandMaxDamage) {
+                    user.getMainHandStack().setDamage(mainhandMaxDamage);
+                }
+            } else if (offhand && offhandDamageable) {
+                user.getOffHandStack().setDamage(offhandSetDamage);
+                if (offhandDamage > offhandMaxDamage) {
+                    user.getOffHandStack().setDamage(offhandMaxDamage);
+                }
             }
         }
     }
@@ -133,42 +126,32 @@ public class NbtClassMethod {
         return (isDamageable && isEmptyDamage);
     }
 
-    public static boolean hasEnchantment(LivingEntity entity, EquipmentSlot equipmentSlot, String id) {
-        if (equipmentSlot != null) {
-            return getEnchantmentLvl(entity, equipmentSlot, id) > 0;
-        } else {
-            return getEnchantmentLvl(entity, id) > 0;
-        }
+    public static boolean hasEnchantment(LivingEntity entity, EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        return getEnchantmentLvl(entity, equipmentSlot, enchantment) > 0;
     }
 
-    public static boolean hasEnchantment(LivingEntity entity, String id) {
-        return getEnchantmentLvl(entity, id) > 0;
+    public static boolean hasEnchantment(LivingEntity entity, Enchantment enchantment) {
+        return getEnchantmentLvl(entity, enchantment) > 0;
     }
 
-    public static int getEnchantmentLvl(LivingEntity entity, EquipmentSlot equipmentSlot, String id) {
-        if (equipmentSlot != null) {
-            short lvl = 0;
-            Optional<Short> lvlCount = entity.getEquippedStack(equipmentSlot).getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
-            if (lvlCount.isPresent()) lvl = lvlCount.get();
-            return lvl;
-        } else {
-            return getEnchantmentLvl(entity,id);
-        }
+    public static boolean hasEnchantment(ItemStack stack, Enchantment enchantment) {
+        return getEnchantmentLvl(stack, enchantment) > 0;
     }
 
-    public static int getEnchantmentLvl(LivingEntity entity, String id) {
-        short lvl = 0;
+    public static int getEnchantmentLvl(LivingEntity entity, EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        return EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(equipmentSlot));
+    }
+
+    public static int getEnchantmentLvl(LivingEntity entity, Enchantment enchantment) {
+        int lvl = 0;
         for (EquipmentSlot slot : EquipmentSlot.values()) {
-            Optional<Short> lvlCount = entity.getEquippedStack(slot).getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
-            if (lvlCount.isPresent()) lvl += lvlCount.get();
+            lvl += EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(slot));
         }
         return lvl;
     }
 
-    public static int getEnchantmentLvl(ItemStack stack, String id) {
-        short lvl = 0;
-        Optional<Short> lvlCount = stack.getEnchantments().parallelStream().map(i -> (NbtCompound) i).filter(i -> i.getString("id").equals(id)).map(i -> i.getShort("lvl")).findFirst();
-        if (lvlCount.isPresent()) lvl = lvlCount.get();
-        return lvl;
+    public static int getEnchantmentLvl(ItemStack stack, Enchantment enchantment) {
+        return EnchantmentHelper.getLevel(enchantment, stack);
     }
+
 }

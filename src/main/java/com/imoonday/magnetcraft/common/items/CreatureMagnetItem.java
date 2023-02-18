@@ -79,7 +79,7 @@ public class CreatureMagnetItem extends Item {
         boolean sneaking = user.isSneaking();
         boolean enabled = stack.getOrCreateNbt().getBoolean("enabled");
         boolean cooling = user.getItemCooldownManager().isCoolingDown(this);
-        boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
+        boolean entityCanAttract = !(entity.isPlayer()) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
         boolean creative = user.isCreative();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;

@@ -4,7 +4,6 @@ import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.NbtClassMethod;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -12,6 +11,8 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -85,22 +86,24 @@ public class MagnetControllerItem extends Item {
         } else {
             boolean hasTag = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
             boolean isClient = user.getWorld().isClient;
-            String message;
+            Text message;
             SoundEvent sound;
             if (hasTag) {
                 user.removeScoreboardTag("MagnetCraft.MagnetOFF");
                 sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
-                message = "所有磁铁:开";
+//                message = "所有磁铁:开";
+                message = Text.translatable("text.magnetcraft.message.magnet_on");
             } else {
                 user.addScoreboardTag("MagnetCraft.MagnetOFF");
                 sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
-                message = "所有磁铁:关";
+//                message = "所有磁铁:关";
+                message = Text.translatable("text.magnetcraft.message.magnet_off");
             }
             if (isClient) {
                 user.playSound(sound, 1, 1);
             }
-            if (display) {
-                MinecraftClient.getInstance().inGameHud.setOverlayMessage(Text.literal(message), false);
+            if (display && !isClient) {
+                ((ServerPlayerEntity) user).networkHandler.sendPacket(new OverlayMessageS2CPacket(message));
             }
             user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
             user.getInventory().updateItems();

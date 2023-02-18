@@ -6,6 +6,7 @@
   "mixins": [
     "ArrowEntityMixin",
     "BrewingMixin",
+    "ItemEntityMixin",
     "LivingEntityMixin",
     "TridentEntityMixin"
   ],

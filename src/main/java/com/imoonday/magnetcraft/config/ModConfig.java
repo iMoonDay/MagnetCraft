@@ -51,6 +51,8 @@ public class ModConfig implements ConfigData {
         public int enchDefaultDis = 10;
         @ConfigEntry.BoundedDiscrete(max = 20)
         public int disPerLvl = 2;
+        @ConfigEntry.BoundedDiscrete(max = 20)
+        public int disPerPower = 2;
         @ConfigEntry.BoundedDiscrete(min = 1,max = 10)
         @ConfigEntry.Gui.RequiresRestart
         public int maxEnchLvl = 5;

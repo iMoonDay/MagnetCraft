@@ -36,12 +36,12 @@ public class GlobalReceiverRegistries {
         ServerPlayNetworking.registerGlobalReceiver(GET_DEGAUSSING_ENTITIES_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             int degaussingDis = ModConfig.getConfig().value.degaussingDis;
             CreatureMethod.entityCanAttract = player.getWorld().getOtherEntities(null, new Box(
-                            player.getPos().getX() + degaussingDis,
-                            player.getPos().getY() + degaussingDis,
-                            player.getPos().getZ() + degaussingDis,
-                            player.getPos().getX() - degaussingDis,
-                            player.getPos().getY() - degaussingDis,
-                            player.getPos().getZ() - degaussingDis),
+                            player.getX() + degaussingDis,
+                            player.getY() + degaussingDis,
+                            player.getZ() + degaussingDis,
+                            player.getX() - degaussingDis,
+                            player.getY() - degaussingDis,
+                            player.getZ() - degaussingDis),
                     e -> (e instanceof LivingEntity && ((LivingEntity) e)
                             .hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)
                             && e.distanceTo(player) <= degaussingDis && !e.isSpectator())).isEmpty();

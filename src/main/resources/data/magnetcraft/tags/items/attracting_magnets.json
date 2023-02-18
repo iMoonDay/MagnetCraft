@@ -3,7 +3,6 @@
   "values": [
     "magnetcraft:polar_magnet",
     "magnetcraft:electromagnet",
-    "magnetcraft:permanent_magnet",
-    "magnetcraft:creature_magnet"
+    "magnetcraft:permanent_magnet"
   ]
 }

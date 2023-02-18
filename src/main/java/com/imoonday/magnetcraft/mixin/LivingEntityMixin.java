@@ -11,7 +11,6 @@ import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.HorseEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
@@ -39,7 +38,7 @@ public abstract class LivingEntityMixin {
         if (entity != null) {
             World world = ((LivingEntity) (Object) this).getWorld();
             if (world == null) return;
-            if (entity instanceof PlayerEntity && entity.isSpectator()) return;
+            if (entity.isPlayer() && entity.isSpectator()) return;
             ModConfig config = ModConfig.getConfig();
             double[] minDis = new double[]{config.value.electromagnetAttractMinDis, config.value.permanentMagnetAttractMinDis, config.value.polarMagnetAttractMinDis};//电磁铁,永磁铁,无极磁铁最小范围
             double creatureDis = config.value.creatureMagnetAttractDis;
@@ -97,7 +96,7 @@ public abstract class LivingEntityMixin {
             boolean mainhandEmptyDamage = NbtClassMethod.checkEmptyDamage(entity, Hand.MAIN_HAND);
             boolean offhandEmptyDamage = NbtClassMethod.checkEmptyDamage(entity, Hand.OFF_HAND);
             boolean display = config.displayActionBar;
-            boolean player = entity instanceof PlayerEntity;
+            boolean player = entity.isPlayer();
             boolean client = entity.getWorld().isClient;
             boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
             boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
@@ -181,8 +180,10 @@ public abstract class LivingEntityMixin {
             }
             if ((isAttracting || handCreature) && display && player) {
                 String message;
+                Text text;
                 if (finalDis > 0) {
-                    message = "吸引: " + finalDis;
+                    message = ": " + finalDis;
+                    text = Text.translatable("text.magnetcraft.message.attract").append(message);
                     if (handElectromagnet || handPermanent) {
                         if (mainhandElectromagnet) {
                             telDis = config.value.electromagnetTeleportMinDis + config.value.magnetHandSpacing;
@@ -208,16 +209,19 @@ public abstract class LivingEntityMixin {
                                 finalTelDis = telDis;
                             }
                         }
-                        message = message + " 传送: " + finalTelDis;
+                        message = ": " + finalTelDis;
+                        text = text.copy().append(" ").append(Text.translatable("text.magnetcraft.message.teleport").append(message));
                     }
                     if (handCreature) {
-                        message = message + " 生物吸引: " + creatureDis;
+                        message = ": " + creatureDis;
+                        text = text.copy().append(" ").append(Text.translatable("text.magnetcraft.message.creature_attract").append(message));
                     }
                 } else {
-                    message = "生物吸引: " + creatureDis;
+                    message = ": " + creatureDis;
+                    text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
                 }
                 if (!client) {
-                    ((ServerPlayerEntity) entity).networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.literal(message)));
+                    ((ServerPlayerEntity) entity).networkHandler.sendPacket(new OverlayMessageS2CPacket(text));
                 }
             }
         }

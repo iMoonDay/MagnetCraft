@@ -7,7 +7,10 @@ import com.imoonday.magnetcraft.common.items.materials.NetheriteMagneticIronArmo
 import com.imoonday.magnetcraft.common.items.materials.NetheriteMagneticIronToolMaterial;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.*;
+import net.minecraft.item.BlockItem;
+import net.minecraft.item.HorseArmorItem;
+import net.minecraft.item.Item;
+import net.minecraft.item.SwordItem;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 
@@ -39,13 +42,13 @@ public class ItemRegistries {
     public static SwordItem MAGNETIC_IRON_SWORD = new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, new Item.Settings());
     public static CustomPickaxeItem MAGNETIC_IRON_PICKAXE = new CustomPickaxeItem(MagneticIronToolMaterial.INSTANCE, 1, -2.8f, new Item.Settings());
     public static CustomAxeItem MAGNETIC_IRON_AXE = new CustomAxeItem(MagneticIronToolMaterial.INSTANCE, 5.5f, -3.0f, new Item.Settings());
-    public static ShovelItem MAGNETIC_IRON_SHOVEL = new ShovelItem(MagneticIronToolMaterial.INSTANCE, 1.5f, -3.0f, new Item.Settings());
+    public static CustomShovelItem MAGNETIC_IRON_SHOVEL = new CustomShovelItem(MagneticIronToolMaterial.INSTANCE, 1.5f, -3.0f, new Item.Settings());
     public static CustomHoeItem MAGNETIC_IRON_HOE = new CustomHoeItem(MagneticIronToolMaterial.INSTANCE, -2, -1.0f, new Item.Settings());
 
     public static SwordItem NETHERITE_MAGNETIC_IRON_SWORD = new SwordItem(NetheriteMagneticIronToolMaterial.INSTANCE, 4, -2.4f, new Item.Settings().fireproof());
     public static CustomPickaxeItem NETHERITE_MAGNETIC_IRON_PICKAXE = new CustomPickaxeItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2, -2.8f, new Item.Settings().fireproof());
     public static CustomAxeItem NETHERITE_MAGNETIC_IRON_AXE = new CustomAxeItem(NetheriteMagneticIronToolMaterial.INSTANCE, 6.0f, -3.0f, new Item.Settings().fireproof());
-    public static ShovelItem NETHERITE_MAGNETIC_IRON_SHOVEL = new ShovelItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2.5f, -3.0f, new Item.Settings().fireproof());
+    public static CustomShovelItem NETHERITE_MAGNETIC_IRON_SHOVEL = new CustomShovelItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2.5f, -3.0f, new Item.Settings().fireproof());
     public static CustomHoeItem NETHERITE_MAGNETIC_IRON_HOE = new CustomHoeItem(NetheriteMagneticIronToolMaterial.INSTANCE, -3, 0.0f, new Item.Settings().fireproof());
 
     public static final MagneticIronArmorMaterial MAGNETIC_IRON_MATERIAL = new MagneticIronArmorMaterial();

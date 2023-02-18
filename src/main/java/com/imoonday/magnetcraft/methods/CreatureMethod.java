@@ -33,7 +33,7 @@ public class CreatureMethod {
         boolean offhandEmpty = !equipmentsHasEnch && !mainhandHasEnch && offhandStack == ItemStack.EMPTY && Objects.equals(hand, "offhand") && entity.getOffHandStack().getItem() == Items.AIR;
         boolean handEmpty = !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && Objects.equals(hand, "hand") && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;
         boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
-        boolean player = entity instanceof PlayerEntity;
+        boolean player = entity.isPlayer();
         boolean client = entity.getWorld().isClient;
         boolean spectator = entity.isSpectator();
         boolean creative = player && ((PlayerEntity) entity).isCreative();
@@ -43,10 +43,10 @@ public class CreatureMethod {
         if (player && client) {
             ClientPlayNetworking.send(IdentifierRegistries.GET_DEGAUSSING_ENTITIES_PACKET_ID, PacketByteBufs.empty());
         } else {
-            entityCanAttract = entity.getWorld().getOtherEntities(null, new Box(entity.getPos().getX() + degaussingDis, entity.getPos().getY() + degaussingDis, entity.getPos().getZ() + degaussingDis, entity.getPos().getX() - degaussingDis, entity.getPos().getY() - degaussingDis, entity.getPos().getZ() - degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
+            entityCanAttract = entity.getWorld().getOtherEntities(null, new Box(entity.getX() + degaussingDis, entity.getY() + degaussingDis, entity.getZ() + degaussingDis, entity.getX() - degaussingDis, entity.getY() - degaussingDis, entity.getZ() - degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
         }
         if (!magnetOff && entityCanAttract && !isEmpty) {
-            entity.getWorld().getOtherEntities(entity, new Box(entity.getPos().getX() + dis, entity.getPos().getY() + dis, entity.getPos().getZ() + dis, entity.getPos().getX() - dis, entity.getPos().getY() - dis, entity.getPos().getZ() - dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
+            entity.getWorld().getOtherEntities(entity, new Box(entity.getX() + dis, entity.getY() + dis, entity.getZ() + dis, entity.getX() - dis, entity.getY() - dis, entity.getZ() - dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
                 double move_x = (entity.getX() - e.getX()) * 0.05;
                 double move_y = (entity.getY() - e.getY()) * 0.05;
                 double move_z = (entity.getZ() - e.getZ()) * 0.05;

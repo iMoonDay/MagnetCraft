@@ -21,7 +21,7 @@ public class AttractEffect extends StatusEffect {
     // 这个方法在应用药水效果时会被调用，所以我们可以在这里实现自定义功能。
     @Override
     public void applyUpdateEffect(LivingEntity entity, int amplifier) {
-//        if (entity instanceof PlayerEntity && entity.isSpectator()) return;
+//        if (entity.isPlayer() && entity.isSpectator()) return;
 //        int dis = 20 + amplifier * 2;//药水默认范围
 //        AttractMethod.attractItems(ItemStack.EMPTY,ItemStack.EMPTY, entity, false, dis,null);
     }

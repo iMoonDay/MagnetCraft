@@ -5,12 +5,12 @@ import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.special.IdentifierRegistries;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -39,7 +39,7 @@ public class AttractMethod {
         boolean offhandEmpty = selected && !equipmentsHasEnch && !mainhandHasEnch && offhandStack == ItemStack.EMPTY && Objects.equals(hand, "offhand") && entity.getOffHandStack().getItem() == Items.AIR;
         boolean handEmpty = selected && !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && Objects.equals(hand, "hand") && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;
         boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
-        boolean player = entity instanceof PlayerEntity;
+        boolean player = entity.isPlayer();
         boolean client = entity.getWorld().isClient;
         if (player && client) {
             ClientPlayNetworking.send(IdentifierRegistries.GET_DEGAUSSING_ENTITIES_PACKET_ID, PacketByteBufs.empty());
@@ -69,8 +69,9 @@ public class AttractMethod {
         entity.getWorld().getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && e.distanceTo(entity) <= dis && e.distanceTo(entity) > 0.5)).forEach(e -> {
             boolean hasNearerPlayer;
             boolean hasNearerEntity = false;
+            boolean player = entity.isPlayer();
             boolean client = entity.getWorld().isClient;
-            if (entity instanceof PlayerEntity) {
+            if (player) {
                 hasNearerPlayer = e.getWorld().getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != entity;
             } else {
                 hasNearerPlayer = e.getWorld().getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != null;
@@ -78,7 +79,7 @@ public class AttractMethod {
             }
             if (!hasNearerPlayer && !hasNearerEntity) {
                 double move_x = (entity.getX() - e.getX()) * 0.05;
-                double move_y = (entity.getY() + 1 - e.getY()) * 0.05;
+                double move_y = (entity.getEyeY() - e.getY()) * 0.05;
                 double move_z = (entity.getZ() - e.getZ()) * 0.05;
                 boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
                 if (stop) {
@@ -87,11 +88,7 @@ public class AttractMethod {
                     e.setVelocity(new Vec3d(move_x, move_y, move_z));
                 }
                 if (!client) {
-                    entity.getWorld().getPlayers().forEach(o -> {
-                        if (o.canSee(e)) {
-                            ((ServerPlayerEntity) o).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e));
-                        }
-                    });
+                    PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
                 }
             }
         });
@@ -116,7 +113,7 @@ public class AttractMethod {
             }
             if (!hasNearerPlayer && !hasNearerEntity) {
                 double move_x = (pos.getX() - e.getX()) * 0.05;
-                double move_y = (pos.getY() + 1 - e.getY()) * 0.05;
+                double move_y = (pos.getY() - e.getY()) * 0.05;
                 double move_z = (pos.getZ() - e.getZ()) * 0.05;
                 boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
                 if (stop) {
@@ -125,11 +122,7 @@ public class AttractMethod {
                     e.setVelocity(new Vec3d(move_x, move_y, move_z));
                 }
                 if (!client) {
-                    world.getPlayers().forEach(o -> {
-                        if (o.canSee(e)) {
-                            ((ServerPlayerEntity) o).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e));
-                        }
-                    });
+                    PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
                 }
             }
         });

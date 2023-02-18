@@ -27,7 +27,7 @@ public class NbtClassMethod {
         boolean display = AutoConfig.getConfigHolder(ModConfig.class).getConfig().displayActionBar;
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         double dis = ModConfig.getConfig().value.creatureMagnetAttractDis;
-        String message;
+        Text message;
         SoundEvent sound;
         ItemStack stack;
         if (!enableSneakToSwitch) {
@@ -43,27 +43,31 @@ public class NbtClassMethod {
         enabled = !enabled;
         if (enabled) {
             if (isMainhand) {
-                message = "主手磁铁:开";
+//                message = "主手磁铁:开";
+                message = Text.translatable("text.magnetcraft.message.mainhand_on");
             } else {
-                message = "副手磁铁:开";
+//                message = "副手磁铁:开";
+                message = Text.translatable("text.magnetcraft.message.offhand_on");
             }
             sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
         } else {
             if (isMainhand) {
-                message = "主手磁铁:关";
+//                message = "主手磁铁:关";
+                message = Text.translatable("text.magnetcraft.message.mainhand_off");
             } else {
-                message = "副手磁铁:关";
+//                message = "副手磁铁:关";
+                message = Text.translatable("text.magnetcraft.message.offhand_off");
             }
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
             if (stack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
-                player.getWorld().getOtherEntities(player, new Box(player.getPos().getX() + dis, player.getPos().getY() + dis, player.getPos().getZ() + dis, player.getPos().getX() - dis, player.getPos().getY() - dis, player.getPos().getZ() - dis), e -> (e.getScoreboardTags().contains(player.getEntityName()) && e instanceof LivingEntity && e.distanceTo(player) <= dis)).forEach(e -> e.removeScoreboardTag(player.getEntityName()));
+                player.getWorld().getOtherEntities(player, new Box(player.getX() + dis, player.getY() + dis, player.getZ() + dis, player.getX() - dis, player.getY() - dis, player.getZ() - dis), e -> (e.getScoreboardTags().contains(player.getEntityName()) && e instanceof LivingEntity && e.distanceTo(player) <= dis)).forEach(e -> e.removeScoreboardTag(player.getEntityName()));
             }
         }
         if (client) {
             player.playSound(sound, 1, 1);
         }
         if (display && !client) {
-            ((ServerPlayerEntity) player).networkHandler.sendPacket(new OverlayMessageS2CPacket(Text.literal(message)));
+            ((ServerPlayerEntity) player).networkHandler.sendPacket(new OverlayMessageS2CPacket(message));
         }
     }
 

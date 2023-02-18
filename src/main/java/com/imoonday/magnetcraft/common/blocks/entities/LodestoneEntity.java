@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethod;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import net.minecraft.block.BlockState;
@@ -14,8 +15,9 @@ public class LodestoneEntity extends BlockEntity {
     }
 
     public static void tick(World world, BlockPos pos) {
+        int disPerPower = ModConfig.getConfig().value.disPerPower;
         boolean hasPowered = world.isReceivingRedstonePower(pos);
-        double dis = world.getReceivedRedstonePower(pos) * 2 + 1;
+        double dis = world.getReceivedRedstonePower(pos) * disPerPower + 1;
         if (hasPowered) {
             AttractMethod.attractItems(world, pos, dis);
         }

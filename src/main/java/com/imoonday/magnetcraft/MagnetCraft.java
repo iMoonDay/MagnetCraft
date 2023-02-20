@@ -2,10 +2,7 @@ package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.*;
-import com.imoonday.magnetcraft.registries.special.CallbackRegistries;
-import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
-import com.imoonday.magnetcraft.registries.special.GlobalReceiverRegistries;
-import com.imoonday.magnetcraft.registries.special.ItemGroupRegistries;
+import com.imoonday.magnetcraft.registries.special.*;
 import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,5 +25,6 @@ public class MagnetCraft implements ModInitializer {
         GlobalReceiverRegistries.register();
         CustomStatRegistries.register();
         CallbackRegistries.register();
+        CommandRegistries.register();
     }
 }

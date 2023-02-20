@@ -10,11 +10,27 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 public class ModConfig implements ConfigData {
 
     public boolean displayActionBar = true;
-    public boolean displayQuantityFeedback = true;
+    public boolean displayMessageFeedback = true;
     public boolean enableSneakToSwitch = true;
     public boolean rightClickReversal = false;
 
-    @ConfigEntry.Gui.CollapsibleObject(startExpanded = true)
+    @ConfigEntry.Gui.CollapsibleObject
+    public Whitelist whitelist = new Whitelist();
+
+    public static class Whitelist {
+        public boolean enable = false;
+        public String[] list = new String[]{"minecraft:example"};
+    }
+
+    @ConfigEntry.Gui.CollapsibleObject
+    public Blacklist blacklist = new Blacklist();
+
+    public static class Blacklist {
+        public boolean enable = false;
+        public String[] list = new String[]{"minecraft:example"};
+    }
+
+    @ConfigEntry.Gui.CollapsibleObject
     public DefaultValue value = new DefaultValue();
 
     public static class DefaultValue {
@@ -55,7 +71,7 @@ public class ModConfig implements ConfigData {
         public int disPerLvl = 2;
         @ConfigEntry.BoundedDiscrete(max = 20)
         public int disPerPower = 2;
-        @ConfigEntry.BoundedDiscrete(min = 1,max = 10)
+        @ConfigEntry.BoundedDiscrete(min = 1, max = 10)
         @ConfigEntry.Gui.RequiresRestart
         public int maxEnchLvl = 5;
         //装备乘数
@@ -66,6 +82,7 @@ public class ModConfig implements ConfigData {
     public static void register() {
         AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
     }
+
     public static ModConfig getConfig() {
         return AutoConfig.getConfigHolder(ModConfig.class).getConfig();
     }

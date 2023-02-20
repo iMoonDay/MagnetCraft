@@ -14,7 +14,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -76,7 +75,7 @@ public abstract class LivingEntityMixin {
             boolean handPolar = mainhandPolar || offhandPolar;
             boolean handCreature = mainhandCreature || offhandCreature;
             boolean handMagnet = mainhandMagnet || offhandMagnet;
-            boolean hasEnch = (NbtClassMethod.hasEnchantment(entity,EnchantmentRegistries.ATTRACT_ENCHANTMENT));
+            boolean hasEnch = (NbtClassMethod.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT));
             boolean hasTag = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
             boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
             boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
@@ -109,21 +108,21 @@ public abstract class LivingEntityMixin {
             double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;
             double telDis;
             double finalTelDis = 0;
-            String playerHand = null;
+            AttractMethod.Hand playerHand = AttractMethod.Hand.NONE;
             ItemStack mainhandStack = ItemStack.EMPTY;
             ItemStack offhandStack = ItemStack.EMPTY;
             if (mainhandMagnet || mainhandHasEnch || mainhandCreature) {
                 mainhandStack = entity.getMainHandStack();
-                playerHand = "mainhand";
+                playerHand = AttractMethod.Hand.MAINHAND;
             }
             if (offhandMagnet || offhandHasEnch || offhandCreature) {
                 offhandStack = entity.getOffHandStack();
-                if (mainhandMagnet || mainhandCreature) playerHand = "hand";
-                else playerHand = "offhand";
+                if (mainhandMagnet || mainhandCreature) playerHand = AttractMethod.Hand.HAND;
+                else playerHand = AttractMethod.Hand.OFFHAND;
             }
-            if (Objects.equals(playerHand, "hand") && (mainhandEmptyDamage || offhandEmptyDamage)) {
-                if (mainhandEmptyDamage) playerHand = "offhand";
-                if (offhandEmptyDamage) playerHand = "mainhand";
+            if (playerHand == AttractMethod.Hand.HAND && (mainhandEmptyDamage || offhandEmptyDamage)) {
+                if (mainhandEmptyDamage) playerHand = AttractMethod.Hand.OFFHAND;
+                if (offhandEmptyDamage) playerHand = AttractMethod.Hand.MAINHAND;
             }
             if (mainhandCreature && mainhandUsedTick >= 200) {
                 NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
@@ -137,7 +136,7 @@ public abstract class LivingEntityMixin {
                 entity.getOffHandStack().setNbt(nbt);
                 NbtClassMethod.addDamage(entity, Hand.OFF_HAND, 1);
             }
-            if (handCreature && !hasTag && ((Objects.equals(playerHand, "mainhand") && !mainhandEmptyDamage) || (Objects.equals(playerHand, "offhand") && !offhandEmptyDamage) || (Objects.equals(playerHand, "hand") && !mainhandEmptyDamage && !offhandEmptyDamage))) {
+            if (handCreature && !hasTag && ((playerHand == AttractMethod.Hand.MAINHAND && !mainhandEmptyDamage) || (playerHand == AttractMethod.Hand.OFFHAND && !offhandEmptyDamage) || (playerHand == AttractMethod.Hand.HAND && !mainhandEmptyDamage && !offhandEmptyDamage))) {
                 CreatureMethod.attractCreatures(mainhandStack, offhandStack, entity, creatureDis, playerHand);
             }
             if (isAttracting) {
@@ -222,7 +221,7 @@ public abstract class LivingEntityMixin {
                     text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
                 }
                 if (!client) {
-                    ((ServerPlayerEntity) entity).networkHandler.sendPacket(new OverlayMessageS2CPacket(text));
+                    ((ServerPlayerEntity) entity).sendMessage(text, true);
                 }
             }
         }

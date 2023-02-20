@@ -11,8 +11,6 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -69,6 +67,10 @@ public class MagnetControllerItem extends Item {
         boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
         boolean sneaking = user.isSneaking();
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        boolean flying = user.getAbilities().flying;
+        if (sneaking && flying) {
+            sneaking = false;
+        }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal) && selected) {
             if (!creative && isEmptyDamage) {
                 return;
@@ -91,19 +93,15 @@ public class MagnetControllerItem extends Item {
             if (hasTag) {
                 user.removeScoreboardTag("MagnetCraft.MagnetOFF");
                 sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
-//                message = "所有磁铁:开";
                 message = Text.translatable("text.magnetcraft.message.magnet_on");
             } else {
                 user.addScoreboardTag("MagnetCraft.MagnetOFF");
                 sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
-//                message = "所有磁铁:关";
                 message = Text.translatable("text.magnetcraft.message.magnet_off");
             }
-            if (isClient) {
-                user.playSound(sound, 1, 1);
-            }
+            user.playSound(sound, 1, 1);
             if (display && !isClient) {
-                ((ServerPlayerEntity) user).networkHandler.sendPacket(new OverlayMessageS2CPacket(message));
+                user.sendMessage(message, true);
             }
             user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
             user.getInventory().updateItems();

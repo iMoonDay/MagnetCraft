@@ -57,6 +57,10 @@ public class CreatureMagnetItem extends Item {
         boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        boolean flying = user.getAbilities().flying;
+        if (sneaking && flying) {
+            sneaking = false;
+        }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);

@@ -9,8 +9,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.packet.s2c.play.OverlayMessageS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -62,7 +60,8 @@ public class NbtClassMethod {
             player.playSound(sound, 1, 1);
         }
         if (display && !client) {
-            ((ServerPlayerEntity) player).networkHandler.sendPacket(new OverlayMessageS2CPacket(message));
+            player.sendMessage(message, true);
+
         }
     }
 

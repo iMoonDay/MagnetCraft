@@ -90,7 +90,7 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("magnet_block"), new BlockItem(MAGNET_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("netherite_magnet_block"), new BlockItem(NETHERITE_MAGNET_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("raw_magnet_block"), new BlockItem(RAW_MAGNET_BLOCK, new FabricItemSettings()));
-        Registry.register(Registries.ITEM, id("lodestone"), new BlockItem(LODESTONE_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, id("lodestone"), new LodestoneBlockItem(LODESTONE_BLOCK, new FabricItemSettings()));
 
         Registry.register(Registries.ITEM, id("magnetic_iron_sword"), MAGNETIC_IRON_SWORD);
         Registry.register(Registries.ITEM, id("magnetic_iron_pickaxe"), MAGNETIC_IRON_PICKAXE);

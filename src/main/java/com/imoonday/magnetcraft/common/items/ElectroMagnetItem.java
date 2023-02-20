@@ -61,6 +61,10 @@ public class ElectroMagnetItem extends Item {
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         double dis = config.value.electromagnetTeleportMinDis;
+        boolean flying = user.getAbilities().flying;
+        if (sneaking && flying) {
+            sneaking = false;
+        }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);

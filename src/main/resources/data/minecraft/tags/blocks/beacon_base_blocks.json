@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:magnet_block",
+    "magnetcraft:netherite_magnet_block"
+  ]
+}

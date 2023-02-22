@@ -3,6 +3,9 @@ package com.imoonday.magnetcraft.common.enchantments;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.item.MiningToolItem;
 
 public class AutomaticCollectionEnchantment extends Enchantment {
     public AutomaticCollectionEnchantment() {
@@ -24,4 +27,8 @@ public class AutomaticCollectionEnchantment extends Enchantment {
         return 1;
     }
 
+    @Override
+    public boolean isAcceptableItem(ItemStack stack) {
+        return stack.getItem() instanceof MiningToolItem || stack.isOf(Items.SHEARS);
+    }
 }

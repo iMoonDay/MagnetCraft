@@ -2,6 +2,8 @@ package com.imoonday.magnetcraft.mixin;
 
 //import com.imoonday.magnetcraft.config.ModConfig;
 
+import com.imoonday.magnetcraft.callbacks.EntityKilledByPlayerCallback;
+import com.imoonday.magnetcraft.common.entities.TridentEntity;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethod;
 import com.imoonday.magnetcraft.methods.CreatureMethod;
@@ -9,14 +11,19 @@ import com.imoonday.magnetcraft.methods.NbtClassMethod;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.HorseEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -58,8 +65,8 @@ public abstract class LivingEntityMixin {
             ItemStack feet = entity.getEquippedStack(EquipmentSlot.FEET);
             ItemStack mainhand = entity.getEquippedStack(EquipmentSlot.MAINHAND);
             ItemStack offhand = entity.getEquippedStack(EquipmentSlot.OFFHAND);
-            boolean mainhandEnabled = mainhand.getOrCreateNbt().getBoolean("enabled");
-            boolean offhandEnabled = offhand.getOrCreateNbt().getBoolean("enabled");
+            boolean mainhandEnabled = mainhand.getNbt() != null && mainhand.getNbt().getBoolean("enabled");
+            boolean offhandEnabled = offhand.getNbt() != null && offhand.getNbt().getBoolean("enabled");
             boolean mainhandElectromagnet = mainhand.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && mainhandEnabled;
             boolean mainhandPermanent = mainhand.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && mainhandEnabled;
             boolean mainhandPolar = mainhand.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && mainhandEnabled;
@@ -102,8 +109,8 @@ public abstract class LivingEntityMixin {
             boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
             boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
             int enchLvl = NbtClassMethod.getEnchantmentLvl(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-            int mainhandUsedTick = entity.getMainHandStack().getOrCreateNbt().getInt("usedTick");
-            int offhandUsedTick = entity.getOffHandStack().getOrCreateNbt().getInt("usedTick");
+            int mainhandUsedTick = entity.getMainHandStack().getNbt() != null ? entity.getMainHandStack().getNbt().getInt("usedTick") : 0;
+            int offhandUsedTick = entity.getOffHandStack().getNbt() != null ? entity.getOffHandStack().getNbt().getInt("usedTick") : 0;
             double enchMinDis = enchDefaultDis + disPerLvl;
             double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;
             double telDis;
@@ -222,6 +229,24 @@ public abstract class LivingEntityMixin {
                 }
                 if (!client) {
                     ((ServerPlayerEntity) entity).sendMessage(text, true);
+                }
+            }
+        }
+    }
+
+    @Inject(at = @At(value = "RETURN"), method = "drop", cancellable = true)
+    void drop(DamageSource source, CallbackInfo ci) {
+        if (source.getAttacker() instanceof PlayerEntity player) {
+            Entity sourceEntity = source.getSource();
+            if (sourceEntity != null) {
+                LivingEntity entity = (LivingEntity) (Object) this;
+                World world = player.world;
+                ItemStack stack;
+                stack = sourceEntity instanceof TridentEntity ? ((TridentEntity) sourceEntity).asItemStack() : player.getMainHandStack();
+                BlockPos pos = entity.getBlockPos();
+                ActionResult result = EntityKilledByPlayerCallback.EVENT.invoker().interact(world, player, stack, pos, entity);
+                if (result == ActionResult.FAIL) {
+                    ci.cancel();
                 }
             }
         }

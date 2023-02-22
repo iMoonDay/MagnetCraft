@@ -1,9 +1,9 @@
 {
-  "feature": "magnetcraft:ore_magnetite_buried",
+  "feature": "magnetcraft:ore_magnetite_small",
   "placement": [
     {
       "type": "minecraft:count",
-      "count": 4
+      "count": 10
     },
     {
       "type": "minecraft:in_square"
@@ -11,12 +11,12 @@
     {
       "type": "minecraft:height_range",
       "height": {
-        "type": "minecraft:trapezoid",
-        "max_inclusive": {
-          "absolute": 32
-        },
+        "type": "minecraft:uniform",
         "min_inclusive": {
-          "absolute": -64
+          "above_bottom": 0
+        },
+        "max_inclusive": {
+          "absolute": 72
         }
       }
     },

@@ -9,9 +9,8 @@ import org.slf4j.LoggerFactory;
 
 public class MagnetCraft implements ModInitializer {
     public static final String MOD_ID = "magnetcraft";
+    @SuppressWarnings("unused")
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
-//    public static final RecipeSerializer<MagnetCraftingRecipe> MAGNET_CRAFTING_RECIPE = RecipeSerializer.register("magnet_crafting",new SpecialRecipeSerializer<>(MagnetCraftingRecipe::new));
-//    public static final RecipeSerializer<ModuleCraftingRecipe> MODULE_CRAFTING_RECIPE = RecipeSerializer.register("module_crafting",new SpecialRecipeSerializer<>(ModuleCraftingRecipe::new));
 
     @Override
     public void onInitialize() {

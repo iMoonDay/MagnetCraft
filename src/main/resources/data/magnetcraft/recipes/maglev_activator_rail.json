@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "minecraft:activator_rail"
+  },
+  "addition": {
+    "item": "magnetcraft:magnetic_iron_ingot"
+  },
+  "result": {
+    "item": "magnetcraft:maglev_activator_rail"
+  }
+}

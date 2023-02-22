@@ -3,9 +3,7 @@ package com.imoonday.magnetcraft.methods;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
-import com.imoonday.magnetcraft.registries.special.IdentifierRegistries;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
@@ -15,13 +13,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 public class CreatureMethod {
-
-    public static boolean entityCanAttract = false;
 
     public static void attractCreatures(ItemStack mainhandStack, ItemStack offhandStack, LivingEntity entity, double dis, AttractMethod.Hand hand) {
         boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
@@ -39,46 +34,41 @@ public class CreatureMethod {
         boolean client = entity.getWorld().isClient;
         boolean spectator = entity.isSpectator();
         boolean creative = player && ((PlayerEntity) entity).isCreative();
+        boolean entityCanAttract;
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        if (player && client) {
-            ClientPlayNetworking.send(IdentifierRegistries.GET_DEGAUSSING_ENTITIES_PACKET_ID, PacketByteBufs.empty());
-        } else {
+        if (!client) {
             entityCanAttract = entity.getWorld().getOtherEntities(null, new Box(entity.getX() + degaussingDis, entity.getY() + degaussingDis, entity.getZ() + degaussingDis, entity.getX() - degaussingDis, entity.getY() - degaussingDis, entity.getZ() - degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
-        }
-        if (!magnetOff && entityCanAttract && !isEmpty) {
-            entity.getWorld().getOtherEntities(entity, new Box(entity.getX() + dis, entity.getY() + dis, entity.getZ() + dis, entity.getX() - dis, entity.getY() - dis, entity.getZ() - dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
-                double move_x = (entity.getX() - e.getX()) * 0.05;
-                double move_y = (entity.getY() - e.getY()) * 0.05;
-                double move_z = (entity.getZ() - e.getZ()) * 0.05;
-                ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
-                ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
-                e.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(entity.getX(), entity.getY() + 1, entity.getZ()));
-                boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0);
-                if (stop) {
-                    e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                } else {
-                    e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                }
-                if (!client) {
-                    entity.getWorld().getPlayers().forEach(o -> {
-                        if (o.canSee(e)) {
-                            ((ServerPlayerEntity) o).networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e));
-                        }
-                    });
-                }
-                if (!spectator && !creative) {
-                    ItemStack stack;
-                    if (isMainhand || isHand) {
-                        stack = entity.getMainHandStack();
-                        int tick = stack.getOrCreateNbt().getInt("usedTick") + 1;
-                        stack.getOrCreateNbt().putInt("usedTick", tick);
+            if (!magnetOff && entityCanAttract && !isEmpty) {
+                entity.getWorld().getOtherEntities(entity, new Box(entity.getX() + dis, entity.getY() + dis, entity.getZ() + dis, entity.getX() - dis, entity.getY() - dis, entity.getZ() - dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
+                    double move_x = (entity.getX() - e.getX()) * 0.05;
+                    double move_y = (entity.getY() - e.getY()) * 0.05;
+                    double move_z = (entity.getZ() - e.getZ()) * 0.05;
+                    ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
+                    ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
+                    e.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(entity.getX(), entity.getY() + 1, entity.getZ()));
+                    boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0);
+                    if (stop) {
+                        e.setVelocity(new Vec3d(move_x, 0.25, move_z));
+                        e.setVelocityClient(move_x, 0.25, move_z);
                     } else {
-                        stack = entity.getOffHandStack();
-                        int tick = stack.getOrCreateNbt().getInt("usedTick") + 1;
-                        stack.getOrCreateNbt().putInt("usedTick", tick);
+                        e.setVelocity(new Vec3d(move_x, move_y, move_z));
+                        e.setVelocityClient(move_x, move_y, move_z);
                     }
-                }
-            });
+                    PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
+                    if (!spectator && !creative) {
+                        ItemStack stack;
+                        if (isMainhand || isHand) {
+                            stack = entity.getMainHandStack();
+                            int tick = stack.getOrCreateNbt().getInt("usedTick") + 1;
+                            stack.getOrCreateNbt().putInt("usedTick", tick);
+                        } else {
+                            stack = entity.getOffHandStack();
+                            int tick = stack.getOrCreateNbt().getInt("usedTick") + 1;
+                            stack.getOrCreateNbt().putInt("usedTick", tick);
+                        }
+                    }
+                });
+            }
         }
     }
 }

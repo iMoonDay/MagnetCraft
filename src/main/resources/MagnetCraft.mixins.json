@@ -4,6 +4,7 @@
   "package": "com.imoonday.magnetcraft.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "AbstractMinecartEntityMixin",
     "ArrowEntityMixin",
     "BrewingMixin",
     "ItemEntityMixin",

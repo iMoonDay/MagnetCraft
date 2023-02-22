@@ -9,7 +9,7 @@
   ],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/MagnetCraft/icon.png",
+  "icon": "assets/magnetcraft/icon.png",
   "environment": "*",
   "entrypoints": {
     "client": [

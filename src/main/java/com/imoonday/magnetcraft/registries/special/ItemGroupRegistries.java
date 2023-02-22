@@ -11,9 +11,10 @@ import static com.imoonday.magnetcraft.registries.common.BlockRegistries.*;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+@SuppressWarnings("CodeBlock2Expr")
 public class ItemGroupRegistries {
 
-    public static void register(){
+    public static void register() {
 
         FabricItemGroup.builder(id("magnet"))
                 .displayName(Text.translatable("group.magnetcraft.magnet"))
@@ -25,6 +26,10 @@ public class ItemGroupRegistries {
                     content.add(MAGNET_BLOCK);
                     content.add(NETHERITE_MAGNET_BLOCK);
                     content.add(LODESTONE_BLOCK);
+                    content.add(MAGLEV_RAIL_BLOCK);
+                    content.add(MAGLEV_POWERED_RAIL_BLOCK);
+                    content.add(MAGLEV_DETECTOR_RAIL_BLOCK);
+                    content.add(MAGLEV_ACTIVATOR_RAIL_BLOCK);
                     content.add(RAW_MAGNET_ITEM);
                     content.add(MAGNET_FRAGMENT_ITEM);
                     content.add(MAGNETIC_IRON_INGOT);
@@ -103,6 +108,10 @@ public class ItemGroupRegistries {
             content.add(PERMANENT_MAGNET_ITEM.getDefaultStack());
             content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
+            content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
+            content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
+            content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);
+            content.addAfter(MAGLEV_DETECTOR_RAIL_BLOCK, MAGLEV_ACTIVATOR_RAIL_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
@@ -119,8 +128,16 @@ public class ItemGroupRegistries {
             content.addAfter(Items.IRON_HORSE_ARMOR, MAGNETIC_IRON_HORSE_ARMOR);
         });
 
-        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content->{
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
             content.addAfter(Items.LODESTONE, LODESTONE_BLOCK);
+        });
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(content -> {
+            content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
+            content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
+            content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);
+            content.addAfter(MAGLEV_DETECTOR_RAIL_BLOCK, MAGLEV_ACTIVATOR_RAIL_BLOCK);
+            content.addAfter(Items.LEVER, MAGLEV_LEVER_BLOCK);
         });
     }
 }

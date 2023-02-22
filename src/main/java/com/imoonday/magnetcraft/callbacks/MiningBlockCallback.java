@@ -17,7 +17,6 @@ public interface MiningBlockCallback {
             (listeners) -> (world, player, stack, block, state, pos, blockEntity) -> {
                 for (MiningBlockCallback listener : listeners) {
                     ActionResult result = listener.interact(world, player, stack, block, state, pos, blockEntity);
-
                     if (result != ActionResult.PASS) {
                         return result;
                     }

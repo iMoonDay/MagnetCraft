@@ -14,12 +14,10 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TridentEntity.class)
-public abstract class TridentEntityMixin implements com.imoonday.magnetcraft.common.entities.TridentEntity {
+public class TridentEntityMixin {
 
     @Shadow private ItemStack tridentStack;
 
-    @SuppressWarnings("ShadowModifiers")
-    @Override
     @Shadow
     public ItemStack asItemStack(){
         return null;

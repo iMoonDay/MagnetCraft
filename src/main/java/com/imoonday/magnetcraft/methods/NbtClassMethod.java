@@ -112,7 +112,7 @@ public class NbtClassMethod {
         }
     }
 
-    public static boolean checkEmptyDamage(LivingEntity player, Hand hand) {
+    public static boolean isEmptyDamage(LivingEntity player, Hand hand) {
         boolean isMainhand = hand == Hand.MAIN_HAND;
         ItemStack stack;
         if (isMainhand) {

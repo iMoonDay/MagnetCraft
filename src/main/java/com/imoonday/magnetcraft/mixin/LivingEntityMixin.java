@@ -2,28 +2,24 @@ package com.imoonday.magnetcraft.mixin;
 
 //import com.imoonday.magnetcraft.config.ModConfig;
 
-import com.imoonday.magnetcraft.callbacks.EntityKilledByPlayerCallback;
-import com.imoonday.magnetcraft.common.entities.TridentEntity;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethod;
 import com.imoonday.magnetcraft.methods.CreatureMethod;
 import com.imoonday.magnetcraft.methods.NbtClassMethod;
+import com.imoonday.magnetcraft.methods.TeleportMethod;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -100,8 +96,8 @@ public abstract class LivingEntityMixin {
             boolean hasNetheriteMagneticIronBoots = feet.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
             boolean hasMagneticIronSuit = hasMagneticIronHelmet && hasMagneticIronChestcplate && hasMagneticIronLeggings && hasMagneticIronBoots;
             boolean hasNetheriteMagneticIronSuit = hasNetheriteMagneticIronHelmet && hasNetheriteMagneticIronChestcplate && hasNetheriteMagneticIronLeggings && hasNetheriteMagneticIronBoots;
-            boolean mainhandEmptyDamage = NbtClassMethod.checkEmptyDamage(entity, Hand.MAIN_HAND);
-            boolean offhandEmptyDamage = NbtClassMethod.checkEmptyDamage(entity, Hand.OFF_HAND);
+            boolean mainhandEmptyDamage = NbtClassMethod.isEmptyDamage(entity, Hand.MAIN_HAND);
+            boolean offhandEmptyDamage = NbtClassMethod.isEmptyDamage(entity, Hand.OFF_HAND);
             boolean display = config.displayActionBar;
             boolean player = entity.isPlayer();
             boolean client = entity.getWorld().isClient;
@@ -234,7 +230,7 @@ public abstract class LivingEntityMixin {
         }
     }
 
-    @Inject(at = @At(value = "RETURN"), method = "drop", cancellable = true)
+    @Inject(at = @At(value = "RETURN"), method = "drop")
     void drop(DamageSource source, CallbackInfo ci) {
         if (source.getAttacker() instanceof PlayerEntity player) {
             Entity sourceEntity = source.getSource();
@@ -243,10 +239,17 @@ public abstract class LivingEntityMixin {
                 World world = player.world;
                 ItemStack stack;
                 stack = sourceEntity instanceof TridentEntity ? ((TridentEntity) sourceEntity).asItemStack() : player.getMainHandStack();
-                BlockPos pos = entity.getBlockPos();
-                ActionResult result = EntityKilledByPlayerCallback.EVENT.invoker().interact(world, player, stack, pos, entity);
-                if (result == ActionResult.FAIL) {
-                    ci.cancel();
+                boolean hasEnchantment = NbtClassMethod.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
+                if (hasEnchantment) {
+                    world.getOtherEntities(null, entity.getBoundingBox(), e -> ((e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.age == 0)).forEach(e -> {
+                        if (e instanceof ExperienceOrbEntity) {
+                            int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
+                            player.addExperience(amount);
+                        } else {
+                            TeleportMethod.teleportItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
+                        }
+                        e.kill();
+                    });
                 }
             }
         }

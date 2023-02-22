@@ -13,7 +13,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 
 public class CreatureMethod {
@@ -37,9 +36,9 @@ public class CreatureMethod {
         boolean entityCanAttract;
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         if (!client) {
-            entityCanAttract = entity.getWorld().getOtherEntities(null, new Box(entity.getX() + degaussingDis, entity.getY() + degaussingDis, entity.getZ() + degaussingDis, entity.getX() - degaussingDis, entity.getY() - degaussingDis, entity.getZ() - degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
+            entityCanAttract = entity.getWorld().getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
             if (!magnetOff && entityCanAttract && !isEmpty) {
-                entity.getWorld().getOtherEntities(entity, new Box(entity.getX() + dis, entity.getY() + dis, entity.getZ() + dis, entity.getX() - dis, entity.getY() - dis, entity.getZ() - dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
+                entity.getWorld().getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
                     double move_x = (entity.getX() - e.getX()) * 0.05;
                     double move_y = (entity.getY() - e.getY()) * 0.05;
                     double move_z = (entity.getZ() - e.getZ()) * 0.05;

@@ -57,7 +57,7 @@ public class ElectroMagnetItem extends Item {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
         boolean sneaking = user.isSneaking();
-        boolean emptyDamage = NbtClassMethod.checkEmptyDamage(user, hand);
+        boolean emptyDamage = NbtClassMethod.isEmptyDamage(user, hand);
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         double dis = config.value.electromagnetTeleportMinDis;
@@ -78,7 +78,7 @@ public class ElectroMagnetItem extends Item {
                     user.getOffHandStack().damage(1, user.world.random, (ServerPlayerEntity) user);
                 }
             }
-            TeleportMethod.teleportItems(world, user, dis, hand);
+            TeleportMethod.teleportSurroundingItemEntitiesToPlayer(world, user, dis, hand);
         }
         user.getItemCooldownManager().set(this, 20);
         return super.use(world, user, hand);

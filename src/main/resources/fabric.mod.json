@@ -23,11 +23,12 @@
     ]
   },
   "mixins": [
-    "MagnetCraft.mixins.json"
+    "magnetcraft.mixins.json"
   ],
   "depends": {
     "fabricloader": ">=0.14.14",
     "fabric": "*",
     "minecraft": "1.19.3"
-  }
+  },
+  "accessWidener": "magnetcraft.accesswidener"
 }

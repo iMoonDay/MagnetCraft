@@ -14,16 +14,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TridentEntity.class)
-public abstract class TridentEntityMixin implements com.imoonday.magnetcraft.common.entities.TridentEntity {
+public class TridentEntityMixin {
 
     @Shadow private ItemStack tridentStack;
-
-    @SuppressWarnings("ShadowModifiers")
-    @Override
-    @Shadow
-    public ItemStack asItemStack(){
-        return null;
-    }
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
     public void checkAttract(CallbackInfo info) {
@@ -32,7 +25,7 @@ public abstract class TridentEntityMixin implements com.imoonday.magnetcraft.com
             World world = ((TridentEntity) (Object) this).getWorld();
             if (world == null) return;
             ModConfig config = ModConfig.getConfig();
-            ItemStack stack = this.asItemStack();
+            ItemStack stack = this.tridentStack;
             int enchLvl = EnchantmentHelper.getLevel(EnchantmentRegistries.ATTRACT_ENCHANTMENT,stack);
             boolean isAttracting = enchLvl > 0;
             double enchDefaultDis = config.value.enchDefaultDis;

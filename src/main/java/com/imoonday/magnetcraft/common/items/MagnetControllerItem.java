@@ -63,7 +63,7 @@ public class MagnetControllerItem extends Item {
     public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
         boolean display = ModConfig.getConfig().displayActionBar;
         boolean creative = user.isCreative();
-        boolean isEmptyDamage = NbtClassMethod.checkEmptyDamage(user, hand);
+        boolean isEmptyDamage = NbtClassMethod.isEmptyDamage(user, hand);
         boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
         boolean sneaking = user.isSneaking();
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;

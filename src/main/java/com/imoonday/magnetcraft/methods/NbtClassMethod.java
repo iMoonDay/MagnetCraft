@@ -26,31 +26,18 @@ public class NbtClassMethod {
         double dis = ModConfig.getConfig().value.creatureMagnetAttractDis;
         Text message;
         SoundEvent sound;
-        ItemStack stack;
+        ItemStack stack = isMainhand ? player.getMainHandStack() : player.getOffHandStack();
         if (!enableSneakToSwitch) {
             return;
-        }
-        if (isMainhand) {
-            stack = player.getMainHandStack();
-        } else {
-            stack = player.getOffHandStack();
         }
         boolean enabled = stack.getOrCreateNbt().getBoolean("enabled");
         stack.getOrCreateNbt().putBoolean("enabled", !enabled);
         enabled = !enabled;
         if (enabled) {
-            if (isMainhand) {
-                message = Text.translatable("text.magnetcraft.message.mainhand_on");
-            } else {
-                message = Text.translatable("text.magnetcraft.message.offhand_on");
-            }
+            message = isMainhand ? Text.translatable("text.magnetcraft.message.mainhand_on") : Text.translatable("text.magnetcraft.message.offhand_on");
             sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
         } else {
-            if (isMainhand) {
-                message = Text.translatable("text.magnetcraft.message.mainhand_off");
-            } else {
-                message = Text.translatable("text.magnetcraft.message.offhand_off");
-            }
+            message = isMainhand ? Text.translatable("text.magnetcraft.message.mainhand_off") : Text.translatable("text.magnetcraft.message.offhand_off");
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
             if (stack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
                 player.getWorld().getOtherEntities(player, new Box(player.getX() + dis, player.getY() + dis, player.getZ() + dis, player.getX() - dis, player.getY() - dis, player.getZ() - dis), e -> (e.getScoreboardTags().contains(player.getEntityName()) && e instanceof LivingEntity && e.distanceTo(player) <= dis)).forEach(e -> e.removeScoreboardTag(player.getEntityName()));
@@ -61,7 +48,6 @@ public class NbtClassMethod {
         }
         if (display && !client) {
             player.sendMessage(message, true);
-
         }
     }
 
@@ -112,14 +98,9 @@ public class NbtClassMethod {
         }
     }
 
-    public static boolean checkEmptyDamage(LivingEntity player, Hand hand) {
+    public static boolean isEmptyDamage(LivingEntity player, Hand hand) {
         boolean isMainhand = hand == Hand.MAIN_HAND;
-        ItemStack stack;
-        if (isMainhand) {
-            stack = player.getMainHandStack();
-        } else {
-            stack = player.getOffHandStack();
-        }
+        ItemStack stack = isMainhand ? player.getMainHandStack() : player.getOffHandStack();
         boolean isDamageable = stack.isDamageable();
         boolean isEmptyDamage = stack.getDamage() >= stack.getMaxDamage();
         return (isDamageable && isEmptyDamage);

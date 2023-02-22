@@ -69,7 +69,7 @@ public class PermanentMagnetItem extends Item {
             }
             NbtClassMethod.enabledSwitch(world, user, hand);
         } else {
-            TeleportMethod.teleportItems(world, user, dis, hand);
+            TeleportMethod.teleportSurroundingItemEntitiesToPlayer(world, user, dis, hand);
         }
         user.getItemCooldownManager().set(this, 10);
         return super.use(world, user, hand);

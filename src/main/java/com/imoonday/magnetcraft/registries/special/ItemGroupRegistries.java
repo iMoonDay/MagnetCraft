@@ -26,6 +26,7 @@ public class ItemGroupRegistries {
                     content.add(MAGNET_BLOCK);
                     content.add(NETHERITE_MAGNET_BLOCK);
                     content.add(LODESTONE_BLOCK);
+                    content.add(MAGLEV_LEVER_BLOCK);
                     content.add(MAGLEV_RAIL_BLOCK);
                     content.add(MAGLEV_POWERED_RAIL_BLOCK);
                     content.add(MAGLEV_DETECTOR_RAIL_BLOCK);

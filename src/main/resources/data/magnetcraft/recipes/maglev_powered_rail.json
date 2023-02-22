@@ -1,12 +1,20 @@
 {
-  "type": "minecraft:smithing",
-  "base": {
-    "item": "minecraft:powered_rail"
-  },
-  "addition": {
-    "item": "magnetcraft:magnetic_iron_ingot"
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "1 1",
+    "121",
+    "1 1"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:powered_rail"
+    },
+    "2": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    }
   },
   "result": {
-    "item": "magnetcraft:maglev_powered_rail"
+    "item": "magnetcraft:maglev_powered_rail",
+    "count": 6
   }
 }

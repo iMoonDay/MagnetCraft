@@ -1,0 +1,6 @@
+{
+  "parent": "magnetcraft:block/maglev_rail_flat",
+  "textures": {
+    "rail": "magnetcraft:block/maglev_powered_rail_on"
+  }
+}

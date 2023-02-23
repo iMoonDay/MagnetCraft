@@ -12,6 +12,7 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
@@ -89,7 +90,13 @@ public class CreatureMagnetItem extends Item {
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         if ((((!sneaking && !rightClickReversal) || (sneaking && rightClickReversal)) || !enableSneakToSwitch) && enabled && !cooling && entityCanAttract) {
             if (!entity.addScoreboardTag(user.getEntityName())) {
-                entity.removeScoreboardTag(user.getEntityName());
+//                entity.removeScoreboardTag(user.getEntityName());
+                NbtCompound tag = new NbtCompound();
+                entity.readNbt(tag);// 获取实体的NBT
+                NbtCompound attracterTag = new NbtCompound(); // 创建一个新的CompoundTag
+                attracterTag.putUuid("playerUUID", user.getUuid()); // 将玩家的UUID放入CompoundTag
+                tag.put("Attracter", attracterTag); // 将CompoundTag放入实体的NBT
+                entity.writeNbt(tag); // 设置实体的NBT
             }
             if (!creative) {
                 user.getItemCooldownManager().set(this, 20);

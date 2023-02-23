@@ -19,7 +19,7 @@ public class ModConfig implements ConfigData {
 
     public static class Whitelist {
         public boolean enable = false;
-        public String[] list = new String[]{"minecraft:example"};
+        public String[] list = new String[]{};
     }
 
     @ConfigEntry.Gui.CollapsibleObject
@@ -27,7 +27,7 @@ public class ModConfig implements ConfigData {
 
     public static class Blacklist {
         public boolean enable = false;
-        public String[] list = new String[]{"minecraft:example"};
+        public String[] list = new String[]{};
     }
 
     @ConfigEntry.Gui.CollapsibleObject
@@ -49,6 +49,8 @@ public class ModConfig implements ConfigData {
         public int arrowAttractDis = 10;
         @ConfigEntry.BoundedDiscrete(max = 100)
         public int droppedMagnetAttractDis = 10;
+        @ConfigEntry.BoundedDiscrete(max = 300)
+        public int lodestoneMaxDis = 30;
         //传送距离
         @ConfigEntry.BoundedDiscrete(max = 150)
         public int electromagnetTeleportMinDis = 15;
@@ -71,6 +73,8 @@ public class ModConfig implements ConfigData {
         public int disPerLvl = 2;
         @ConfigEntry.BoundedDiscrete(max = 20)
         public int disPerPower = 2;
+        @ConfigEntry.BoundedDiscrete(max = 30)
+        public int disEachClick = 5;
         @ConfigEntry.BoundedDiscrete(min = 1, max = 10)
         @ConfigEntry.Gui.RequiresRestart
         public int maxEnchLvl = 5;

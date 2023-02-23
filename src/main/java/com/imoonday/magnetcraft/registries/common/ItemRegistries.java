@@ -36,6 +36,7 @@ public class ItemRegistries {
     public static final ElectroMagnetItem ELECTROMAGNET_ITEM = new ElectroMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(500));
     public static final PermanentMagnetItem PERMANENT_MAGNET_ITEM = new PermanentMagnetItem(new FabricItemSettings().maxCount(1));
     public static final CreatureMagnetItem CREATURE_MAGNET_ITEM = new CreatureMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(100));
+    public static final MineralMagnetItem MINERAL_MAGNET_ITEM = new MineralMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(27 * 64));
 
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100));
 
@@ -63,7 +64,7 @@ public class ItemRegistries {
     public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_LEGGINGS = new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.LEGS, new Item.Settings().fireproof());
     public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_BOOTS = new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.FEET, new Item.Settings().fireproof());
 
-    public static final HorseArmorItem MAGNETIC_IRON_HORSE_ARMOR = new HorseArmorItem(9,"magnetic_iron",new Item.Settings().maxCount(1));
+    public static final HorseArmorItem MAGNETIC_IRON_HORSE_ARMOR = new HorseArmorItem(9, "magnetic_iron", new Item.Settings().maxCount(1));
 
     public static void register() {
         Registry.register(Registries.ITEM, id("raw_magnet"), RAW_MAGNET_ITEM);
@@ -82,6 +83,7 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("electromagnet"), ELECTROMAGNET_ITEM);
         Registry.register(Registries.ITEM, id("permanent_magnet"), PERMANENT_MAGNET_ITEM);
         Registry.register(Registries.ITEM, id("creature_magnet"), CREATURE_MAGNET_ITEM);
+        Registry.register(Registries.ITEM, id("mineral_magnet"), MINERAL_MAGNET_ITEM);
 
         Registry.register(Registries.ITEM, id("magnet_controller"), MAGNET_CONTROLLER_ITEM);
 

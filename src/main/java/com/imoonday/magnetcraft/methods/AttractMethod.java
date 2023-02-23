@@ -63,6 +63,10 @@ public class AttractMethod {
     }
 
     public static void attractItems(World world, BlockPos pos, double dis) {
+        attractItems(world, pos.toCenterPos(), dis);
+    }
+
+    public static void attractItems(World world, Vec3d pos, double dis) {
         boolean client = world.isClient;
         boolean entityCanAttract;
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
@@ -122,6 +126,10 @@ public class AttractMethod {
     }
 
     public static void attracting(World world, BlockPos pos, double dis) {
+        attracting(world, pos.toCenterPos(), dis);
+    }
+
+    public static void attracting(World world, Vec3d pos, double dis) {
         world.getOtherEntities(null, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= dis && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) > 0.5)).forEach(e -> {
             float f = (float) (pos.getX() - e.getX());
             float g = (float) (pos.getY() - e.getY());

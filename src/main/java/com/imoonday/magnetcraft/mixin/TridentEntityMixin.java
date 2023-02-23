@@ -31,10 +31,10 @@ public class TridentEntityMixin {
             double enchDefaultDis = config.value.enchDefaultDis;
             double disPerLvl = config.value.disPerLvl;
             double enchMinDis = enchDefaultDis + disPerLvl;
-            double finalDis = enchMinDis + (enchLvl - 1) * disPerLvl;
+            double dis = enchMinDis + (enchLvl - 1) * disPerLvl;
             if (isAttracting) {
                 entity.addScoreboardTag("MagnetCraft.isAttracting");
-                AttractMethod.attractItems(entity,finalDis);
+                AttractMethod.attractItems(entity,dis);
             }
         }
     }

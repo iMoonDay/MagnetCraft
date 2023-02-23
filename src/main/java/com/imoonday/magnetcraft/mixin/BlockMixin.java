@@ -23,7 +23,7 @@ public class BlockMixin {
     public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack, CallbackInfo ci) {
         boolean hasEnchantment = NbtClassMethod.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_COLLECTION_ENCHANTMENT);
         if (hasEnchantment) {
-            Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, stack).forEach(e -> TeleportMethod.teleportItemStackToPlayer(world, player, e));
+            Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, stack).forEach(e -> TeleportMethod.giveItemStackToPlayer(world, player, e));
             ci.cancel();
         }
 

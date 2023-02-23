@@ -35,7 +35,7 @@ public class TeleportMethod {
                 int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
                 player.addExperience(amount);
             } else {
-                teleportItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
+                giveItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
             }
             player.incrementStat(CustomStatRegistries.ITEMS_TELEPORTED_TO_PLAYER);
             player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
@@ -59,7 +59,7 @@ public class TeleportMethod {
         }
     }
 
-    public static void teleportItemStackToPlayer(World world, PlayerEntity player, ItemStack stack) {
+    public static void giveItemStackToPlayer(World world, PlayerEntity player, ItemStack stack) {
         PlayerInventory inventory = player.getInventory();
         boolean hasSlot = inventory.getEmptySlot() != -1;
         ItemEntity itemEntity = new ItemEntity(world, player.getX(), player.getY(), player.getZ(), stack);
@@ -83,7 +83,8 @@ public class TeleportMethod {
             world.spawnEntity(itemEntity);
             boolean isClient = world.isClient;
             boolean displayMessageFeedback = ModConfig.getConfig().displayMessageFeedback;
-            if (!isClient && displayMessageFeedback) {
+            boolean creative = player.isCreative();
+            if (!isClient && displayMessageFeedback && !creative) {
                 player.sendMessage(Text.translatable("text.magnetcraft.message.inventory_full"));
             }
         }

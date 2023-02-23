@@ -10,6 +10,7 @@
     "BrewingMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
+    "PlayerEntityMixin",
     "TridentEntityMixin"
   ],
   "client": [

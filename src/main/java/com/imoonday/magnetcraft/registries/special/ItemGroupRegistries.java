@@ -65,6 +65,7 @@ public class ItemGroupRegistries {
                     content.add(ELECTROMAGNET_ITEM.getDefaultStack());
                     content.add(PERMANENT_MAGNET_ITEM.getDefaultStack());
                     content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
+                    content.add(MINERAL_MAGNET_ITEM);
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                 }).build();
 
@@ -108,6 +109,7 @@ public class ItemGroupRegistries {
             content.add(ELECTROMAGNET_ITEM.getDefaultStack());
             content.add(PERMANENT_MAGNET_ITEM.getDefaultStack());
             content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
+            content.add(MINERAL_MAGNET_ITEM);
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);

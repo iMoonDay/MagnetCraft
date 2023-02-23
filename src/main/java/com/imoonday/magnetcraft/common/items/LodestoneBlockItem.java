@@ -18,7 +18,9 @@ public class LodestoneBlockItem extends BlockItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.translatable("block.magnetcraft.lodestone.tooltip")
+        tooltip.add(Text.translatable("block.magnetcraft.lodestone.tooltip.1")
+                .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+        tooltip.add(Text.translatable("block.magnetcraft.lodestone.tooltip.2")
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
     }
 

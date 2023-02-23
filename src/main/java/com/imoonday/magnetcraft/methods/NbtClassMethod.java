@@ -106,6 +106,12 @@ public class NbtClassMethod {
         return (isDamageable && isEmptyDamage);
     }
 
+    public static boolean isEmptyDamage(ItemStack stack) {
+        boolean isDamageable = stack.isDamageable();
+        boolean isEmptyDamage = stack.getDamage() >= stack.getMaxDamage();
+        return (isDamageable && isEmptyDamage);
+    }
+
     public static boolean hasEnchantment(LivingEntity entity, EquipmentSlot equipmentSlot, Enchantment enchantment) {
         return getEnchantmentLvl(entity, equipmentSlot, enchantment) > 0;
     }

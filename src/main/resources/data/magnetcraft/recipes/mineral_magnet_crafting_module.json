@@ -1,0 +1,29 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "324",
+    " 5 "
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:diamond"
+    },
+    "2": {
+      "item": "magnetcraft:empty_crafting_module"
+    },
+    "3": {
+      "item": "minecraft:emerald"
+    },
+    "4": {
+      "item": "minecraft:emerald"
+    },
+    "5": {
+      "item": "minecraft:ender_pearl"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:mineral_magnet_crafting_module",
+    "count": 1
+  }
+}

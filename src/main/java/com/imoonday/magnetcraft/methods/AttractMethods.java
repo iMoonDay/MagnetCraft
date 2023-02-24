@@ -9,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -18,7 +17,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-public class AttractMethod {
+public class AttractMethods {
 
     public enum Hand {
         MAINHAND,
@@ -29,12 +28,12 @@ public class AttractMethod {
 
     public static void attractItems(@Nullable ItemStack mainhandStack, @Nullable ItemStack offhandStack, LivingEntity entity, boolean selected, double dis, Hand hand) {
         boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        boolean isMainhand = hand == AttractMethod.Hand.MAINHAND;
-        boolean isOffhand = hand == AttractMethod.Hand.OFFHAND;
-        boolean isHand = hand == AttractMethod.Hand.HAND;
-        boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean equipmentsHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.HEAD, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.FEET, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || NbtClassMethod.hasEnchantment(entity, EquipmentSlot.LEGS, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean isMainhand = hand == AttractMethods.Hand.MAINHAND;
+        boolean isOffhand = hand == AttractMethods.Hand.OFFHAND;
+        boolean isHand = hand == AttractMethods.Hand.HAND;
+        boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean equipmentsHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.HEAD, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.FEET, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.LEGS, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
         boolean mainhandEmpty = selected && !equipmentsHasEnch && !offhandHasEnch && mainhandStack == ItemStack.EMPTY && isMainhand && entity.getMainHandStack().getItem() == Items.AIR;
         boolean offhandEmpty = selected && !equipmentsHasEnch && !mainhandHasEnch && offhandStack == ItemStack.EMPTY && isOffhand && entity.getOffHandStack().getItem() == Items.AIR;
         boolean handEmpty = selected && !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && isHand && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;
@@ -62,10 +61,6 @@ public class AttractMethod {
         }
     }
 
-    public static void attractItems(World world, BlockPos pos, double dis) {
-        attractItems(world, pos.toCenterPos(), dis);
-    }
-
     public static void attractItems(World world, Vec3d pos, double dis) {
         boolean client = world.isClient;
         boolean entityCanAttract;
@@ -91,12 +86,15 @@ public class AttractMethod {
             String item;
             boolean whitelistPass;
             boolean blacklistPass;
+            boolean hasDegaussingPlayer;
             boolean pass = true;
+            int degaussingDis = ModConfig.getConfig().value.degaussingDis;
             if (e instanceof ItemEntity) {
                 item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
                 whitelistPass = Arrays.stream(whitelist).toList().contains(item);
                 blacklistPass = !Arrays.stream(blacklist).toList().contains(item);
-                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass);
+                hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
+                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && !hasDegaussingPlayer;
             }
             if (pass) {
                 if (!client) {
@@ -125,10 +123,6 @@ public class AttractMethod {
         });
     }
 
-    public static void attracting(World world, BlockPos pos, double dis) {
-        attracting(world, pos.toCenterPos(), dis);
-    }
-
     public static void attracting(World world, Vec3d pos, double dis) {
         world.getOtherEntities(null, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= dis && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) > 0.5)).forEach(e -> {
             float f = (float) (pos.getX() - e.getX());
@@ -144,13 +138,16 @@ public class AttractMethod {
             String item;
             boolean whitelistPass;
             boolean blacklistPass;
+            boolean hasDegaussingPlayer;
             boolean pass = true;
             boolean hasNearerEntity;
+            int degaussingDis = ModConfig.getConfig().value.degaussingDis;
             if (e instanceof ItemEntity) {
                 item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
                 whitelistPass = Arrays.stream(whitelist).toList().contains(item);
                 blacklistPass = !Arrays.stream(blacklist).toList().contains(item);
-                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass);
+                hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
+                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && !hasDegaussingPlayer;
             }
             if (pass) {
                 if (!client) {

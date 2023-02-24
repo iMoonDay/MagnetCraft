@@ -54,6 +54,7 @@ public class LodestoneBlock extends BlockWithEntity {
         Objects.requireNonNull(world.getBlockEntity(pos)).readNbt(nbt);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         boolean isLodestone = world.getBlockState(pos).isOf(BlockRegistries.LODESTONE_BLOCK);
@@ -67,16 +68,12 @@ public class LodestoneBlock extends BlockWithEntity {
                     nbt.putBoolean("redstone", false);
                     nbt.putDouble("dis", 0);
                 } else if (dis < ModConfig.getConfig().value.lodestoneMaxDis) {
-                    nbt.putBoolean("redstone", false);
                     nbt.putDouble("dis", dis + ModConfig.getConfig().value.disEachClick);
                 } else {
                     nbt.putBoolean("redstone", true);
                     nbt.putDouble("dis", 0);
                 }
-                nbt.putInt("direction", direction);
             } else {
-                nbt.putBoolean("redstone", redstone);
-                nbt.putDouble("dis", dis);
                 if (direction < 6 && direction >= 0) {
                     nbt.putInt("direction", direction + 1);
                 } else {

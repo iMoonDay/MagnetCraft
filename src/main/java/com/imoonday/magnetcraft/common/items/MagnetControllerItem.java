@@ -1,7 +1,8 @@
 package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.NbtClassMethod;
+import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -11,6 +12,7 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -34,16 +36,21 @@ public class MagnetControllerItem extends Item {
 
     public static void register() {
         ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (itemStack.getNbt() == null || !itemStack.getNbt().contains("enabled")) return 0.0F;
-            return itemStack.getOrCreateNbt().getBoolean("enabled") ? 1.0F : 0.0F;
+            if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
+            return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
         });
     }
 
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        NbtClassMethod.enabledSet(stack);
+        EnabledNbtMethods.enabledSet(stack);
         return stack;
+    }
+
+    @Override
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return ingredient.isOf(Items.FLINT) || super.canRepair(stack, ingredient);
     }
 
     @Override
@@ -63,7 +70,7 @@ public class MagnetControllerItem extends Item {
     public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
         boolean display = ModConfig.getConfig().displayActionBar;
         boolean creative = user.isCreative();
-        boolean isEmptyDamage = NbtClassMethod.isEmptyDamage(user, hand);
+        boolean isEmptyDamage = DamageMethods.isEmptyDamage(user, hand);
         boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
         boolean sneaking = user.isSneaking();
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
@@ -75,7 +82,7 @@ public class MagnetControllerItem extends Item {
             if (!creative && isEmptyDamage) {
                 return;
             }
-            NbtClassMethod.addDamage(user, hand, 1);
+            DamageMethods.addDamage(user, hand, 1);
             if (hasEffect) {
                 user.removeStatusEffect(EffectRegistries.DEGAUSSING_EFFECT);
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_MILK, 1, 1);
@@ -127,7 +134,7 @@ public class MagnetControllerItem extends Item {
             }
         }
         boolean enabled = !user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        stack.getOrCreateNbt().putBoolean("enabled", enabled);
+        stack.getOrCreateNbt().putBoolean("Enable", enabled);
     }
 }
 

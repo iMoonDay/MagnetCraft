@@ -31,12 +31,13 @@ public class ItemRegistries {
     public static final CraftingModuleItem ELECTROMAGNET_CRAFTING_MODULE_ITEM = new CraftingModuleItem(new FabricItemSettings().maxCount(16));
     public static final CraftingModuleItem PERMANENT_MAGNET_CRAFTING_MODULE_ITEM = new CraftingModuleItem(new FabricItemSettings().maxCount(16));
     public static final CraftingModuleItem CREATURE_MAGNET_CRAFTING_MODULE_ITEM = new CraftingModuleItem(new FabricItemSettings().maxCount(16));
+    public static final CraftingModuleItem MINERAL_MAGNET_CRAFTING_MODULE_ITEM = new CraftingModuleItem(new FabricItemSettings().maxCount(16));
 
     public static final PolorMagnetItem POLAR_MAGNET_ITEM = new PolorMagnetItem(new FabricItemSettings().maxCount(1));
     public static final ElectroMagnetItem ELECTROMAGNET_ITEM = new ElectroMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(500));
     public static final PermanentMagnetItem PERMANENT_MAGNET_ITEM = new PermanentMagnetItem(new FabricItemSettings().maxCount(1));
     public static final CreatureMagnetItem CREATURE_MAGNET_ITEM = new CreatureMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(100));
-    public static final MineralMagnetItem MINERAL_MAGNET_ITEM = new MineralMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(27 * 64));
+    public static final MineralMagnetItem MINERAL_MAGNET_ITEM = new MineralMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(9 * 64));
 
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100));
 
@@ -78,6 +79,7 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("permanent_magnet_crafting_module"), PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
         Registry.register(Registries.ITEM, id("polar_magnet_crafting_module"), POLAR_MAGNET_CRAFTING_MODULE_ITEM);
         Registry.register(Registries.ITEM, id("creature_magnet_crafting_module"), CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
+        Registry.register(Registries.ITEM, id("mineral_magnet_crafting_module"), MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
 
         Registry.register(Registries.ITEM, id("polar_magnet"), POLAR_MAGNET_ITEM);
         Registry.register(Registries.ITEM, id("electromagnet"), ELECTROMAGNET_ITEM);

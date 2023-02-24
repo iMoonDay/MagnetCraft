@@ -1,0 +1,15 @@
+{
+  "values": [
+    "minecraft:coal",
+    "minecraft:raw_iron",
+    "minecraft:raw_gold",
+    "minecraft:gold_nugget",
+    "minecraft:diamond",
+    "minecraft:redstone",
+    "minecraft:raw_copper",
+    "minecraft:emerald",
+    "minecraft:lapis_lazuli",
+    "minecraft:quartz",
+    "magnetcraft:raw_magnet"
+  ]
+}

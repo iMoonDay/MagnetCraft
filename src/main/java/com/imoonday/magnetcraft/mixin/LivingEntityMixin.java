@@ -2,11 +2,9 @@ package com.imoonday.magnetcraft.mixin;
 
 //import com.imoonday.magnetcraft.config.ModConfig;
 
+import com.imoonday.magnetcraft.common.items.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethod;
-import com.imoonday.magnetcraft.methods.CreatureMethod;
-import com.imoonday.magnetcraft.methods.NbtClassMethod;
-import com.imoonday.magnetcraft.methods.TeleportMethod;
+import com.imoonday.magnetcraft.methods.*;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -61,8 +59,8 @@ public abstract class LivingEntityMixin {
             ItemStack feet = entity.getEquippedStack(EquipmentSlot.FEET);
             ItemStack mainhand = entity.getEquippedStack(EquipmentSlot.MAINHAND);
             ItemStack offhand = entity.getEquippedStack(EquipmentSlot.OFFHAND);
-            boolean mainhandEnabled = mainhand.getNbt() != null && mainhand.getNbt().getBoolean("enabled");
-            boolean offhandEnabled = offhand.getNbt() != null && offhand.getNbt().getBoolean("enabled");
+            boolean mainhandEnabled = mainhand.getNbt() != null && mainhand.getNbt().getBoolean("Enable");
+            boolean offhandEnabled = offhand.getNbt() != null && offhand.getNbt().getBoolean("Enable");
             boolean mainhandElectromagnet = mainhand.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && mainhandEnabled;
             boolean mainhandPermanent = mainhand.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && mainhandEnabled;
             boolean mainhandPolar = mainhand.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && mainhandEnabled;
@@ -78,11 +76,11 @@ public abstract class LivingEntityMixin {
             boolean handPolar = mainhandPolar || offhandPolar;
             boolean handCreature = mainhandCreature || offhandCreature;
             boolean handMagnet = mainhandMagnet || offhandMagnet;
-            boolean hasEnch = (NbtClassMethod.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT));
+            boolean hasEnch = (EnchantmentMethods.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT));
             boolean hasTag = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
             boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
-            boolean mainhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-            boolean offhandHasEnch = NbtClassMethod.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+            boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+            boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
             boolean selected = mainhandMagnet || mainhandHasEnch || offhandMagnet || offhandHasEnch || mainhandCreature || offhandCreature;
             boolean horseArmorAttracting = entity instanceof HorseEntity && ((HorseEntity) entity).getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
             boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && !hasTag;
@@ -96,51 +94,51 @@ public abstract class LivingEntityMixin {
             boolean hasNetheriteMagneticIronBoots = feet.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
             boolean hasMagneticIronSuit = hasMagneticIronHelmet && hasMagneticIronChestcplate && hasMagneticIronLeggings && hasMagneticIronBoots;
             boolean hasNetheriteMagneticIronSuit = hasNetheriteMagneticIronHelmet && hasNetheriteMagneticIronChestcplate && hasNetheriteMagneticIronLeggings && hasNetheriteMagneticIronBoots;
-            boolean mainhandEmptyDamage = NbtClassMethod.isEmptyDamage(entity, Hand.MAIN_HAND);
-            boolean offhandEmptyDamage = NbtClassMethod.isEmptyDamage(entity, Hand.OFF_HAND);
+            boolean mainhandEmptyDamage = DamageMethods.isEmptyDamage(entity, Hand.MAIN_HAND);
+            boolean offhandEmptyDamage = DamageMethods.isEmptyDamage(entity, Hand.OFF_HAND);
             boolean display = config.displayActionBar;
             boolean player = entity.isPlayer();
             boolean client = entity.getWorld().isClient;
             boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
             boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
             boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
-            int enchLvl = NbtClassMethod.getEnchantmentLvl(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+            int enchLvl = EnchantmentMethods.getEnchantmentLvl(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
             int mainhandUsedTick = entity.getMainHandStack().getNbt() != null ? entity.getMainHandStack().getNbt().getInt("usedTick") : 0;
             int offhandUsedTick = entity.getOffHandStack().getNbt() != null ? entity.getOffHandStack().getNbt().getInt("usedTick") : 0;
             double enchMinDis = enchDefaultDis + disPerLvl;
             double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;
             double telDis;
             double finalTelDis = 0;
-            AttractMethod.Hand playerHand = AttractMethod.Hand.NONE;
+            AttractMethods.Hand playerHand = AttractMethods.Hand.NONE;
             ItemStack mainhandStack = ItemStack.EMPTY;
             ItemStack offhandStack = ItemStack.EMPTY;
             if (mainhandMagnet || mainhandHasEnch || mainhandCreature) {
                 mainhandStack = entity.getMainHandStack();
-                playerHand = AttractMethod.Hand.MAINHAND;
+                playerHand = AttractMethods.Hand.MAINHAND;
             }
             if (offhandMagnet || offhandHasEnch || offhandCreature) {
                 offhandStack = entity.getOffHandStack();
-                if (mainhandMagnet || mainhandCreature) playerHand = AttractMethod.Hand.HAND;
-                else playerHand = AttractMethod.Hand.OFFHAND;
+                if (mainhandMagnet || mainhandCreature) playerHand = AttractMethods.Hand.HAND;
+                else playerHand = AttractMethods.Hand.OFFHAND;
             }
-            if (playerHand == AttractMethod.Hand.HAND && (mainhandEmptyDamage || offhandEmptyDamage)) {
-                if (mainhandEmptyDamage) playerHand = AttractMethod.Hand.OFFHAND;
-                if (offhandEmptyDamage) playerHand = AttractMethod.Hand.MAINHAND;
+            if (playerHand == AttractMethods.Hand.HAND && (mainhandEmptyDamage || offhandEmptyDamage)) {
+                if (mainhandEmptyDamage) playerHand = AttractMethods.Hand.OFFHAND;
+                if (offhandEmptyDamage) playerHand = AttractMethods.Hand.MAINHAND;
             }
             if (mainhandCreature && mainhandUsedTick >= 200) {
                 NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
                 nbt.putInt("usedTick", 0);
                 entity.getMainHandStack().setNbt(nbt);
-                NbtClassMethod.addDamage(entity, Hand.MAIN_HAND, 1);
+                DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1);
             }
             if (offhandCreature && offhandUsedTick >= 200) {
                 NbtCompound nbt = entity.getOffHandStack().getOrCreateNbt();
                 nbt.putInt("usedTick", 0);
                 entity.getOffHandStack().setNbt(nbt);
-                NbtClassMethod.addDamage(entity, Hand.OFF_HAND, 1);
+                DamageMethods.addDamage(entity, Hand.OFF_HAND, 1);
             }
-            if (handCreature && !hasTag && ((playerHand == AttractMethod.Hand.MAINHAND && !mainhandEmptyDamage) || (playerHand == AttractMethod.Hand.OFFHAND && !offhandEmptyDamage) || (playerHand == AttractMethod.Hand.HAND && !mainhandEmptyDamage && !offhandEmptyDamage))) {
-                CreatureMethod.attractCreatures(mainhandStack, offhandStack, entity, creatureDis, playerHand);
+            if (handCreature && !hasTag && ((playerHand == AttractMethods.Hand.MAINHAND && !mainhandEmptyDamage) || (playerHand == AttractMethods.Hand.OFFHAND && !offhandEmptyDamage) || (playerHand == AttractMethods.Hand.HAND && !mainhandEmptyDamage && !offhandEmptyDamage))) {
+                CreatureMagnetItem.attractCreatures(mainhandStack, offhandStack, entity, creatureDis, playerHand);
             }
             if (isAttracting) {
                 int amplifier;
@@ -176,7 +174,7 @@ public abstract class LivingEntityMixin {
                 }
                 if (hasMagneticIronSuit) finalDis *= magnetSetMultiplier;
                 if (hasNetheriteMagneticIronSuit) finalDis *= netheriteMagnetSetMultiplier;
-                AttractMethod.attractItems(mainhandStack, offhandStack, entity, selected, finalDis, playerHand);
+                AttractMethods.attractItems(mainhandStack, offhandStack, entity, selected, finalDis, playerHand);
                 entity.addScoreboardTag("MagnetCraft.isAttracting");
             } else {
                 entity.removeScoreboardTag("MagnetCraft.isAttracting");
@@ -239,14 +237,14 @@ public abstract class LivingEntityMixin {
                 World world = player.world;
                 ItemStack stack;
                 stack = sourceEntity instanceof TridentEntity ? ((TridentEntity) sourceEntity).asItemStack() : player.getMainHandStack();
-                boolean hasEnchantment = NbtClassMethod.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
+                boolean hasEnchantment = EnchantmentMethods.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
                 if (hasEnchantment) {
                     world.getOtherEntities(null, entity.getBoundingBox(), e -> ((e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.age == 0)).forEach(e -> {
                         if (e instanceof ExperienceOrbEntity) {
                             int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
                             player.addExperience(amount);
                         } else {
-                            TeleportMethod.giveItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
+                            TeleportMethods.giveItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
                         }
                         e.kill();
                     });

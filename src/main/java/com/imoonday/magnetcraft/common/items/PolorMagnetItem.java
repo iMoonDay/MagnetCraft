@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.NbtClassMethod;
+import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
@@ -25,21 +25,21 @@ public class PolorMagnetItem extends Item {
 
     public static void register() {
         ModelPredicateProviderRegistry.register(ItemRegistries.POLAR_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (itemStack.getNbt() == null || !itemStack.getNbt().contains("enabled")) return 0.0F;
-            return itemStack.getOrCreateNbt().getBoolean("enabled") ? 1.0F : 0.0F;
+            if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
+            return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
         });
     }
 
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        NbtClassMethod.enabledSet(stack);
+        EnabledNbtMethods.enabledSet(stack);
         return stack;
     }
 
     @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
-        NbtClassMethod.enabledSet(stack);
+        EnabledNbtMethods.enabledSet(stack);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class PolorMagnetItem extends Item {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);
             }
-            NbtClassMethod.enabledSwitch(world, user, hand);
+            EnabledNbtMethods.enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 30);
         }
         return super.use(world, user, hand);
@@ -70,6 +70,6 @@ public class PolorMagnetItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-        NbtClassMethod.enabledCheck(stack);
+        EnabledNbtMethods.enabledCheck(stack);
     }
 }

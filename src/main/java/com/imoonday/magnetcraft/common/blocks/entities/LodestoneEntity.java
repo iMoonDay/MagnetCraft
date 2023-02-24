@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethod;
+import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.minecraft.block.Block;
@@ -46,7 +46,7 @@ public class LodestoneEntity extends BlockEntity {
                 case 6 -> centerPos.add(0, -1, 0);
                 default -> centerPos;
             };
-            AttractMethod.attractItems(world, centerPos, dis);
+            AttractMethods.attractItems(world, centerPos, dis);
         }
     }
 
@@ -65,14 +65,21 @@ public class LodestoneEntity extends BlockEntity {
             nbt.putDouble("dis", dis2);
         }
         nbt.putInt("direction", direction);
+//        markDirty();
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        redstone = nbt.getBoolean("redstone");
-        dis2 = nbt.getDouble("dis");
-        direction = nbt.getInt("direction");
+        if (nbt.contains("redstone")) {
+            redstone = nbt.getBoolean("redstone");
+        }
+        if (nbt.contains("dis")) {
+            dis2 = nbt.getDouble("dis");
+        }
+        if (nbt.contains("direction")) {
+            direction = nbt.getInt("direction");
+        }
     }
 
     @Nullable

@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethod;
+import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.PotionRegistries;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.potion.Potion;
@@ -29,7 +29,7 @@ public class ArrowEntityMixin {
             if (isAttracting) {
                 entity.addScoreboardTag("MagnetCraft.isAttracting");
                 if (!world.isClient) {
-                    AttractMethod.attractItems(entity, dis);
+                    AttractMethods.attractItems(entity, dis);
                 }
             }
         }

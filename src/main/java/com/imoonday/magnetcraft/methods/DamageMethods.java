@@ -23,6 +23,9 @@ public class DamageMethods {
     }
 
     public static boolean isEmptyDamage(LivingEntity player, Hand hand) {
+        if (hand == null) {
+            return false;
+        }
         ItemStack stack = player.getStackInHand(hand);
         boolean isDamageable = stack.isDamageable();
         boolean isEmptyDamage = stack.getDamage() >= stack.getMaxDamage();

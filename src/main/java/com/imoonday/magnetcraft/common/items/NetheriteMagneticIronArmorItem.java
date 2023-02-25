@@ -20,9 +20,7 @@ public class NetheriteMagneticIronArmorItem extends ArmorItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.translatable("item.magnetcraft.netherite_magnetic_armor.tooltip.1")
-                .append(Text.literal(String.valueOf(ModConfig.getConfig().value.netheriteMagnetSetMultiplier)))
-                .append(Text.translatable("item.magnetcraft.netherite_magnetic_armor.tooltip.2"))
+        tooltip.add(Text.translatable("item.magnetcraft.netherite_magnetic_armor.tooltip", ModConfig.getConfig().value.netheriteMagnetSetMultiplier)
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
     }
 }

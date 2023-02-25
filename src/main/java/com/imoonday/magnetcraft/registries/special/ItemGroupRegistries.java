@@ -61,6 +61,8 @@ public class ItemGroupRegistries {
                     content.add(ELECTROMAGNET_CRAFTING_MODULE_ITEM);
                     content.add(PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
+                    content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
+                    content.add(RESTORE_MODULE_ITEM);
                     content.add(MAGNET_TEMPLATE_ITEM);
                     content.add(POLAR_MAGNET_ITEM.getDefaultStack());
                     content.add(ELECTROMAGNET_ITEM.getDefaultStack());
@@ -106,6 +108,8 @@ public class ItemGroupRegistries {
             content.add(ELECTROMAGNET_CRAFTING_MODULE_ITEM);
             content.add(PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
+            content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
+            content.add(RESTORE_MODULE_ITEM);
             content.add(MAGNET_TEMPLATE_ITEM);
             content.add(POLAR_MAGNET_ITEM.getDefaultStack());
             content.add(ELECTROMAGNET_ITEM.getDefaultStack());

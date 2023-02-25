@@ -58,9 +58,10 @@ public class LodestoneBlock extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         boolean isLodestone = world.getBlockState(pos).isOf(BlockRegistries.LODESTONE_BLOCK);
-        boolean redstone = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getBoolean("redstone");
-        double dis = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getDouble("dis");
-        int direction = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getInt("direction");
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        boolean redstone = Objects.requireNonNull(blockEntity).createNbt().getBoolean("redstone");
+        double dis = Objects.requireNonNull(blockEntity).createNbt().getDouble("dis");
+        int direction = Objects.requireNonNull(blockEntity).createNbt().getInt("direction");
         NbtCompound nbt = new NbtCompound();
         if (isLodestone && hand == Hand.MAIN_HAND) {
             if (player.isSneaky()) {
@@ -80,16 +81,20 @@ public class LodestoneBlock extends BlockWithEntity {
                     nbt.putInt("direction", 0);
                 }
             }
-            if (!world.isClient) Objects.requireNonNull(world.getBlockEntity(pos)).readNbt(nbt);
+            if (!world.isClient) {
+                blockEntity.readNbt(nbt);
+                blockEntity.markDirty();
+            }
             showState(world, pos, player);
         }
         return ActionResult.SUCCESS;
     }
 
     public static void showState(World world, BlockPos pos, PlayerEntity player) {
-        boolean redstone = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getBoolean("redstone");
-        double dis = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getDouble("dis");
-        int direction = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getInt("direction");
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        boolean redstone = Objects.requireNonNull(blockEntity).createNbt().getBoolean("redstone");
+        double dis = Objects.requireNonNull(blockEntity).createNbt().getDouble("dis");
+        int direction = Objects.requireNonNull(blockEntity).createNbt().getInt("direction");
         String directionText = "text.magnetcraft.message.direction." + direction;
         Text text;
         if (!redstone) {

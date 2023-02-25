@@ -56,6 +56,16 @@ public class CreatureMagnetItem extends Item {
     }
 
     @Override
+    public boolean hasRecipeRemainder() {
+        return true;
+    }
+
+    @Override
+    public ItemStack getRecipeRemainder(ItemStack stack) {
+        return new ItemStack(ItemRegistries.CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
+    }
+
+    @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
         EnabledNbtMethods.enabledSet(stack);
         usedTickSet(stack);

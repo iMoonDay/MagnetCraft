@@ -53,7 +53,7 @@ public class MineralMagnetItem extends Item {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         List<NbtElement> list = stack.getOrCreateNbt().getList("Cores", NbtString.STRING_TYPE).stream().toList();
         if (list.isEmpty()) {
-            tooltip.add(Text.literal("空").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+            tooltip.add(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.1").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         } else {
             for (NbtElement nbtElement : list) {
                 String name = nbtElement.toString().replace("'", "").replace("\"", "");
@@ -79,6 +79,16 @@ public class MineralMagnetItem extends Item {
     }
 
     @Override
+    public boolean hasRecipeRemainder() {
+        return true;
+    }
+
+    @Override
+    public ItemStack getRecipeRemainder(ItemStack stack) {
+        return new ItemStack(ItemRegistries.MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
+    }
+
+    @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
         coresCheck(stack);
     }
@@ -101,10 +111,12 @@ public class MineralMagnetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
         coresCheck(stack);
+        if (user instanceof PlayerEntity && user.isSpectator() && ((PlayerEntity) user).getItemCooldownManager().isCoolingDown(this)) {
+            ((PlayerEntity) user).getItemCooldownManager().remove(this);
+        }
     }
 
     public static int searchMineral(PlayerEntity player, Hand hand) {
-        String string;
         int total = 0;
         int totalValue = 0;
         if (!player.world.isClient) {
@@ -123,8 +135,7 @@ public class MineralMagnetItem extends Item {
             boolean isEmptyDamage = false;
             DamageMethods.addDamage(player, hand, 1);
             if (player.experienceLevel < 5 && !player.isCreative()) {
-                string = "等级不足(至少5级)";
-                player.sendMessage(Text.literal(string), true);
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
             }
             for (int x = -15; x <= 15; x++) {
@@ -205,54 +216,41 @@ public class MineralMagnetItem extends Item {
                 player.addExperienceLevels(-5);
             }
             if (isEmptyDamage) {
-                string = "耐久不足,搜寻矿物被迫终止";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.3"));
             }
-            string = "一共发现了 " + total + " 个矿石";
-            player.sendMessage(Text.literal(string));
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.4", total));
             if (coal > 0) {
-                string = coal + " 个煤矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.6", coal));
             }
             if (iron > 0) {
-                string = iron + " 个铁矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.7", iron));
             }
             if (gold > 0) {
-                string = gold + " 个金矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.8", gold));
             }
             if (diamond > 0) {
-                string = diamond + " 个钻石矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.9", diamond));
             }
             if (redstone > 0) {
-                string = redstone + " 个红石矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.10", redstone));
             }
             if (copper > 0) {
-                string = copper + " 个铜矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.11", copper));
             }
             if (emerald > 0) {
-                string = emerald + " 个绿宝石矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.12", emerald));
             }
             if (lapis > 0) {
-                string = lapis + " 个青金石矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.13", lapis));
             }
             if (quartz > 0) {
-                string = quartz + " 个石英矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.14", quartz));
             }
             if (magnetite > 0) {
-                string = magnetite + " 个磁铁矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.15", magnetite));
             }
             if (others > 0) {
-                string = others + " 个非原版矿石";
-                player.sendMessage(Text.literal(string));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.16", others));
             }
         }
         return totalValue;
@@ -270,7 +268,7 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void coresSet(ItemStack stack, Item[] items) {
-        NbtList list = stack.getOrCreateNbt().getList("Cores",NbtElement.STRING_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList("Cores", NbtElement.STRING_TYPE);
         String[] names = new String[items.length];
         for (int i = 0; i < items.length; i++) {
             names[i] = Registries.ITEM.getId(items[i]).toString();

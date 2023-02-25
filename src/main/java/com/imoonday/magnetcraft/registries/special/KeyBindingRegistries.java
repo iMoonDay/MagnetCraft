@@ -18,11 +18,29 @@ public class KeyBindingRegistries {
                         GLFW.GLFW_KEY_R,
                         "key.category.magnetcraft"));
 
+        KeyBinding addOrRemoveBlacklist = KeyBindingHelper.registerKeyBinding(
+                new KeyBinding("key.magnetcraft.blacklist",
+                        InputUtil.Type.KEYSYM,
+                        GLFW.GLFW_KEY_MINUS,
+                        "key.category.magnetcraft"));
+
+        KeyBinding addOrRemoveWhitelist = KeyBindingHelper.registerKeyBinding(
+                new KeyBinding("key.magnetcraft.whitelist",
+                        InputUtil.Type.KEYSYM,
+                        GLFW.GLFW_KEY_EQUAL,
+                        "key.category.magnetcraft"));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ClientPlayerEntity player = client.player;
             ClientWorld world = client.world;
             while (attractEnchantmentsSwitch.wasPressed() && player != null && world != null) {
                 ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, PacketByteBufs.empty());
+            }
+            while (addOrRemoveBlacklist.wasPressed() && player != null && world != null) {
+                ClientPlayNetworking.send(IdentifierRegistries.BLACKLIST_PACKET_ID, PacketByteBufs.empty());
+            }
+            while (addOrRemoveWhitelist.wasPressed() && player != null && world != null) {
+                ClientPlayNetworking.send(IdentifierRegistries.WHITELIST_PACKET_ID, PacketByteBufs.empty());
             }
         });
     }

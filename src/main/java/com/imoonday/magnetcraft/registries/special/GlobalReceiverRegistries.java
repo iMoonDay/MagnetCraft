@@ -7,8 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.network.ClientPlayerEntity;
 
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.KEYBINDINGS_PACKET_ID;
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.USE_CONTROLLER_PACKET_ID;
+import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
 public class GlobalReceiverRegistries {
 
@@ -22,6 +21,18 @@ public class GlobalReceiverRegistries {
                         break;
                     }
                 }
+            }
+        }));
+
+        ServerPlayNetworking.registerGlobalReceiver(BLACKLIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            if (player.hasPermissionLevel(4)) {
+                CommandRegistries.addOrRemoveBlacklistItem(player);
+            }
+        }));
+
+        ServerPlayNetworking.registerGlobalReceiver(WHITELIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            if (player.hasPermissionLevel(4)) {
+                CommandRegistries.addOrRemoveWhitelistItem(player);
             }
         }));
 

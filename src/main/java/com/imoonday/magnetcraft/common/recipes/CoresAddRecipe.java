@@ -9,6 +9,7 @@ import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
 import static com.imoonday.magnetcraft.MagnetCraft.CORES_ADD_RECIPE;
@@ -43,6 +44,7 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
         boolean hasMagnet = false;
         boolean hasCores = false;
         int count = 0;
+        Item[] cores = new Item[inventory.size()];
         ItemStack magnetStack = ItemStack.EMPTY;
         for (int i = 0; i < inventory.size(); ++i) {
             ItemStack stack = inventory.getStack(i);
@@ -57,9 +59,15 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
                     hasMagnet = true;
                     magnetStack = stack.copy();
                 }
+                for (Item core : cores) {
+                    if (core == stack.getItem()) {
+                        return ItemStack.EMPTY;
+                    }
+                }
                 if (stack.isIn(CORES)) {
                     hasCores = true;
                     count++;
+                    cores[i] = stack.getItem();
                 }
             }
         }
@@ -93,4 +101,16 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
     public RecipeSerializer<?> getSerializer() {
         return CORES_ADD_RECIPE;
     }
+
+    @Override
+    public DefaultedList<ItemStack> getRemainder(CraftingInventory inventory) {
+        DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
+        for (int i = 0; i < defaultedList.size(); ++i) {
+            Item item = inventory.getStack(i).getItem();
+            if (!item.hasRecipeRemainder() || item == ItemRegistries.MINERAL_MAGNET_ITEM) continue;
+            defaultedList.set(i, new ItemStack(item.getRecipeRemainder()));
+        }
+        return defaultedList;
+    }
+
 }

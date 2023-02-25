@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:restore_module"
+    },
+    {
+      "tag": "magnetcraft:magnets"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:magnet_template"
+  }
+}

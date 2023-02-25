@@ -55,17 +55,15 @@ public class LodestoneEntity extends BlockEntity {
         boolean hasPowered = world != null && world.isReceivingRedstonePower(pos);
         int disPerPower = ModConfig.getConfig().value.disPerPower;
         double dis = world.getReceivedRedstonePower(pos) * disPerPower;
+        nbt.putBoolean("redstone", redstone);
         if (redstone) {
-            nbt.putBoolean("redstone", true);
             nbt.putBoolean("enable", hasPowered);
             nbt.putDouble("dis", dis);
         } else {
-            nbt.putBoolean("redstone", false);
             nbt.putBoolean("enable", dis2 > 1);
             nbt.putDouble("dis", dis2);
         }
         nbt.putInt("direction", direction);
-//        markDirty();
     }
 
     @Override

@@ -21,4 +21,5 @@ abstract class AbstractMinecartEntityMixin {
     public boolean isActivator(BlockState instance, Block block) {
         return instance.isOf(Blocks.ACTIVATOR_RAIL) || instance.isOf(BlockRegistries.MAGLEV_ACTIVATOR_RAIL_BLOCK);
     }
+
 }

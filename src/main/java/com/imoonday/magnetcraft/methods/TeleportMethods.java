@@ -3,7 +3,6 @@ package com.imoonday.magnetcraft.methods;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
 import me.shedaniel.autoconfig.AutoConfig;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -40,13 +39,9 @@ public class TeleportMethods {
             player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
 
         });
-        if (MinecraftClient.getInstance().getLanguageManager().getLanguage().getName().equals("简体中文")) {
-            text = count > 0 ? "[磁铁]: 在 " + dis + " 格范围内捡起了 " + count + " 个物品/经验" : "[磁铁]: 在 " + dis + " 格范围内没有寻找到物品/经验";
-        } else {
-            text = count > 0 ? "[Magnet]: Picked up " + count + " items or experiences within the " + dis + " grid range" : "[Magnet]: No items or experiences found in the " + dis + " grid";
-        }
+        text = count > 0 ? "text.magnetcraft.message.teleport.tooltip.1" : "text.magnetcraft.message.teleport.tooltip.2";
         if (!client && message) {
-            player.sendMessage(Text.literal(text));
+            player.sendMessage(Text.translatable(text,dis,count));
         }
     }
 
@@ -59,7 +54,7 @@ public class TeleportMethods {
         } else {
             for (int i = 0; i < inventory.size(); i++) {
                 ItemStack stack1 = inventory.getStack(i);
-                if (ItemStack.canCombine(stack1,stack)) {
+                if (ItemStack.canCombine(stack1, stack)) {
                     int stack1Count = stack1.getCount();
                     int eCount = stack.getCount();
                     int totalCount = stack1Count + eCount;

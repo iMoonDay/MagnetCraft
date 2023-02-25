@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "323",
+    " 1 "
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:crying_obsidian"
+    },
+    "2": {
+      "item": "magnetcraft:empty_crafting_module"
+    },
+    "3": {
+      "item": "minecraft:amethyst_shard"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:restore_module"
+  }
+}

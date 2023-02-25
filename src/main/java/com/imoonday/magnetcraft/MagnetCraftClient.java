@@ -17,5 +17,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         PolorMagnetItem.register();
         CreatureMagnetItem.register();
         MineralMagnetItem.register();
+        CropMagnetItem.register();
     }
 }

@@ -1,12 +1,23 @@
 {
-  "type": "minecraft:smithing",
-  "base": {
-    "item": "minecraft:lever"
-  },
-  "addition": {
-    "item": "magnetcraft:magnetic_iron_ingot"
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "1  ",
+    "2  ",
+    "3  "
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnet_fragment"
+    },
+    "2": {
+      "item": "minecraft:stick"
+    },
+    "3": {
+      "item": "minecraft:cobblestone"
+    }
   },
   "result": {
-    "item": "magnetcraft:maglev_lever"
+    "item": "magnetcraft:maglev_lever",
+    "count": 1
   }
 }

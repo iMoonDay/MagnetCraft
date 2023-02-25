@@ -5,6 +5,7 @@
     "magnetcraft:electromagnet",
     "magnetcraft:permanent_magnet",
     "magnetcraft:creature_magnet",
-    "magnetcraft:mineral_magnet"
+    "magnetcraft:mineral_magnet",
+    "magnetcraft:crop_magnet"
   ]
 }

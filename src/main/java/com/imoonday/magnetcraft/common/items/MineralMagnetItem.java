@@ -138,17 +138,17 @@ public class MineralMagnetItem extends Item {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
             }
-            for (int x = -15; x <= 15; x++) {
+            for (int x = -10; x <= 10; x++) {
                 if (DamageMethods.isEmptyDamage(player, hand)) {
                     isEmptyDamage = true;
                     break;
                 }
-                for (int y = -15; y <= 15; y++) {
+                for (int y = -10; y <= 10; y++) {
                     if (DamageMethods.isEmptyDamage(player, hand)) {
                         isEmptyDamage = true;
                         break;
                     }
-                    for (int z = -15; z <= 15; z++) {
+                    for (int z = -10; z <= 10; z++) {
                         if (DamageMethods.isEmptyDamage(player, hand)) {
                             isEmptyDamage = true;
                             break;
@@ -168,7 +168,7 @@ public class MineralMagnetItem extends Item {
                         });
                         if (state.isIn(ORES) && nbtPass[0]) {
                             droppedStacks.forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
-                            player.world.breakBlock(pos, false, player);
+                            world.breakBlock(pos, false, player);
                             if (state.isIn(COAL_ORES)) {
                                 coal++;
                             } else if (state.isIn(IRON_ORES)) {

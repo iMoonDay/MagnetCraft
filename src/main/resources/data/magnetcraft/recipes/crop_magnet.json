@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smithing",
+  "base": {
+    "item": "magnetcraft:magnet_template"
+  },
+  "addition": {
+    "item": "magnetcraft:crop_magnet_crafting_module"
+  },
+  "result": {
+    "item": "magnetcraft:crop_magnet",
+    "count": 1
+  }
+}

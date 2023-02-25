@@ -62,6 +62,7 @@ public class ItemGroupRegistries {
                     content.add(PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
+                    content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(RESTORE_MODULE_ITEM);
                     content.add(MAGNET_TEMPLATE_ITEM);
                     content.add(POLAR_MAGNET_ITEM.getDefaultStack());
@@ -70,6 +71,7 @@ public class ItemGroupRegistries {
                     content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
                     content.add(MINERAL_MAGNET_ITEM.getDefaultStack());
                     content.add(MineralMagnetItem.getAllCoresStack());
+                    content.add(CROP_MAGNET_ITEM);
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                 }).build();
 
@@ -109,6 +111,7 @@ public class ItemGroupRegistries {
             content.add(PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
+            content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(RESTORE_MODULE_ITEM);
             content.add(MAGNET_TEMPLATE_ITEM);
             content.add(POLAR_MAGNET_ITEM.getDefaultStack());
@@ -116,6 +119,8 @@ public class ItemGroupRegistries {
             content.add(PERMANENT_MAGNET_ITEM.getDefaultStack());
             content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
             content.add(MINERAL_MAGNET_ITEM.getDefaultStack());
+            content.add(MineralMagnetItem.getAllCoresStack());
+            content.add(CROP_MAGNET_ITEM);
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);

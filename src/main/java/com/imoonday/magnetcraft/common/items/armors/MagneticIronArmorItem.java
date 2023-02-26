@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.items;
+package com.imoonday.magnetcraft.common.items.armors;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import net.minecraft.client.item.TooltipContext;

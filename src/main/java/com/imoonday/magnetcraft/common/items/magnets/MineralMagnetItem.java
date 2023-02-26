@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.items;
+package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;

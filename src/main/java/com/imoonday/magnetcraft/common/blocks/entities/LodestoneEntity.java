@@ -24,10 +24,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import java.util.Objects;
@@ -51,6 +48,7 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
         boolean enable = nbt.getBoolean("enable");
         int direction1 = nbt.getInt("direction");
         Vec3d centerPos = pos.toCenterPos();
+        Direction direction;
         centerPos = centerPos.add(0, 0.5, 0);
         if (enable) {
             centerPos = switch (direction1) {
@@ -62,8 +60,23 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
                 case 6 -> centerPos.add(0, -1, 0);
                 default -> centerPos;
             };
+            direction = switch (direction1) {
+                case 1 -> Direction.SOUTH;
+                case 2 -> Direction.WEST;
+                case 3 -> Direction.NORTH;
+                case 4 -> Direction.EAST;
+                case 5 -> Direction.UP;
+                case 6 -> Direction.DOWN;
+                default -> null;
+            };
             AttractMethods.attractItems(world, centerPos, dis);
-            putItemEntityIn(world, pos);
+            if (direction != null) {
+                putItemEntityIn(world, pos, direction);
+            } else {
+                for (Direction direction2 : new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP, Direction.DOWN}) {
+                    putItemEntityIn(world, pos, direction2);
+                }
+            }
         }
     }
 
@@ -130,8 +143,8 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
         return new LodestoneScreenHandler(syncId, inv, this);
     }
 
-    public static void putItemEntityIn(World world, BlockPos blockPos) {
-        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.up())), entity -> entity instanceof ItemEntity).forEach(e -> {
+    public static void putItemEntityIn(World world, BlockPos blockPos, Direction direction) {
+        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).forEach(e -> {
             Inventory inventory = (Inventory) world.getBlockEntity(blockPos);
             ItemStack stack = ((ItemEntity) e).getStack();
             boolean hasEmptySlot = false;

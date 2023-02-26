@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.registries.special;
 
-import com.imoonday.magnetcraft.common.items.MineralMagnetItem;
+import com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.ItemGroups;

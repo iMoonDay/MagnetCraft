@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.items;
+package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
@@ -119,7 +119,7 @@ public class CropMagnetItem extends Item {
                             world.breakBlock(pos, false, player);
                             count++;
                             DamageMethods.addDamage(player, hand, 1);
-                        } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) == 3) {
+                        } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) > 1) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.setBlockState(pos, state.with(AGE_3, 1));
                             count++;

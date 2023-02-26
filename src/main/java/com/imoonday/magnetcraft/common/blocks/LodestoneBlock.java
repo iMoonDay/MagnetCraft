@@ -67,16 +67,47 @@ public class LodestoneBlock extends BlockWithEntity {
         int direction = Objects.requireNonNull(blockEntity).createNbt().getInt("direction");
         NbtCompound nbt = new NbtCompound();
         Direction side = hit.getSide();
-        if (side == Direction.UP) {
-            if (!world.isClient) {
-                NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
-                if (screenHandlerFactory != null) {
-                    player.openHandledScreen(screenHandlerFactory);
+        if (player.isSneaky()) {
+            if (side == Direction.SOUTH) {
+                if (direction == 1) {
+                    nbt.putInt("direction", 0);
+                } else {
+                    nbt.putInt("direction", 1);
+                }
+            } else if (side == Direction.WEST) {
+                if (direction == 2) {
+                    nbt.putInt("direction", 0);
+                } else {
+                    nbt.putInt("direction", 2);
+                }
+            } else if (side == Direction.NORTH) {
+                if (direction == 3) {
+                    nbt.putInt("direction", 0);
+                } else {
+                    nbt.putInt("direction", 3);
+                }
+            } else if (side == Direction.EAST) {
+                if (direction == 4) {
+                    nbt.putInt("direction", 0);
+                } else {
+                    nbt.putInt("direction", 4);
+                }
+            } else if (side == Direction.UP) {
+                if (direction == 5) {
+                    nbt.putInt("direction", 0);
+                } else {
+                    nbt.putInt("direction", 5);
+                }
+            } else if (side == Direction.DOWN) {
+                if (direction == 6) {
+                    nbt.putInt("direction", 0);
+                } else {
+                    nbt.putInt("direction", 6);
                 }
             }
         } else {
-            if (isLodestone && hand == Hand.MAIN_HAND) {
-                if (player.isSneaky()) {
+            if (side == Direction.UP) {
+                if (isLodestone && hand == Hand.MAIN_HAND) {
                     if (redstone) {
                         nbt.putBoolean("redstone", false);
                         nbt.putDouble("dis", 0);
@@ -86,19 +117,19 @@ public class LodestoneBlock extends BlockWithEntity {
                         nbt.putBoolean("redstone", true);
                         nbt.putDouble("dis", 0);
                     }
-                } else {
-                    if (direction < 6 && direction >= 0) {
-                        nbt.putInt("direction", direction + 1);
-                    } else {
-                        nbt.putInt("direction", 0);
+                }
+            } else {
+                if (!world.isClient) {
+                    NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
+                    if (screenHandlerFactory != null) {
+                        player.openHandledScreen(screenHandlerFactory);
                     }
                 }
-                if (!world.isClient) {
-                    blockEntity.readNbt(nbt);
-                    blockEntity.markDirty();
-                }
-                showState(world, pos, player);
             }
+        }
+        if (!world.isClient) {
+            blockEntity.readNbt(nbt);
+            blockEntity.markDirty();
         }
         return ActionResult.SUCCESS;
     }

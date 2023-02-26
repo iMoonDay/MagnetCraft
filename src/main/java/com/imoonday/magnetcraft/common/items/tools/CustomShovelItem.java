@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.items;
+package com.imoonday.magnetcraft.common.items.tools;
 
 import net.minecraft.item.ShovelItem;
 import net.minecraft.item.ToolMaterial;

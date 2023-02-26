@@ -2,7 +2,7 @@ package com.imoonday.magnetcraft.mixin;
 
 //import com.imoonday.magnetcraft.config.ModConfig;
 
-import com.imoonday.magnetcraft.common.items.CreatureMagnetItem;
+import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.*;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;

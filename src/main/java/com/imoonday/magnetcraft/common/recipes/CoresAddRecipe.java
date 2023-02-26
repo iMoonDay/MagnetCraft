@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.recipes;
 
-import com.imoonday.magnetcraft.common.items.MineralMagnetItem;
+import com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;

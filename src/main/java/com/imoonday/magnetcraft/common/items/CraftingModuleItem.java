@@ -16,7 +16,7 @@ public class CraftingModuleItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack itemStack, World world, List<Text> tooltip, TooltipContext tooltipContext) {
-        String key = itemStack.getTranslationKey() + "_tooltip";
+        String key = itemStack.getTranslationKey().replace("_crafting_module", "");
         tooltip.add(Text.translatable(key).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
     }
 }

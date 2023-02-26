@@ -1,10 +1,17 @@
 package com.imoonday.magnetcraft.registries.common;
 
 import com.imoonday.magnetcraft.common.items.*;
+import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
+import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
+import com.imoonday.magnetcraft.common.items.magnets.*;
 import com.imoonday.magnetcraft.common.items.materials.MagneticIronArmorMaterial;
 import com.imoonday.magnetcraft.common.items.materials.MagneticIronToolMaterial;
 import com.imoonday.magnetcraft.common.items.materials.NetheriteMagneticIronArmorMaterial;
 import com.imoonday.magnetcraft.common.items.materials.NetheriteMagneticIronToolMaterial;
+import com.imoonday.magnetcraft.common.items.tools.CustomAxeItem;
+import com.imoonday.magnetcraft.common.items.tools.CustomHoeItem;
+import com.imoonday.magnetcraft.common.items.tools.CustomPickaxeItem;
+import com.imoonday.magnetcraft.common.items.tools.CustomShovelItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.BlockItem;

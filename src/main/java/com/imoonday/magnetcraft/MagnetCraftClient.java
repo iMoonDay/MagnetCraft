@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.common.items.*;
+import com.imoonday.magnetcraft.common.items.magnets.*;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.special.KeyBindingRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;

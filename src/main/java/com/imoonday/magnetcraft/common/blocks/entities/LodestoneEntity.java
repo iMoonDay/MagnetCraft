@@ -1,27 +1,43 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
+import com.imoonday.magnetcraft.ImplementedInventory;
+import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
+import com.imoonday.magnetcraft.screen.handler.LodestoneScreenHandler;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.Objects;
 
-public class LodestoneEntity extends BlockEntity {
+public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
 
     private boolean redstone;
     private double dis2;
     private int direction;
+    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(18, ItemStack.EMPTY);
 
     public LodestoneEntity(BlockPos pos, BlockState state) {
         super(BlockRegistries.LODESTONE_ENTITY, pos, state);
@@ -47,6 +63,7 @@ public class LodestoneEntity extends BlockEntity {
                 default -> centerPos;
             };
             AttractMethods.attractItems(world, centerPos, dis);
+            putItemEntityIn(world, pos);
         }
     }
 
@@ -64,6 +81,7 @@ public class LodestoneEntity extends BlockEntity {
             nbt.putDouble("dis", dis2);
         }
         nbt.putInt("direction", direction);
+        Inventories.writeNbt(nbt, this.inventory);
     }
 
     @Override
@@ -78,6 +96,7 @@ public class LodestoneEntity extends BlockEntity {
         if (nbt.contains("direction")) {
             direction = nbt.getInt("direction");
         }
+        Inventories.readNbt(nbt, this.inventory);
     }
 
     @Nullable
@@ -89,5 +108,65 @@ public class LodestoneEntity extends BlockEntity {
     @Override
     public NbtCompound toInitialChunkDataNbt() {
         return createNbt();
+    }
+
+    @Override
+    public DefaultedList<ItemStack> getItems() {
+        return inventory;
+    }
+
+    @Override
+    public Text getDisplayName() {
+        if (world != null) {
+            return LodestoneBlock.showState(world, pos, null);
+        } else {
+            return Text.translatable(getCachedState().getBlock().getTranslationKey());
+        }
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        return new LodestoneScreenHandler(syncId, inv, this);
+    }
+
+    public static void putItemEntityIn(World world, BlockPos blockPos) {
+        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.up())), entity -> entity instanceof ItemEntity).forEach(e -> {
+            Inventory inventory = (Inventory) world.getBlockEntity(blockPos);
+            ItemStack stack = ((ItemEntity) e).getStack();
+            boolean hasEmptySlot = false;
+            boolean hasSameStack = false;
+            boolean countOverflow = false;
+            int overflowCount = 0;
+            int slot = -1;
+            if (inventory != null) {
+                for (int i = 0; i < inventory.size(); i++) {
+                    ItemStack inventoryStack = inventory.getStack(i);
+                    hasEmptySlot = inventoryStack.isEmpty();
+                    hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
+                    countOverflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
+                    if (countOverflow) {
+                        overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
+                    }
+                    if (hasEmptySlot || hasSameStack) {
+                        slot = i;
+                        break;
+                    }
+                }
+            }
+            if (hasEmptySlot) {
+                inventory.setStack(slot, stack);
+                e.kill();
+            } else if (hasSameStack) {
+                if (countOverflow) {
+                    inventory.setStack(slot, stack.copy().copyWithCount(stack.getMaxCount()));
+                    stack.setCount(overflowCount);
+                } else {
+                    stack.increment(inventory.getStack(slot).getCount());
+                    inventory.setStack(slot, stack);
+                    e.kill();
+                }
+            }
+        });
     }
 }

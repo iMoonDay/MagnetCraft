@@ -3,6 +3,7 @@ package com.imoonday.magnetcraft;
 import com.imoonday.magnetcraft.common.items.*;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.special.KeyBindingRegistries;
+import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.fabricmc.api.ClientModInitializer;
 
 public class MagnetCraftClient implements ClientModInitializer {
@@ -18,5 +19,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         CreatureMagnetItem.register();
         MineralMagnetItem.register();
         CropMagnetItem.register();
+        ScreenRegistries.register();
     }
 }

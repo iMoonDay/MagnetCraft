@@ -1,6 +1,6 @@
 # 磁铁工艺 MagnetCraft
 
-**mod前置**: Cloth Config
+**mod前置**: Cloth Config API
 
 **模组初步开发中，可能存在较多bug，生存档酌情使用。**
 

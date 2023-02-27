@@ -4,7 +4,10 @@ package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.*;
+import com.imoonday.magnetcraft.methods.AttractMethods;
+import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.methods.EnchantmentMethods;
+import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -37,7 +40,7 @@ public abstract class LivingEntityMixin {
     public void checkAttract(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity != null) {
-            World world = ((LivingEntity) (Object) this).getWorld();
+            World world = ((LivingEntity) (Object) this).world;
             if (world == null) return;
             if (entity.isPlayer() && entity.isSpectator()) return;
             ModConfig config = ModConfig.getConfig();
@@ -49,10 +52,8 @@ public abstract class LivingEntityMixin {
             double disPerAmplifier = config.value.disPerAmplifier;
             double enchDefaultDis = config.value.enchDefaultDis;
             double disPerLvl = config.value.disPerLvl;
-            double magnetSetMultiplier = config.value.magnetSetMultiplier;
-            double netheriteMagnetSetMultiplier = config.value.netheriteMagnetSetMultiplier;
-            if (magnetSetMultiplier < 1) magnetSetMultiplier = 1.5;
-            if (netheriteMagnetSetMultiplier < 1) netheriteMagnetSetMultiplier = 2;
+            double magnetSetMultiplier = config.value.magnetSetMultiplier >= 1 ? config.value.magnetSetMultiplier : 1.5;
+            double netheriteMagnetSetMultiplier = config.value.netheriteMagnetSetMultiplier >= 1 ? config.value.netheriteMagnetSetMultiplier : 2;
             ItemStack head = entity.getEquippedStack(EquipmentSlot.HEAD);
             ItemStack chest = entity.getEquippedStack(EquipmentSlot.CHEST);
             ItemStack legs = entity.getEquippedStack(EquipmentSlot.LEGS);
@@ -98,7 +99,7 @@ public abstract class LivingEntityMixin {
             boolean offhandEmptyDamage = DamageMethods.isEmptyDamage(entity, Hand.OFF_HAND);
             boolean display = config.displayActionBar;
             boolean player = entity.isPlayer();
-            boolean client = entity.getWorld().isClient;
+            boolean client = entity.world.isClient;
             boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
             boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
             boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};

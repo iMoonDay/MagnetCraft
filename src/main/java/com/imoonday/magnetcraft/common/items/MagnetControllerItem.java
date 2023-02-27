@@ -69,11 +69,11 @@ public class MagnetControllerItem extends Item {
 
     public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
         boolean display = ModConfig.getConfig().displayActionBar;
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         boolean creative = user.isCreative();
         boolean isEmptyDamage = DamageMethods.isEmptyDamage(user, hand);
         boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
         boolean sneaking = user.isSneaking();
-        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         boolean flying = user.getAbilities().flying;
         if (sneaking && flying) {
             sneaking = false;
@@ -94,7 +94,7 @@ public class MagnetControllerItem extends Item {
             }
         } else {
             boolean hasTag = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-            boolean isClient = user.getWorld().isClient;
+            boolean isClient = user.world.isClient;
             Text message;
             SoundEvent sound;
             if (hasTag) {
@@ -118,7 +118,7 @@ public class MagnetControllerItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-        boolean client = user.getWorld().isClient;
+        boolean client = user.world.isClient;
         if (client) {
             ClientOFF = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         } else {

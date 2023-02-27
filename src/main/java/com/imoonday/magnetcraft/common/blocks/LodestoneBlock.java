@@ -41,7 +41,7 @@ public class LodestoneBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BlockRegistries.LODESTONE_ENTITY, (world1, pos, state1, blockEntity) -> LodestoneEntity.tick(world1, pos));
+        return checkType(type, BlockRegistries.LODESTONE_ENTITY, LodestoneEntity::tick);
     }
 
     @Override

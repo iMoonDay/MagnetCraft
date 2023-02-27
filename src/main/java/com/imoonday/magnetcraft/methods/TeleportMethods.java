@@ -2,7 +2,6 @@ package com.imoonday.magnetcraft.methods;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
-import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,18 +14,19 @@ import net.minecraft.world.World;
 
 public class TeleportMethods {
 
+
     public static void teleportSurroundingItemEntitiesToPlayer(World world, PlayerEntity player, double dis, Hand hand) {
-        ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
+        boolean message = ModConfig.getConfig().displayMessageFeedback;
+        int magnetHandSpacing = ModConfig.getConfig().value.magnetHandSpacing;
         boolean emptyDamage = DamageMethods.isEmptyDamage(player, hand);
         boolean mainhand = hand == Hand.MAIN_HAND;
-        boolean message = config.displayMessageFeedback;
         boolean client = world.isClient;
         if (emptyDamage) return;
-        if (mainhand) dis += config.value.magnetHandSpacing;
+        if (mainhand) dis += magnetHandSpacing;
         double finalDis = dis;
-        int count = player.getWorld().getOtherEntities(player, player.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.distanceTo(player) <= finalDis).size();
+        int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.distanceTo(player) <= finalDis).size();
         String text;
-        player.getWorld().getOtherEntities(player, player.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.distanceTo(player) <= finalDis).forEach(e -> {
+        player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.distanceTo(player) <= finalDis).forEach(e -> {
             boolean isExp = e instanceof ExperienceOrbEntity;
             DamageMethods.addDamage(player, hand, 1);
             if (isExp) {
@@ -46,6 +46,7 @@ public class TeleportMethods {
     }
 
     public static void giveItemStackToPlayer(World world, PlayerEntity player, ItemStack stack) {
+        boolean message = ModConfig.getConfig().displayMessageFeedback;
         PlayerInventory inventory = player.getInventory();
         boolean hasSlot = inventory.getEmptySlot() != -1;
         ItemEntity itemEntity = new ItemEntity(world, player.getX(), player.getY(), player.getZ(), stack);
@@ -66,9 +67,8 @@ public class TeleportMethods {
             }
             world.spawnEntity(itemEntity);
             boolean isClient = world.isClient;
-            boolean displayMessageFeedback = ModConfig.getConfig().displayMessageFeedback;
             boolean creative = player.isCreative();
-            if (!isClient && displayMessageFeedback && !creative) {
+            if (!isClient && message && !creative) {
                 player.sendMessage(Text.translatable("text.magnetcraft.message.inventory_full"));
             }
         }

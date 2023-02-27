@@ -5,7 +5,6 @@ import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -24,6 +23,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class ElectroMagnetItem extends Item {
+
     public ElectroMagnetItem(Settings settings) {
         super(settings);
     }
@@ -72,12 +72,11 @@ public class ElectroMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-        boolean sneaking = user.isSneaking();
-        boolean emptyDamage = DamageMethods.isEmptyDamage(user, hand);
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
-        double dis = config.value.electromagnetTeleportMinDis;
+        double dis = ModConfig.getConfig().value.electromagnetTeleportMinDis;
+        boolean sneaking = user.isSneaking();
+        boolean emptyDamage = DamageMethods.isEmptyDamage(user, hand);
         boolean flying = user.getAbilities().flying;
         if (sneaking && flying) {
             sneaking = false;

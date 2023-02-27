@@ -27,7 +27,7 @@
   "item.magnetcraft.creature_magnet.tooltip.2": "潜行右键切换开关",
   "item.magnetcraft.mineral_magnet": "矿物磁铁",
   "item.magnetcraft.mineral_magnet.tooltip.1": "空",
-  "item.magnetcraft.mineral_magnet.tooltip.2": "等级不足(至少5级)",
+  "item.magnetcraft.mineral_magnet.tooltip.2": "等级不足(至少%d级)",
   "item.magnetcraft.mineral_magnet.tooltip.3": "耐久不足,搜寻矿物被迫终止",
   "item.magnetcraft.mineral_magnet.tooltip.4": "一共发现了 %d 个矿石",
   "item.magnetcraft.mineral_magnet.tooltip.6": "%d 个煤矿石",
@@ -111,7 +111,7 @@
   "stat.magnetcraft.items_teleported_to_player": "通过磁铁获取的物品数量",
   "text.magnetcraft.message.attract": "吸引",
   "text.magnetcraft.message.teleport": "传送",
-  "text.magnetcraft.message.teleport.tooltip.1": "[磁铁]: 在 %1%d 格范围内捡起了 %2%d 个物品/经验",
+  "text.magnetcraft.message.teleport.tooltip.1": "[磁铁]: 在 %1$d 格范围内捡起了 %2$d 个物品/经验",
   "text.magnetcraft.message.teleport.tooltip.2": "[磁铁]: 在 %d 格范围内没有寻找到物品/经验",
   "text.magnetcraft.message.creature_attract": "生物吸引",
   "text.magnetcraft.message.mainhand_on": "主手磁铁:开",
@@ -179,6 +179,8 @@
   "text.autoconfig.magnetcraft.option.value.disPerPower": "每级红石信号增加的磁石吸引距离",
   "text.autoconfig.magnetcraft.option.value.disEachClick": "每次右击磁石增加的吸引距离",
   "text.autoconfig.magnetcraft.option.value.maxEnchLvl": "最大附魔等级",
+  "text.autoconfig.magnetcraft.option.value.requiredExperienceLevel": "矿物磁铁每次使用所需要的等级",
+  "text.autoconfig.magnetcraft.option.value.removeFoodLevelEveryCount": "作物磁铁每次使用消耗一点饱食度的最低限度(0则不消耗)",
   "text.autoconfig.magnetcraft.option.value.magnetSetMultiplier": "磁铁套装提升范围的倍率",
   "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "下界磁铁套装提升范围的倍率"
 }

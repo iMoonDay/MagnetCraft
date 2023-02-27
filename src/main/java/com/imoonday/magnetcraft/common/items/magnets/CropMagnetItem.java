@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -21,6 +22,7 @@ import net.minecraft.world.World;
 import static net.minecraft.state.property.Properties.*;
 
 public class CropMagnetItem extends Item {
+
     public CropMagnetItem(Settings settings) {
         super(settings);
     }
@@ -51,9 +53,10 @@ public class CropMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        int levelEveryCount = ModConfig.getConfig().value.removeFoodLevelEveryCount;
         if (!DamageMethods.isEmptyDamage(user, hand)) {
             int crops = searchCrops(user, hand);
-            int removeFoodLevel = crops / 32 + (crops % 32 == 0 ? 0 : 1);
+            int removeFoodLevel = levelEveryCount != 0 ? crops / levelEveryCount + (crops % levelEveryCount == 0 ? 0 : 1) : 0;
             boolean success = crops > 0;
             if (success && !user.isCreative()) {
                 user.getHungerManager().setFoodLevel(user.getHungerManager().getFoodLevel() - removeFoodLevel);

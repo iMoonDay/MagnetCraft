@@ -78,6 +78,10 @@ public class ModConfig implements ConfigData {
         @ConfigEntry.BoundedDiscrete(min = 1, max = 10)
         @ConfigEntry.Gui.RequiresRestart
         public int maxEnchLvl = 5;
+        @ConfigEntry.BoundedDiscrete(max = 30)
+        public int requiredExperienceLevel = 5;
+        @ConfigEntry.BoundedDiscrete(max = 5 * 64)
+        public int removeFoodLevelEveryCount = 32;
         //装备乘数
         public double magnetSetMultiplier = 1.5;
         public double netheriteMagnetSetMultiplier = 2;
@@ -90,4 +94,9 @@ public class ModConfig implements ConfigData {
     public static ModConfig getConfig() {
         return AutoConfig.getConfigHolder(ModConfig.class).getConfig();
     }
+
+    public static DefaultValue getValue() {
+        return AutoConfig.getConfigHolder(ModConfig.class).getConfig().value;
+    }
+
 }

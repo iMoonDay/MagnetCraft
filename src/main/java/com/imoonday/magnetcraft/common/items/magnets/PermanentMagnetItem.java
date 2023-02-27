@@ -4,7 +4,6 @@ import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import me.shedaniel.autoconfig.AutoConfig;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
@@ -21,6 +20,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class PermanentMagnetItem extends Item {
+
     public PermanentMagnetItem(Settings settings) {
         super(settings);
     }
@@ -64,11 +64,10 @@ public class PermanentMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ModConfig config = AutoConfig.getConfigHolder(ModConfig.class).getConfig();
-        boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
-        double dis = config.value.permanentMagnetTeleportMinDis;
+        double dis = ModConfig.getConfig().value.permanentMagnetTeleportMinDis;
+        boolean sneaking = user.isSneaking();
         boolean flying = user.getAbilities().flying;
         if (sneaking && flying) {
             sneaking = false;

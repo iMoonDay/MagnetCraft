@@ -1,0 +1,34 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:empty_crafting_module"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "magnetcraft:polar_magnet_crafting_module",
+      "magnetcraft:polar_magnet",
+      "magnetcraft:electromagnet_crafting_module",
+      "magnetcraft:electromagnet",
+      "magnetcraft:permanent_magnet_crafting_module",
+      "magnetcraft:permanent_magnet",
+      "magnetcraft:creature_magnet_crafting_module",
+      "magnetcraft:creature_magnet",
+      "magnetcraft:mineral_magnet_crafting_module",
+      "magnetcraft:mineral_magnet",
+      "magnetcraft:crop_magnet_crafting_module",
+      "magnetcraft:crop_magnet",
+      "magnetcraft:restore_module",
+      "magnetcraft:magnet_template_from_magnet"
+    ]
+  }
+}

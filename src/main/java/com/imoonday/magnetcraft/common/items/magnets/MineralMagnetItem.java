@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -36,6 +37,7 @@ import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags.QU
 import static net.minecraft.registry.tag.BlockTags.*;
 
 public class MineralMagnetItem extends Item {
+
     public MineralMagnetItem(Settings settings) {
         super(settings);
     }
@@ -117,6 +119,7 @@ public class MineralMagnetItem extends Item {
     }
 
     public static int searchMineral(PlayerEntity player, Hand hand) {
+        int requiredExperienceLevel = ModConfig.getConfig().value.requiredExperienceLevel;
         int total = 0;
         int totalValue = 0;
         if (!player.world.isClient) {
@@ -131,10 +134,10 @@ public class MineralMagnetItem extends Item {
             int quartz = 0;
             int magnetite = 0;
             int others = 0;
-            int value = 1;
+            int value;
             boolean isEmptyDamage = false;
             DamageMethods.addDamage(player, hand, 1);
-            if (player.experienceLevel < 5 && !player.isCreative()) {
+            if (player.experienceLevel < requiredExperienceLevel && !player.isCreative()) {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
             }
@@ -171,6 +174,7 @@ public class MineralMagnetItem extends Item {
                             world.breakBlock(pos, false, player);
                             if (state.isIn(COAL_ORES)) {
                                 coal++;
+                                value = 1;
                             } else if (state.isIn(IRON_ORES)) {
                                 iron++;
                                 value = 2;
@@ -204,6 +208,7 @@ public class MineralMagnetItem extends Item {
                                 value = 2;
                             } else {
                                 others++;
+                                value = 1;
                             }
                             total++;
                             totalValue += value;
@@ -213,10 +218,10 @@ public class MineralMagnetItem extends Item {
                 }
             }
             if (!player.isCreative() && totalValue > 0) {
-                player.addExperienceLevels(-5);
+                player.addExperienceLevels(-requiredExperienceLevel);
             }
             if (isEmptyDamage) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.3"));
+                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.3", requiredExperienceLevel));
             }
             player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.4", total));
             if (coal > 0) {

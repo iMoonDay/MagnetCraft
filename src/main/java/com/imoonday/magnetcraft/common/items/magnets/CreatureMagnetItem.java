@@ -31,6 +31,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class CreatureMagnetItem extends Item {
+
     public CreatureMagnetItem(Settings settings) {
         super(settings);
     }
@@ -81,9 +82,9 @@ public class CreatureMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        boolean sneaking = user.isSneaking();
         boolean flying = user.getAbilities().flying;
         if (sneaking && flying) {
             sneaking = false;
@@ -107,13 +108,13 @@ public class CreatureMagnetItem extends Item {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         boolean sneaking = user.isSneaking();
         boolean enabled = stack.getOrCreateNbt().getBoolean("Enable");
         boolean cooling = user.getItemCooldownManager().isCoolingDown(this);
         boolean entityCanAttract = !(entity.isPlayer()) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
         boolean creative = user.isCreative();
-        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         if ((((!sneaking && !rightClickReversal) || (sneaking && rightClickReversal)) || !enableSneakToSwitch) && enabled && !cooling && entityCanAttract) {
             if (!entity.addScoreboardTag(user.getEntityName())) {
                 entity.removeScoreboardTag(user.getEntityName());
@@ -126,6 +127,7 @@ public class CreatureMagnetItem extends Item {
     }
 
     public static void attractCreatures(ItemStack mainhandStack, ItemStack offhandStack, LivingEntity entity, double dis, AttractMethods.Hand hand) {
+        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
         boolean isMainhand = hand == AttractMethods.Hand.MAINHAND;
         boolean isOffhand = hand == AttractMethods.Hand.OFFHAND;
@@ -138,15 +140,14 @@ public class CreatureMagnetItem extends Item {
         boolean handEmpty = !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && isHand && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;
         boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
         boolean player = entity.isPlayer();
-        boolean client = entity.getWorld().isClient;
+        boolean client = entity.world.isClient;
         boolean spectator = entity.isSpectator();
         boolean creative = player && ((PlayerEntity) entity).isCreative();
         boolean entityCanAttract;
-        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         if (!client) {
-            entityCanAttract = entity.getWorld().getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
+            entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
             if (!magnetOff && entityCanAttract && !isEmpty) {
-                entity.getWorld().getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
+                entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
                     double move_x = (entity.getX() - e.getX()) * 0.05;
                     double move_y = (entity.getY() - e.getY()) * 0.05;
                     double move_z = (entity.getZ() - e.getZ()) * 0.05;

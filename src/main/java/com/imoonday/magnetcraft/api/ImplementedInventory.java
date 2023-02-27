@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft;
+package com.imoonday.magnetcraft.api;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.Inventories;

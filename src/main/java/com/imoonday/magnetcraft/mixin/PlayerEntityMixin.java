@@ -24,7 +24,7 @@ public class PlayerEntityMixin {
     public void checkLootingAt(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player != null) {
-            World world = ((PlayerEntity) (Object) this).getWorld();
+            World world = ((PlayerEntity) (Object) this).world;
             if (world == null) return;
             MinecraftClient client = MinecraftClient.getInstance();
             HitResult hit = client.crosshairTarget;

@@ -22,7 +22,7 @@ public class TridentEntityMixin {
     public void checkAttract(CallbackInfo info) {
         TridentEntity entity = (TridentEntity) (Object) this;
         if (entity != null) {
-            World world = ((TridentEntity) (Object) this).getWorld();
+            World world = ((TridentEntity) (Object) this).world;
             if (world == null) return;
             ModConfig config = ModConfig.getConfig();
             ItemStack stack = this.tridentStack;

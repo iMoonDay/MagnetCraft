@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
-import com.imoonday.magnetcraft.ImplementedInventory;
+import com.imoonday.magnetcraft.api.ImplementedInventory;
 import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
@@ -14,44 +14,56 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
-import java.util.Objects;
-
 public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
 
     private boolean redstone;
-    private double dis2;
+    private double dis;
     private int direction;
+    private boolean enable;
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(18, ItemStack.EMPTY);
+
+    protected final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+        @Override
+        public int get(int index) {
+            return redstone ? 1 : 0;
+        }
+
+        @Override
+        public void set(int index, int value) {
+
+        }
+
+        @Override
+        public int size() {
+            return 1;
+        }
+    };
 
     public LodestoneEntity(BlockPos pos, BlockState state) {
         super(BlockRegistries.LODESTONE_ENTITY, pos, state);
     }
 
-    public static void tick(World world, BlockPos pos) {
-        BlockState state = world.getBlockState(pos);
+    public static void tick(World world, BlockPos pos, BlockState state, LodestoneEntity entity) {
+        int maxDis = ModConfig.getConfig().value.lodestoneMaxDis;
         world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
-        NbtCompound nbt = Objects.requireNonNull(world.getBlockEntity(pos)).createNbt();
-        double dis = nbt.getDouble("dis") <= ModConfig.getConfig().value.lodestoneMaxDis ? nbt.getDouble("dis") + 1 : ModConfig.getConfig().value.lodestoneMaxDis + 1;
-        boolean enable = nbt.getBoolean("enable");
-        int direction1 = nbt.getInt("direction");
-        Vec3d centerPos = pos.toCenterPos();
-        Direction direction;
-        centerPos = centerPos.add(0, 0.5, 0);
-        if (enable) {
-            centerPos = switch (direction1) {
+        double dis = entity.dis <= maxDis ? entity.dis + 1 : maxDis + 1;
+        int getDirection = entity.direction;
+        Vec3d centerPos = pos.toCenterPos().add(0, 0.5, 0);
+        if (entity.enable) {
+            centerPos = switch (getDirection) {
                 case 1 -> centerPos.add(0, 0, 1);
                 case 2 -> centerPos.add(-1, 0, 0);
                 case 3 -> centerPos.add(0, 0, -1);
@@ -60,7 +72,7 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
                 case 6 -> centerPos.add(0, -1, 0);
                 default -> centerPos;
             };
-            direction = switch (direction1) {
+            Direction direction = switch (getDirection) {
                 case 1 -> Direction.SOUTH;
                 case 2 -> Direction.WEST;
                 case 3 -> Direction.NORTH;
@@ -71,10 +83,10 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
             };
             AttractMethods.attractItems(world, centerPos, dis);
             if (direction != null) {
-                putItemEntityIn(world, pos, direction);
+                putItemEntityIn(world, pos, entity, direction);
             } else {
                 for (Direction direction2 : new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP, Direction.DOWN}) {
-                    putItemEntityIn(world, pos, direction2);
+                    putItemEntityIn(world, pos, entity, direction2);
                 }
             }
         }
@@ -82,17 +94,9 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
 
     @Override
     public void writeNbt(NbtCompound nbt) {
-        boolean hasPowered = world != null && world.isReceivingRedstonePower(pos);
-        int disPerPower = ModConfig.getConfig().value.disPerPower;
-        double dis = world.getReceivedRedstonePower(pos) * disPerPower;
-        nbt.putBoolean("redstone", redstone);
-        if (redstone) {
-            nbt.putBoolean("enable", hasPowered);
-            nbt.putDouble("dis", dis);
-        } else {
-            nbt.putBoolean("enable", dis2 > 1);
-            nbt.putDouble("dis", dis2);
-        }
+        int disPerPower = ModConfig.getConfig().value.disPerPower;nbt.putBoolean("redstone", redstone);
+        nbt.putDouble("dis", redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : this.dis);
+        nbt.putBoolean("enable", enable);
         nbt.putInt("direction", direction);
         Inventories.writeNbt(nbt, this.inventory);
     }
@@ -104,12 +108,12 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
             redstone = nbt.getBoolean("redstone");
         }
         if (nbt.contains("dis")) {
-            dis2 = nbt.getDouble("dis");
+            dis = nbt.getDouble("dis");
         }
         if (nbt.contains("direction")) {
             direction = nbt.getInt("direction");
         }
-        Inventories.readNbt(nbt, this.inventory);
+        enable = redstone ? world != null && world.isReceivingRedstonePower(pos) : dis > 1;
     }
 
     @Nullable
@@ -140,43 +144,41 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
     @org.jetbrains.annotations.Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        return new LodestoneScreenHandler(syncId, inv, this);
+        return new LodestoneScreenHandler(syncId, inv, this, propertyDelegate);
     }
 
-    public static void putItemEntityIn(World world, BlockPos blockPos, Direction direction) {
+    public static void putItemEntityIn(World world, BlockPos blockPos, LodestoneEntity blockEntity, Direction direction) {
         world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).forEach(e -> {
-            Inventory inventory = (Inventory) world.getBlockEntity(blockPos);
+            DefaultedList<ItemStack> inventory = blockEntity.inventory;
             ItemStack stack = ((ItemEntity) e).getStack();
             boolean hasEmptySlot = false;
             boolean hasSameStack = false;
             boolean countOverflow = false;
             int overflowCount = 0;
             int slot = -1;
-            if (inventory != null) {
-                for (int i = 0; i < inventory.size(); i++) {
-                    ItemStack inventoryStack = inventory.getStack(i);
-                    hasEmptySlot = inventoryStack.isEmpty();
-                    hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
-                    countOverflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
+            for (int i = 0; i < inventory.size(); i++) {
+                ItemStack inventoryStack = inventory.get(i);
+                hasEmptySlot = inventoryStack.isEmpty();
+                hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
+                countOverflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
+                if (hasEmptySlot || hasSameStack) {
+                    slot = i;
                     if (countOverflow) {
                         overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
                     }
-                    if (hasEmptySlot || hasSameStack) {
-                        slot = i;
-                        break;
-                    }
+                    break;
                 }
             }
             if (hasEmptySlot) {
-                inventory.setStack(slot, stack);
+                inventory.set(slot, stack);
                 e.kill();
             } else if (hasSameStack) {
                 if (countOverflow) {
-                    inventory.setStack(slot, stack.copy().copyWithCount(stack.getMaxCount()));
+                    inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
                     stack.setCount(overflowCount);
                 } else {
-                    stack.increment(inventory.getStack(slot).getCount());
-                    inventory.setStack(slot, stack);
+                    stack.increment(inventory.get(slot).getCount());
+                    inventory.set(slot, stack);
                     e.kill();
                 }
             }

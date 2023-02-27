@@ -18,7 +18,7 @@ public class ItemEntityMixin {
     public void checkAttract(CallbackInfo info) {
         ItemEntity entity = (ItemEntity) (Object) this;
         if (entity != null) {
-            World world = ((ItemEntity) (Object) this).getWorld();
+            World world = ((ItemEntity) (Object) this).world;
             if (world == null) return;
             ItemStack stack = entity.getStack();
             boolean isAttracting = stack.isIn(ItemTags.ATTRACTING_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");

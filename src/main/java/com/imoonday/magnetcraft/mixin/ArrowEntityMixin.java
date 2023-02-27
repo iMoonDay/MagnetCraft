@@ -22,7 +22,7 @@ public class ArrowEntityMixin {
     public void checkAttract(CallbackInfo info) {
         ArrowEntity entity = (ArrowEntity) (Object) this;
         if (entity != null) {
-            World world = ((ArrowEntity) (Object) this).getWorld();
+            World world = ((ArrowEntity) (Object) this).world;
             if (world == null) return;
             boolean isAttracting = this.potion == PotionRegistries.ATTRACT_POTION;
             double dis = ModConfig.getConfig().value.arrowAttractDis;

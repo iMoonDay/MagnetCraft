@@ -1,0 +1,33 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:netherite_magnetic_iron_ingot"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "magnetcraft:magnet_template",
+      "magnetcraft:magnet_controller",
+      "magnetcraft:netherite_magnet_block",
+      "magnetcraft:netherite_magnetic_iron_axe",
+      "magnetcraft:netherite_magnetic_iron_pickaxe",
+      "magnetcraft:netherite_magnetic_iron_shovel",
+      "magnetcraft:netherite_magnetic_iron_hoe",
+      "magnetcraft:netherite_magnetic_iron_sword",
+      "magnetcraft:netherite_magnetic_iron_helmet",
+      "magnetcraft:netherite_magnetic_iron_chestplate",
+      "magnetcraft:netherite_magnetic_iron_leggings",
+      "magnetcraft:netherite_magnetic_iron_boots",
+      "magnetcraft:permanent_magnet"
+    ]
+  }
+}

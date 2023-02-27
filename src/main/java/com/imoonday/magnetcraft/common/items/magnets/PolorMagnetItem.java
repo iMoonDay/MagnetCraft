@@ -19,6 +19,7 @@ import net.minecraft.world.World;
 import java.util.List;
 
 public class PolorMagnetItem extends Item {
+
     public PolorMagnetItem(Settings settings) {
         super(settings);
     }
@@ -60,9 +61,9 @@ public class PolorMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        boolean sneaking = user.isSneaking();
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        boolean sneaking = user.isSneaking();
         boolean flying = user.getAbilities().flying;
         if (sneaking && flying) {
             sneaking = false;

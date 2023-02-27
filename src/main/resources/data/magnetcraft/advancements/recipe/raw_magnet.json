@@ -1,0 +1,29 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:raw_magnet"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "magnetcraft:raw_magnet_block",
+      "magnetcraft:magnet_fragment_from_blasting_deepslate_magnetite",
+      "magnetcraft:magnet_fragment_from_blasting_magnetite",
+      "magnetcraft:magnet_fragment_from_blasting_raw_magnet",
+      "magnetcraft:magnet_fragment_from_smelting_deepslate_magnetite",
+      "magnetcraft:magnet_fragment_from_smelting_magnetite",
+      "magnetcraft:magnet_fragment_from_smelting_raw_magnet",
+      "magnetcraft:magnetic_iron_ingot_from_magnet_fragment",
+      "magnetcraft:netherite_magnetic_iron_ingot_from_magnetic_iron_ingot"
+    ]
+  }
+}

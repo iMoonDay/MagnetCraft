@@ -6,21 +6,31 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
 public class LodestoneScreenHandler extends ScreenHandler {
 
     public Inventory inventory;
+    private final PropertyDelegate propertyDelegate;
 
     public LodestoneScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(18));
+        this(syncId, inventory, new SimpleInventory(18),new ArrayPropertyDelegate(1));
     }
 
-    public LodestoneScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory) {
+    public int getRedstone(){
+        return propertyDelegate.get(0);
+    }
+
+    public LodestoneScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory,PropertyDelegate propertyDelegate) {
         super(ScreenRegistries.LODESTONE_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
+        this.propertyDelegate = propertyDelegate;
+        this.addProperties(propertyDelegate);
         checkSize(inventory, 18);
+        checkDataCount(propertyDelegate,1);
         int y;
         int x;
         for (y = 0; y < 2; ++y) {
@@ -67,4 +77,5 @@ public class LodestoneScreenHandler extends ScreenHandler {
     public boolean canUse(PlayerEntity player) {
         return this.inventory.canPlayerUse(player);
     }
+
 }

@@ -1,0 +1,42 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:magnetic_iron_ingot"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "magnetcraft:magnet_template",
+      "magnetcraft:magnet_controller",
+      "magnetcraft:magnet_block",
+      "magnetcraft:maglev_rail",
+      "magnetcraft:maglev_powered_rail",
+      "magnetcraft:maglev_detector_rail",
+      "magnetcraft:maglev_activator_rail",
+      "magnetcraft:maglev_lever",
+      "magnetcraft:lodestone",
+      "magnetcraft:empty_crafting_module",
+      "magnetcraft:magnet_powder_from_smelting",
+      "magnetcraft:magnet_powder_from_blasting",
+      "magnetcraft:magnetic_iron_axe",
+      "magnetcraft:magnetic_iron_pickaxe",
+      "magnetcraft:magnetic_iron_shovel",
+      "magnetcraft:magnetic_iron_hoe",
+      "magnetcraft:magnetic_iron_sword",
+      "magnetcraft:magnetic_iron_helmet",
+      "magnetcraft:magnetic_iron_chestplate",
+      "magnetcraft:magnetic_iron_leggings",
+      "magnetcraft:magnetic_iron_boots",
+      "magnetcraft:magnetic_iron_horse_armor"
+    ]
+  }
+}

@@ -1,11 +1,16 @@
 package com.imoonday.magnetcraft.registries.special;
 
 import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
+import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.hit.BlockHitResult;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
@@ -26,13 +31,43 @@ public class GlobalReceiverRegistries {
 
         ServerPlayNetworking.registerGlobalReceiver(BLACKLIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             if (player.hasPermissionLevel(4)) {
-                CommandRegistries.addOrRemoveBlacklistItem(player);
+                CommandRegistries.itemListHandling(player, null, CommandRegistries.ListType.BLACKLIST, null);
             }
         }));
 
         ServerPlayNetworking.registerGlobalReceiver(WHITELIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             if (player.hasPermissionLevel(4)) {
-                CommandRegistries.addOrRemoveWhitelistItem(player);
+                CommandRegistries.itemListHandling(player, null, CommandRegistries.ListType.WHITELIST, null);
+            }
+        }));
+
+        ServerPlayNetworking.registerGlobalReceiver(LODESTONE_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            BlockHitResult blockHitResult = buf.readBlockHitResult();
+            int taskNum = buf.readInt();
+            BlockEntity entity = player.world.getBlockEntity(blockHitResult.getBlockPos());
+            if (player.world.getBlockState(blockHitResult.getBlockPos()).isOf(BlockRegistries.LODESTONE_BLOCK) && entity != null) {
+                NbtCompound nbt = entity.createNbt();
+                final int disEachClick = ModConfig.getValue().disEachClick;
+                switch (taskNum) {
+                    case 0 -> {
+                        nbt.putBoolean("redstone", !entity.createNbt().getBoolean("redstone"));
+                        if (entity.createNbt().getBoolean("redstone")) {
+                            nbt.putDouble("dis", 0);
+                        }
+                    }
+                    case 1 -> {
+                        if (!entity.createNbt().getBoolean("redstone")) {
+                            nbt.putDouble("dis", entity.createNbt().getDouble("dis") - disEachClick >= 0 ? entity.createNbt().getDouble("dis") - disEachClick : 0);
+                        }
+                    }
+                    case 2 -> {
+                        if (!entity.createNbt().getBoolean("redstone")) {
+                            nbt.putDouble("dis", entity.createNbt().getDouble("dis") + disEachClick <= ModConfig.getValue().lodestoneMaxDis ? entity.createNbt().getDouble("dis") + disEachClick : ModConfig.getValue().lodestoneMaxDis);
+                        }
+                    }
+                }
+                entity.readNbt(nbt);
+                entity.markDirty();
             }
         }));
 

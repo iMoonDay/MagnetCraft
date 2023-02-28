@@ -2,13 +2,21 @@ package com.imoonday.magnetcraft.screen;
 
 import com.imoonday.magnetcraft.screen.handler.LodestoneScreenHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+
+import java.awt.*;
+import java.util.Objects;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
@@ -32,18 +40,50 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         super.mouseClicked(mouseX, mouseY, button);
-        boolean redstone = this.handler.getRedstone() == 1;
-        boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 8;
-        boolean onLeftClick = mouseX >= x + 133 && mouseX <= x + 133 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
+        boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.message.redstone_mode")) && mouseY >= y + 20 && mouseY <= y + 20 + 8;
+        boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         if (onRedstone) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal(String.valueOf(redstone)));
+            MinecraftClient client = MinecraftClient.getInstance();
+            HitResult hit = client.crosshairTarget;
+            if (hit != null) {
+                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
+                    BlockHitResult blockHit = (BlockHitResult) hit;
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeBlockHitResult(blockHit);
+                    buf.writeInt(0);
+                    buf.retain();
+                    ClientPlayNetworking.send(id("lodestone"), buf);
+                }
+            }
         }
         if (onLeftClick) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("-"));
+            MinecraftClient client = MinecraftClient.getInstance();
+            HitResult hit = client.crosshairTarget;
+            if (hit != null) {
+                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
+                    BlockHitResult blockHit = (BlockHitResult) hit;
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeBlockHitResult(blockHit);
+                    buf.writeInt(1);
+                    buf.retain();
+                    ClientPlayNetworking.send(id("lodestone"), buf);
+                }
+            }
         }
         if (onRightClick) {
-            MinecraftClient.getInstance().inGameHud.getChatHud().addMessage(Text.literal("+"));
+            MinecraftClient client = MinecraftClient.getInstance();
+            HitResult hit = client.crosshairTarget;
+            if (hit != null) {
+                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
+                    BlockHitResult blockHit = (BlockHitResult) hit;
+                    PacketByteBuf buf = PacketByteBufs.create();
+                    buf.writeBlockHitResult(blockHit);
+                    buf.writeInt(2);
+                    buf.retain();
+                    ClientPlayNetworking.send(id("lodestone"), buf);
+                }
+            }
         }
         return true;
     }
@@ -57,32 +97,37 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         int y = (height - backgroundHeight) / 2;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
         boolean redstone = this.handler.getRedstone() == 1;
-        boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 8;
-        boolean onLeftClick = mouseX >= x + 133 && mouseX <= x + 133 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
+        boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.message.redstone_mode")) && mouseY >= y + 20 && mouseY <= y + 20 + 8;
+        boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
+        int dis = this.handler.getDis();
         if (onRedstone) {
             if (redstone) {
-                drawTexture(matrices, x + 11, y + 17, 8, 166 + 8, 8, 8);
+                drawTexture(matrices, x + 11, y + 20, 8, 166 + 8, 8, 8);
             } else {
-                drawTexture(matrices, x + 11, y + 17, 8, 166, 8, 8);
+                drawTexture(matrices, x + 11, y + 20, 8, 166, 8, 8);
             }
         } else {
             if (redstone) {
-                drawTexture(matrices, x + 11, y + 17, 0, 166 + 8, 8, 8);
+                drawTexture(matrices, x + 11, y + 20, 0, 166 + 8, 8, 8);
             } else {
-                drawTexture(matrices, x + 11, y + 17, 0, 166, 8, 8);
+                drawTexture(matrices, x + 11, y + 20, 0, 166, 8, 8);
             }
         }
         if (onLeftClick) {
-            drawTexture(matrices, x + 133, y + 17, 48, 166, 16, 16);
+            drawTexture(matrices, x + 132, y + 17, 48, 166, 16, 16);
             drawTexture(matrices, x + 133 + 16, y + 17, 16 + 16, 166, 16, 16);
         } else if (onRightClick) {
-            drawTexture(matrices, x + 133, y + 17, 16, 166, 16, 16);
+            drawTexture(matrices, x + 132, y + 17, 16, 166, 16, 16);
             drawTexture(matrices, x + 133 + 16, y + 17, 48 + 16, 166, 16, 16);
         } else {
-            drawTexture(matrices, x + 133, y + 17, 16, 166, 16, 16);
+            drawTexture(matrices, x + 132, y + 17, 16, 166, 16, 16);
             drawTexture(matrices, x + 133 + 16, y + 17, 16 + 16, 166, 16, 16);
         }
+        textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.redstone_mode"), x + 11 + 10, y + 20, Color.black.getRGB());
+        textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.direction." + this.handler.getDirection()), x + 11, y + 10, Color.black.getRGB());
+        int x1 = ((x + 133 + 16) * 2 - textRenderer.getWidth(String.valueOf(dis))) / 2;
+        textRenderer.draw(matrices, String.valueOf(dis), x1, y + 21, Color.black.getRGB());
     }
 
     @Override

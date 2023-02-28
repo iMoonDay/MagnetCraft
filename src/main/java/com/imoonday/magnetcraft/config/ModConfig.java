@@ -6,6 +6,8 @@ import me.shedaniel.autoconfig.annotation.Config;
 import me.shedaniel.autoconfig.annotation.ConfigEntry;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 
+import java.util.ArrayList;
+
 @Config(name = "magnetcraft")
 public class ModConfig implements ConfigData {
 
@@ -19,7 +21,7 @@ public class ModConfig implements ConfigData {
 
     public static class Whitelist {
         public boolean enable = false;
-        public String[] list = new String[]{};
+        public ArrayList<String> list = new ArrayList<>();
     }
 
     @ConfigEntry.Gui.CollapsibleObject
@@ -27,7 +29,8 @@ public class ModConfig implements ConfigData {
 
     public static class Blacklist {
         public boolean enable = false;
-        public String[] list = new String[]{};
+        public ArrayList<String> list = new ArrayList<>();
+
     }
 
     @ConfigEntry.Gui.CollapsibleObject

@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks;
 
 import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
-import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
@@ -60,10 +59,7 @@ public class LodestoneBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        boolean isLodestone = world.getBlockState(pos).isOf(BlockRegistries.LODESTONE_BLOCK);
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        boolean redstone = Objects.requireNonNull(blockEntity).createNbt().getBoolean("redstone");
-        double dis = Objects.requireNonNull(blockEntity).createNbt().getDouble("dis");
         int direction = Objects.requireNonNull(blockEntity).createNbt().getInt("direction");
         NbtCompound nbt = new NbtCompound();
         Direction side = hit.getSide();
@@ -106,30 +102,20 @@ public class LodestoneBlock extends BlockWithEntity {
                 }
             }
         } else {
-            if (side == Direction.UP) {
-                if (isLodestone && hand == Hand.MAIN_HAND) {
-                    if (redstone) {
-                        nbt.putBoolean("redstone", false);
-                        nbt.putDouble("dis", 0);
-                    } else if (dis < ModConfig.getConfig().value.lodestoneMaxDis) {
-                        nbt.putDouble("dis", dis + ModConfig.getConfig().value.disEachClick);
-                    } else {
-                        nbt.putBoolean("redstone", true);
-                        nbt.putDouble("dis", 0);
-                    }
-                }
-            } else {
-                if (!world.isClient) {
-                    NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
-                    if (screenHandlerFactory != null) {
-                        player.openHandledScreen(screenHandlerFactory);
-                    }
+            if (!world.isClient) {
+                NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
+                if (screenHandlerFactory != null) {
+                    player.openHandledScreen(screenHandlerFactory);
                 }
             }
+//            }
         }
         if (!world.isClient) {
             blockEntity.readNbt(nbt);
             blockEntity.markDirty();
+            if (player.isSneaky()) {
+                showState(world, pos, player);
+            }
         }
         return ActionResult.SUCCESS;
     }
@@ -156,7 +142,7 @@ public class LodestoneBlock extends BlockWithEntity {
         return ScreenHandler.calculateComparatorOutput(world.getBlockEntity(pos));
     }
 
-    public static Text showState(World world, BlockPos pos, @Nullable PlayerEntity player) {
+    public static void showState(World world, BlockPos pos, @Nullable PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         boolean redstone = Objects.requireNonNull(blockEntity).createNbt().getBoolean("redstone");
         double dis = Objects.requireNonNull(blockEntity).createNbt().getDouble("dis");
@@ -172,6 +158,5 @@ public class LodestoneBlock extends BlockWithEntity {
                     .append(Text.translatable(directionText));
         }
         if (!world.isClient && player != null) player.sendMessage(text, true);
-        return text;
     }
 }

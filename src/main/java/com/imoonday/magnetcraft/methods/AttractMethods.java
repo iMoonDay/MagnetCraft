@@ -15,7 +15,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 
 public class AttractMethods {
 
@@ -77,8 +77,8 @@ public class AttractMethods {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
-        String[] whitelist = ModConfig.getConfig().whitelist.list;
-        String[] blacklist = ModConfig.getConfig().blacklist.list;
+        ArrayList<String> whitelist = ModConfig.getConfig().whitelist.list;
+        ArrayList<String> blacklist = ModConfig.getConfig().blacklist.list;
         entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && e.distanceTo(entity) <= dis && e.distanceTo(entity) > 0.5)).forEach(e -> {
             boolean hasNearerPlayer;
             boolean hasNearerEntity = false;
@@ -91,8 +91,8 @@ public class AttractMethods {
             boolean pass = true;
             if (e instanceof ItemEntity) {
                 item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
-                whitelistPass = Arrays.stream(whitelist).toList().contains(item);
-                blacklistPass = !Arrays.stream(blacklist).toList().contains(item);
+                whitelistPass = whitelist.contains(item);
+                blacklistPass = !blacklist.contains(item);
                 hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
                 pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && !hasDegaussingPlayer;
             }
@@ -127,8 +127,8 @@ public class AttractMethods {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
-        String[] whitelist = ModConfig.getConfig().whitelist.list;
-        String[] blacklist = ModConfig.getConfig().blacklist.list;
+        ArrayList<String> whitelist = ModConfig.getConfig().whitelist.list;
+        ArrayList<String> blacklist = ModConfig.getConfig().blacklist.list;
         world.getOtherEntities(null, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= dis && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) > 0.5)).forEach(e -> {
             float f = (float) (pos.getX() - e.getX());
             float g = (float) (pos.getY() - e.getY());
@@ -144,8 +144,8 @@ public class AttractMethods {
             boolean hasNearerEntity;
             if (e instanceof ItemEntity) {
                 item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
-                whitelistPass = Arrays.stream(whitelist).toList().contains(item);
-                blacklistPass = !Arrays.stream(blacklist).toList().contains(item);
+                whitelistPass = whitelist.contains(item);
+                blacklistPass = !blacklist.contains(item);
                 hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
                 pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && !hasDegaussingPlayer;
             }

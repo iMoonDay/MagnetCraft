@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
 import com.imoonday.magnetcraft.api.ImplementedInventory;
-import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
@@ -38,17 +37,25 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
     protected final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
-            return redstone ? 1 : 0;
+            if (index == 0) {
+                return redstone ? 1 : 0;
+            }
+            if (index == 1) {
+                return (int) dis;
+            }
+            if (index == 2) {
+                return direction;
+            }
+            return 0;
         }
 
         @Override
         public void set(int index, int value) {
-
         }
 
         @Override
         public int size() {
-            return 1;
+            return 3;
         }
     };
 
@@ -57,36 +64,38 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
     }
 
     public static void tick(World world, BlockPos pos, BlockState state, LodestoneEntity entity) {
-        int maxDis = ModConfig.getConfig().value.lodestoneMaxDis;
-        world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
-        double dis = entity.dis <= maxDis ? entity.dis + 1 : maxDis + 1;
-        int getDirection = entity.direction;
-        Vec3d centerPos = pos.toCenterPos().add(0, 0.5, 0);
-        if (entity.enable) {
-            centerPos = switch (getDirection) {
-                case 1 -> centerPos.add(0, 0, 1);
-                case 2 -> centerPos.add(-1, 0, 0);
-                case 3 -> centerPos.add(0, 0, -1);
-                case 4 -> centerPos.add(1, 0, 0);
-                case 5 -> centerPos.add(0, 1, 0);
-                case 6 -> centerPos.add(0, -1, 0);
-                default -> centerPos;
-            };
-            Direction direction = switch (getDirection) {
-                case 1 -> Direction.SOUTH;
-                case 2 -> Direction.WEST;
-                case 3 -> Direction.NORTH;
-                case 4 -> Direction.EAST;
-                case 5 -> Direction.UP;
-                case 6 -> Direction.DOWN;
-                default -> null;
-            };
-            AttractMethods.attractItems(world, centerPos, dis);
-            if (direction != null) {
-                putItemEntityIn(world, pos, entity, direction);
-            } else {
-                for (Direction direction2 : new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP, Direction.DOWN}) {
-                    putItemEntityIn(world, pos, entity, direction2);
+        if (world != null) {
+            int maxDis = ModConfig.getConfig().value.lodestoneMaxDis;
+            world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
+            double dis = entity.dis <= maxDis ? entity.dis + 1 : maxDis + 1;
+            int getDirection = entity.direction;
+            Vec3d centerPos = pos.toCenterPos().add(0, 0.5, 0);
+            if (entity.enable) {
+                centerPos = switch (getDirection) {
+                    case 1 -> centerPos.add(0, 0, 1);
+                    case 2 -> centerPos.add(-1, 0, 0);
+                    case 3 -> centerPos.add(0, 0, -1);
+                    case 4 -> centerPos.add(1, 0, 0);
+                    case 5 -> centerPos.add(0, 1, 0);
+                    case 6 -> centerPos.add(0, -1, 0);
+                    default -> centerPos;
+                };
+                Direction direction = switch (getDirection) {
+                    case 1 -> Direction.SOUTH;
+                    case 2 -> Direction.WEST;
+                    case 3 -> Direction.NORTH;
+                    case 4 -> Direction.EAST;
+                    case 5 -> Direction.UP;
+                    case 6 -> Direction.DOWN;
+                    default -> null;
+                };
+                AttractMethods.attractItems(world, centerPos, dis);
+                if (direction != null) {
+                    putItemEntityIn(world, pos, entity, direction);
+                } else {
+                    for (Direction direction2 : new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP, Direction.DOWN}) {
+                        putItemEntityIn(world, pos, entity, direction2);
+                    }
                 }
             }
         }
@@ -94,11 +103,14 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
 
     @Override
     public void writeNbt(NbtCompound nbt) {
-        int disPerPower = ModConfig.getConfig().value.disPerPower;nbt.putBoolean("redstone", redstone);
-        nbt.putDouble("dis", redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : this.dis);
+        int disPerPower = ModConfig.getConfig().value.disPerPower;
+        nbt.putBoolean("redstone", redstone);
+        nbt.putDouble("dis", redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : dis);
+        dis = nbt.getDouble("dis");
+        enable = redstone ? world != null && world.isReceivingRedstonePower(pos) : dis > 1;
         nbt.putBoolean("enable", enable);
         nbt.putInt("direction", direction);
-        Inventories.writeNbt(nbt, this.inventory);
+        Inventories.writeNbt(nbt, inventory);
     }
 
     @Override
@@ -113,7 +125,6 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
         if (nbt.contains("direction")) {
             direction = nbt.getInt("direction");
         }
-        enable = redstone ? world != null && world.isReceivingRedstonePower(pos) : dis > 1;
     }
 
     @Nullable
@@ -134,11 +145,8 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
 
     @Override
     public Text getDisplayName() {
-        if (world != null) {
-            return LodestoneBlock.showState(world, pos, null);
-        } else {
-            return Text.translatable(getCachedState().getBlock().getTranslationKey());
-        }
+//        return Text.translatable(getCachedState().getBlock().getTranslationKey());
+        return Text.empty();
     }
 
     @org.jetbrains.annotations.Nullable
@@ -153,17 +161,17 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
             ItemStack stack = ((ItemEntity) e).getStack();
             boolean hasEmptySlot = false;
             boolean hasSameStack = false;
-            boolean countOverflow = false;
+            boolean overflow = false;
             int overflowCount = 0;
             int slot = -1;
             for (int i = 0; i < inventory.size(); i++) {
                 ItemStack inventoryStack = inventory.get(i);
                 hasEmptySlot = inventoryStack.isEmpty();
                 hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
-                countOverflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
+                overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
                 if (hasEmptySlot || hasSameStack) {
                     slot = i;
-                    if (countOverflow) {
+                    if (overflow) {
                         overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
                     }
                     break;
@@ -173,7 +181,7 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
                 inventory.set(slot, stack);
                 e.kill();
             } else if (hasSameStack) {
-                if (countOverflow) {
+                if (overflow) {
                     inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
                     stack.setCount(overflowCount);
                 } else {

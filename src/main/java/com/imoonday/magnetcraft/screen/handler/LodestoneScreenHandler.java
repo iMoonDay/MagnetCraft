@@ -17,20 +17,28 @@ public class LodestoneScreenHandler extends ScreenHandler {
     private final PropertyDelegate propertyDelegate;
 
     public LodestoneScreenHandler(int syncId, PlayerInventory inventory) {
-        this(syncId, inventory, new SimpleInventory(18),new ArrayPropertyDelegate(1));
+        this(syncId, inventory, new SimpleInventory(18), new ArrayPropertyDelegate(3));
     }
 
-    public int getRedstone(){
+    public int getRedstone() {
         return propertyDelegate.get(0);
     }
 
-    public LodestoneScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory,PropertyDelegate propertyDelegate) {
+    public int getDis(){
+        return propertyDelegate.get(1);
+    }
+
+    public int getDirection(){
+        return propertyDelegate.get(2);
+    }
+
+    public LodestoneScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(ScreenRegistries.LODESTONE_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
         this.propertyDelegate = propertyDelegate;
         this.addProperties(propertyDelegate);
         checkSize(inventory, 18);
-        checkDataCount(propertyDelegate,1);
+        checkDataCount(propertyDelegate, 3);
         int y;
         int x;
         for (y = 0; y < 2; ++y) {

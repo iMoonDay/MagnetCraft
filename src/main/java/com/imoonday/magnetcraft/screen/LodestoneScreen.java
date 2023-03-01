@@ -4,23 +4,21 @@ import com.imoonday.magnetcraft.screen.handler.LodestoneScreenHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 
 import java.awt.*;
-import java.util.Objects;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
 public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
+
     private static final Identifier TEXTURE = id("textures/gui/lodestone.png");
 
     /**
@@ -43,47 +41,21 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.message.redstone_mode")) && mouseY >= y + 20 && mouseY <= y + 20 + 8;
         boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
-        if (onRedstone) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            HitResult hit = client.crosshairTarget;
-            if (hit != null) {
-                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
-                    BlockHitResult blockHit = (BlockHitResult) hit;
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeBlockHitResult(blockHit);
-                    buf.writeInt(0);
-                    buf.retain();
-                    ClientPlayNetworking.send(id("lodestone"), buf);
-                }
+        if (onRedstone || onLeftClick || onRightClick) {
+            if (client != null && client.player != null) {
+                client.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
             }
-        }
-        if (onLeftClick) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            HitResult hit = client.crosshairTarget;
-            if (hit != null) {
-                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
-                    BlockHitResult blockHit = (BlockHitResult) hit;
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeBlockHitResult(blockHit);
-                    buf.writeInt(1);
-                    buf.retain();
-                    ClientPlayNetworking.send(id("lodestone"), buf);
-                }
+            PacketByteBuf buf = PacketByteBufs.create();
+            buf.writeBlockPos(this.handler.getPos());
+            if (onRedstone) {
+                buf.writeInt(0);
+            } else if (onLeftClick) {
+                buf.writeInt(1);
+            } else {
+                buf.writeInt(2);
             }
-        }
-        if (onRightClick) {
-            MinecraftClient client = MinecraftClient.getInstance();
-            HitResult hit = client.crosshairTarget;
-            if (hit != null) {
-                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
-                    BlockHitResult blockHit = (BlockHitResult) hit;
-                    PacketByteBuf buf = PacketByteBufs.create();
-                    buf.writeBlockHitResult(blockHit);
-                    buf.writeInt(2);
-                    buf.retain();
-                    ClientPlayNetworking.send(id("lodestone"), buf);
-                }
-            }
+            buf.retain();
+            ClientPlayNetworking.send(id("lodestone"), buf);
         }
         return true;
     }
@@ -127,6 +99,11 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.redstone_mode"), x + 11 + 10, y + 20, Color.black.getRGB());
         textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.direction." + this.handler.getDirection()), x + 11, y + 10, Color.black.getRGB());
         int x1 = ((x + 133 + 16) * 2 - textRenderer.getWidth(String.valueOf(dis))) / 2;
+        if (x + 132 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.message.attract")) < x + backgroundWidth) {
+            textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.attract"), x + 132 + 8, y + 7, Color.black.getRGB());
+        } else {
+            textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.attract"), x + 132 + 8 - 8, y + 7, Color.black.getRGB());
+        }
         textRenderer.draw(matrices, String.valueOf(dis), x1, y + 21, Color.black.getRGB());
     }
 
@@ -140,7 +117,7 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
     @Override
     protected void init() {
         super.init();
-        titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+        titleX = (backgroundWidth - textRenderer.getWidth(title)) - 10;
     }
 
 }

@@ -3,17 +3,28 @@ package com.imoonday.magnetcraft.registries.special;
 import com.imoonday.magnetcraft.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.command.argument.ItemSlotArgumentType;
 import net.minecraft.command.argument.ItemStackArgumentType;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.Registries;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
@@ -22,6 +33,150 @@ public class CommandRegistries {
 
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("magnet")
+                        .then(literal("nbthelper")
+                                .then(literal("mainhand")
+                                        .executes(context -> {
+                                                    ServerPlayerEntity player = context.getSource().getPlayer();
+                                                    if (player != null) {
+                                                        String text = "None";
+                                                        NbtCompound nbt = player.getMainHandStack().getNbt();
+                                                        if (nbt != null) {
+                                                            text = nbt.toString();
+                                                        }
+                                                        player.sendMessage(Text.literal(text));
+                                                    }
+                                                    return 0;
+                                                }
+                                        )
+                                )
+                                .then(literal("offhand")
+                                        .executes(context -> {
+                                                    ServerPlayerEntity player = context.getSource().getPlayer();
+                                                    if (player != null) {
+                                                        String text = "None";
+                                                        NbtCompound nbt = player.getOffHandStack().getNbt();
+                                                        if (nbt != null) {
+                                                            text = nbt.toString();
+                                                        }
+                                                        player.sendMessage(Text.literal(text));
+                                                    }
+                                                    return 0;
+                                                }
+                                        )
+                                )
+                                .then(literal("slot")
+                                        .then(argument("slot", ItemSlotArgumentType.itemSlot())
+                                                .executes(context -> {
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                String text = "None";
+                                                                NbtCompound nbt = player.getInventory().getStack(ItemSlotArgumentType.getItemSlot(context, "slot")).getNbt();
+                                                                if (nbt != null) {
+                                                                    text = nbt.toString();
+                                                                }
+                                                                player.sendMessage(Text.literal(text));
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
+                                )
+                                .then(literal("block")
+                                        .executes(context -> {
+                                                    ServerPlayerEntity player = context.getSource().getPlayer();
+                                                    if (player != null) {
+                                                        String text = "None";
+                                                        MinecraftClient client = MinecraftClient.getInstance();
+                                                        HitResult hit = client.crosshairTarget;
+                                                        if (hit != null) {
+                                                            if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
+                                                                BlockHitResult blockHit = (BlockHitResult) hit;
+                                                                BlockPos blockPos = blockHit.getBlockPos();
+                                                                if (player.world.getBlockEntity(blockPos) != null) {
+                                                                    NbtCompound nbt = Objects.requireNonNull(player.world.getBlockEntity(blockPos)).createNbt();
+                                                                    text = nbt.toString();
+                                                                }
+                                                                player.sendMessage(Text.literal(text));
+                                                            }
+                                                        }
+                                                    }
+                                                    return 0;
+                                                }
+                                        )
+                                )
+                                .then(literal("entity")
+                                        .executes(context -> {
+                                                    ServerPlayerEntity player = context.getSource().getPlayer();
+                                                    if (player != null) {
+                                                        String text = "None";
+                                                        MinecraftClient client = MinecraftClient.getInstance();
+                                                        HitResult hit = client.crosshairTarget;
+                                                        if (hit != null) {
+                                                            if (Objects.requireNonNull(hit.getType()) == HitResult.Type.ENTITY) {
+                                                                EntityHitResult entityHit = (EntityHitResult) hit;
+                                                                Entity entity = entityHit.getEntity();
+                                                                NbtCompound nbt;
+                                                                nbt = entity.writeNbt(new NbtCompound());
+                                                                text = nbt.toString();
+                                                            }
+                                                        }
+                                                        player.sendMessage(Text.literal(text));
+                                                    }
+                                                    return 0;
+                                                }
+                                        )
+                                        .then(literal("mainhand")
+                                                .executes(context -> {
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                String text = "None";
+                                                                MinecraftClient client = MinecraftClient.getInstance();
+                                                                HitResult hit = client.crosshairTarget;
+                                                                if (hit != null) {
+                                                                    if (Objects.requireNonNull(hit.getType()) == HitResult.Type.ENTITY) {
+                                                                        EntityHitResult entityHit = (EntityHitResult) hit;
+                                                                        Entity entity = entityHit.getEntity();
+                                                                        if (entity instanceof LivingEntity) {
+                                                                            NbtCompound nbt = ((LivingEntity) entity).getStackInHand(Hand.MAIN_HAND).getNbt();
+                                                                            if (nbt != null) {
+                                                                                text = nbt.toString();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                player.sendMessage(Text.literal(text));
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
+                                        .then(literal("offhand")
+                                                .executes(context -> {
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                String text = "None";
+                                                                MinecraftClient client = MinecraftClient.getInstance();
+                                                                HitResult hit = client.crosshairTarget;
+                                                                if (hit != null) {
+                                                                    if (Objects.requireNonNull(hit.getType()) == HitResult.Type.ENTITY) {
+                                                                        EntityHitResult entityHit = (EntityHitResult) hit;
+                                                                        Entity entity = entityHit.getEntity();
+                                                                        if (entity instanceof LivingEntity) {
+                                                                            NbtCompound nbt = ((LivingEntity) entity).getStackInHand(Hand.OFF_HAND).getNbt();
+                                                                            if (nbt != null) {
+                                                                                text = nbt.toString();
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                }
+                                                                player.sendMessage(Text.literal(text));
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
+                                )
+                        )
                         .requires(ServerCommandSource::isExecutedByPlayer)
                         .requires(e -> e.hasPermissionLevel(4))
                         .then(literal("blacklist")
@@ -37,13 +192,15 @@ public class CommandRegistries {
                                         )
                                         .then(argument("item", ItemStackArgumentType.itemStack(registryAccess))
                                                 .executes(context -> {
-                                                    ServerPlayerEntity player = context.getSource().getPlayer();
-                                                    if (player != null) {
-                                                        Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
-                                                        itemListHandling(player, item, ListType.BLACKLIST, Action.ADD);
-                                                    }
-                                                    return 0;
-                                                }))
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
+                                                                itemListHandling(player, item, ListType.BLACKLIST, Action.ADD);
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
                                 )
                                 .then(literal("remove")
                                         .executes(context -> {
@@ -57,13 +214,15 @@ public class CommandRegistries {
                                         )
                                         .then(argument("item", ItemStackArgumentType.itemStack(registryAccess))
                                                 .executes(context -> {
-                                                    ServerPlayerEntity player = context.getSource().getPlayer();
-                                                    if (player != null) {
-                                                        Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
-                                                        itemListHandling(player, item, ListType.BLACKLIST, Action.REMOVE);
-                                                    }
-                                                    return 0;
-                                                }))
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
+                                                                itemListHandling(player, item, ListType.BLACKLIST, Action.REMOVE);
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
                                 )
                                 .then(literal("list")
                                         .executes(context -> {
@@ -117,13 +276,15 @@ public class CommandRegistries {
                                         )
                                         .then(argument("item", ItemStackArgumentType.itemStack(registryAccess))
                                                 .executes(context -> {
-                                                    ServerPlayerEntity player = context.getSource().getPlayer();
-                                                    if (player != null) {
-                                                        Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
-                                                        itemListHandling(player, item, ListType.WHITELIST, Action.ADD);
-                                                    }
-                                                    return 0;
-                                                }))
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
+                                                                itemListHandling(player, item, ListType.WHITELIST, Action.ADD);
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
                                 )
                                 .then(literal("remove")
                                         .executes(context -> {
@@ -137,13 +298,15 @@ public class CommandRegistries {
                                         )
                                         .then(argument("item", ItemStackArgumentType.itemStack(registryAccess))
                                                 .executes(context -> {
-                                                    ServerPlayerEntity player = context.getSource().getPlayer();
-                                                    if (player != null) {
-                                                        Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
-                                                        itemListHandling(player, item, ListType.WHITELIST, Action.REMOVE);
-                                                    }
-                                                    return 0;
-                                                }))
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                Item item = ItemStackArgumentType.getItemStackArgument(context, "item").getItem();
+                                                                itemListHandling(player, item, ListType.WHITELIST, Action.REMOVE);
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
                                 )
                                 .then(literal("list")
                                         .executes(context -> {

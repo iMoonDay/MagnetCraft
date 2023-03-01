@@ -80,7 +80,7 @@
   "block.magnetcraft.netherite_magnet_block": "下界磁铁块",
   "block.magnetcraft.raw_magnet_block": "粗磁铁块",
   "block.magnetcraft.lodestone": "磁石",
-  "block.magnetcraft.lodestone.tooltip.1": "右击上方切换吸引模式或范围",
+  "block.magnetcraft.lodestone.tooltip.1": "右击打开磁石配置界面",
   "block.magnetcraft.lodestone.tooltip.2": "空手潜行右击选择吸引方向",
   "block.magnetcraft.lodestone.tooltip.3": "吸引: %d ",
   "block.magnetcraft.maglev_rail": "磁悬浮铁轨",

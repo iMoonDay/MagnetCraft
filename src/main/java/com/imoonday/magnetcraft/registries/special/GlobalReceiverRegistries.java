@@ -10,7 +10,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
@@ -42,10 +42,10 @@ public class GlobalReceiverRegistries {
         }));
 
         ServerPlayNetworking.registerGlobalReceiver(LODESTONE_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
-            BlockHitResult blockHitResult = buf.readBlockHitResult();
+            BlockPos pos = buf.readBlockPos();
             int taskNum = buf.readInt();
-            BlockEntity entity = player.world.getBlockEntity(blockHitResult.getBlockPos());
-            if (player.world.getBlockState(blockHitResult.getBlockPos()).isOf(BlockRegistries.LODESTONE_BLOCK) && entity != null) {
+            BlockEntity entity = player.world.getBlockEntity(pos);
+            if (player.world.getBlockState(pos).isOf(BlockRegistries.LODESTONE_BLOCK) && entity != null) {
                 NbtCompound nbt = entity.createNbt();
                 final int disEachClick = ModConfig.getValue().disEachClick;
                 switch (taskNum) {

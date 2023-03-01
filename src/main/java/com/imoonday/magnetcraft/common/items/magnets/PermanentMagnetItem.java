@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.api.FilterableMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
@@ -8,7 +9,6 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -19,7 +19,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class PermanentMagnetItem extends Item {
+public class PermanentMagnetItem extends FilterableMagnetItem {
 
     public PermanentMagnetItem(Settings settings) {
         super(settings);

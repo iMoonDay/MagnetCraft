@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.registries.special;
 
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -8,6 +9,8 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
 import net.minecraft.client.world.ClientWorld;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 import org.lwjgl.glfw.GLFW;
 
 public class KeyBindingRegistries {
@@ -34,7 +37,13 @@ public class KeyBindingRegistries {
             ClientPlayerEntity player = client.player;
             ClientWorld world = client.world;
             while (attractEnchantmentsSwitch.wasPressed() && player != null && world != null) {
-                ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, PacketByteBufs.empty());
+                for (int i = 0; i < player.getInventory().size(); i++) {
+                    ItemStack stack = player.getInventory().getStack(i);
+                    if (stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
+                        stack.use(world, player, Hand.MAIN_HAND);
+                    }
+                }
+//                ClientPlayNetworking.send(IdentifierRegistries.KEYBINDINGS_PACKET_ID, PacketByteBufs.empty());
             }
             while (addOrRemoveBlacklist.wasPressed() && player != null && world != null) {
                 ClientPlayNetworking.send(IdentifierRegistries.BLACKLIST_PACKET_ID, PacketByteBufs.empty());

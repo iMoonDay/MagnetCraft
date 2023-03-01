@@ -80,7 +80,7 @@
   "block.magnetcraft.netherite_magnet_block": "Netherite Magnet Block",
   "block.magnetcraft.raw_magnet_block": "Raw Magnet Block",
   "block.magnetcraft.lodestone": "Lodestone",
-  "block.magnetcraft.lodestone.tooltip.1": "Right-click above to toggle attract mode or range",
+  "block.magnetcraft.lodestone.tooltip.1": "Right-click to open the magnet configuration interface",
   "block.magnetcraft.lodestone.tooltip.2": "Empty-handed right-click on sneaking to select the direction of attract",
   "block.magnetcraft.lodestone.tooltip.3": "Attract: %d ",
   "block.magnetcraft.maglev_rail": "Maglev Rail",

@@ -6,6 +6,7 @@ import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.screen.handler.LodestoneScreenHandler;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -16,17 +17,18 @@ import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
-import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
-public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFactory, ImplementedInventory {
+public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
 
     private boolean redstone;
     private double dis;
@@ -153,6 +155,11 @@ public class LodestoneEntity extends BlockEntity implements NamedScreenHandlerFa
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         return new LodestoneScreenHandler(syncId, inv, this, propertyDelegate);
+    }
+
+    @Override
+    public void writeScreenOpeningData(ServerPlayerEntity player, PacketByteBuf buf) {
+        buf.writeBlockPos(pos);
     }
 
     public static void putItemEntityIn(World world, BlockPos blockPos, LodestoneEntity blockEntity, Direction direction) {

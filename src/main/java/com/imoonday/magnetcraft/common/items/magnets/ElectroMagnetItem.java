@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.api.FilterableMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
@@ -9,7 +10,6 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -22,7 +22,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class ElectroMagnetItem extends Item {
+public class ElectroMagnetItem extends FilterableMagnetItem {
 
     public ElectroMagnetItem(Settings settings) {
         super(settings);

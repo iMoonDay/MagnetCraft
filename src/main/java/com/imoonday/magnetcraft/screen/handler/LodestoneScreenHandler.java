@@ -6,18 +6,23 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ArrayPropertyDelegate;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.util.math.BlockPos;
 
+@SuppressWarnings("ConstantValue")
 public class LodestoneScreenHandler extends ScreenHandler {
 
+    private BlockPos pos;
     public Inventory inventory;
     private final PropertyDelegate propertyDelegate;
 
-    public LodestoneScreenHandler(int syncId, PlayerInventory inventory) {
+    public LodestoneScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
         this(syncId, inventory, new SimpleInventory(18), new ArrayPropertyDelegate(3));
+        pos = buf.readBlockPos();
     }
 
     public int getRedstone() {
@@ -32,11 +37,16 @@ public class LodestoneScreenHandler extends ScreenHandler {
         return propertyDelegate.get(2);
     }
 
+    public BlockPos getPos() {
+        return pos;
+    }
+
     public LodestoneScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(ScreenRegistries.LODESTONE_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
         this.propertyDelegate = propertyDelegate;
         this.addProperties(propertyDelegate);
+        this.pos = BlockPos.ORIGIN;
         checkSize(inventory, 18);
         checkDataCount(propertyDelegate, 3);
         int y;

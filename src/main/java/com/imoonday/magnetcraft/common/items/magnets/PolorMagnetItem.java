@@ -1,24 +1,24 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.api.FilterableMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
+import com.imoonday.magnetcraft.methods.FilterNbtMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
+import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.List;
 
-public class PolorMagnetItem extends Item {
+public class PolorMagnetItem extends FilterableMagnetItem {
 
     public PolorMagnetItem(Settings settings) {
         super(settings);
@@ -50,6 +50,7 @@ public class PolorMagnetItem extends Item {
 
     @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
+        super.onCraft(stack, world, player);
         EnabledNbtMethods.enabledSet(stack);
     }
 
@@ -57,6 +58,7 @@ public class PolorMagnetItem extends Item {
     public void appendTooltip(ItemStack itemStack, World world, List<Text> tooltip, TooltipContext tooltipContext) {
         tooltip.add(Text.translatable("item.magnetcraft.polar_magnet.tooltip.1")
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+        super.appendTooltip(itemStack, world, tooltip, tooltipContext);
     }
 
     @Override
@@ -74,6 +76,8 @@ public class PolorMagnetItem extends Item {
             }
             EnabledNbtMethods.enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 30);
+        } else {
+            openScreen(user, hand, this);
         }
         return super.use(world, user, hand);
     }
@@ -82,5 +86,15 @@ public class PolorMagnetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
         EnabledNbtMethods.enabledCheck(stack);
+    }
+
+    @Override
+    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
+        if (clickType == ClickType.LEFT) {
+            FilterNbtMethods.addFilterItem(stack, otherStack);
+        } else {
+            FilterNbtMethods.removeFilterItem(stack, otherStack);
+        }
+        return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
     }
 }

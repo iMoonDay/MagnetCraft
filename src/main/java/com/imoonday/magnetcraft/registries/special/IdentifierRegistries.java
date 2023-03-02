@@ -11,7 +11,7 @@ public class IdentifierRegistries {
     public static final Identifier WHITELIST_PACKET_ID = id("whitelist");
     public static final Identifier LODESTONE_PACKET_ID = id("lodestone");
     public static final Identifier CHANGE_FILTER_PACKET_ID = id("change_filter");
-    public static final Identifier CLIENT_CHANGE_FILTER_PACKET_ID = id("client_change_filter");
+
     public static Identifier id(String id) {
         return new Identifier(MOD_ID, id);
     }

@@ -85,9 +85,7 @@ public class GlobalReceiverRegistries {
                         boolean b = buf.readBoolean();
                         FilterableMagnetScreen.setBoolean(player, slot, key, b);
                     }
-                    case 2 -> {
-                        FilterableMagnetScreen.setBoolean(player, slot, key);
-                    }
+                    case 2 -> FilterableMagnetScreen.setBoolean(player, slot, key);
                 }
             } else {
                 NbtCompound nbt = buf.readNbt();

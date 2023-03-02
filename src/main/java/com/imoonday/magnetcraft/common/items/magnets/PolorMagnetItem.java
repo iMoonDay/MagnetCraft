@@ -77,7 +77,9 @@ public class PolorMagnetItem extends FilterableMagnetItem {
             EnabledNbtMethods.enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 30);
         } else {
-            openScreen(user, hand, this);
+            if (!user.world.isClient) {
+                openScreen(user, hand, this);
+            }
         }
         return super.use(world, user, hand);
     }

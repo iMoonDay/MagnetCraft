@@ -63,7 +63,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
 
     @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
-        ItemStack newStack = ItemStack.EMPTY;
+        ItemStack newStack;
         Slot slot = this.slots.get(invSlot);
         if (slot != null && slot.hasStack()) {
             ItemStack originalStack = slot.getStack();
@@ -76,14 +76,81 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                 return ItemStack.EMPTY;
             }
 
+            if (this.inventory.containsAny(stack1 -> stack1.isOf(newStack.getItem()))) {
+                return ItemStack.EMPTY;
+            }
+
             if (originalStack.isEmpty()) {
                 slot.setStack(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
             }
+        } else {
+            newStack = ItemStack.EMPTY;
         }
-
         return newStack;
+    }
+
+    @Override
+    protected boolean insertItem(ItemStack stack, int startIndex, int endIndex, boolean fromLast) {
+        ItemStack itemStack;
+        Slot slot;
+        boolean bl = false;
+        int i = startIndex;
+        if (fromLast) {
+            i = endIndex - 1;
+        }
+        if (stack.isStackable()) {
+            while (!stack.isEmpty() && (fromLast ? i >= startIndex : i < endIndex)) {
+                if (i < this.inventory.size()) {
+                    break;
+                }
+                slot = this.slots.get(i);
+                itemStack = slot.getStack();
+                if (!itemStack.isEmpty() && ItemStack.canCombine(stack, itemStack)) {
+                    int j = itemStack.getCount() + stack.getCount();
+                    if (j <= stack.getMaxCount()) {
+                        stack.setCount(0);
+                        itemStack.setCount(j);
+                        slot.markDirty();
+                        bl = true;
+                    } else if (itemStack.getCount() < stack.getMaxCount()) {
+                        stack.decrement(stack.getMaxCount() - itemStack.getCount());
+                        itemStack.setCount(stack.getMaxCount());
+                        slot.markDirty();
+                        bl = true;
+                    }
+                }
+                if (fromLast) {
+                    --i;
+                    continue;
+                }
+                ++i;
+            }
+        }
+        if (!stack.isEmpty()) {
+            i = fromLast ? endIndex - 1 : startIndex;
+            while (fromLast ? i >= startIndex : i < endIndex) {
+                slot = this.slots.get(i);
+                itemStack = slot.getStack();
+                if (itemStack.isEmpty() && slot.canInsert(stack)) {
+                    if (stack.getCount() > slot.getMaxItemCount()) {
+                        slot.setStack(stack.split(slot.getMaxItemCount()));
+                    } else {
+                        slot.setStack(stack.split(stack.getCount()));
+                    }
+                    slot.markDirty();
+                    bl = true;
+                    break;
+                }
+                if (fromLast) {
+                    --i;
+                    continue;
+                }
+                ++i;
+            }
+        }
+        return bl;
     }
 
     @Override

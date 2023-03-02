@@ -11,7 +11,7 @@ import static net.minecraft.item.Items.AIR;
 
 public class FilterNbtMethods {
     public static void filterCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("Filter") || !stack.getNbt().contains("Whitelist")) {
+        if (stack.getNbt() == null || !stack.getNbt().contains("Filter") || !stack.getNbt().contains("Whitelist") || !stack.getNbt().contains("CompareDamage") || !stack.getNbt().contains("CompareNbt")) {
             filterSet(stack);
         }
     }
@@ -22,6 +22,12 @@ public class FilterNbtMethods {
         }
         if (!stack.getOrCreateNbt().contains("Filter")) {
             stack.getOrCreateNbt().put("Filter", new NbtList());
+        }
+        if (!stack.getOrCreateNbt().contains("CompareDamage")) {
+            stack.getOrCreateNbt().putBoolean("CompareDamage", false);
+        }
+        if (!stack.getOrCreateNbt().contains("CompareNbt")) {
+            stack.getOrCreateNbt().putBoolean("CompareNbt", false);
         }
     }
 

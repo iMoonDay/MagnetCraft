@@ -4,6 +4,7 @@ import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
+import com.imoonday.magnetcraft.screen.FilterableMagnetScreen;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -71,6 +72,31 @@ public class GlobalReceiverRegistries {
             }
         }));
 
+        ServerPlayNetworking.registerGlobalReceiver(CHANGE_FILTER_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            boolean onButton = buf.readBoolean();
+            if (onButton) {
+                NbtCompound nbt = buf.readNbt();
+                int method = buf.readInt();
+                int slot = buf.readInt();
+                String key = buf.readString();
+                FilterableMagnetScreen.setNbt(player, slot, nbt);
+                switch (method) {
+                    case 1 -> {
+                        boolean b = buf.readBoolean();
+                        FilterableMagnetScreen.setBoolean(player, slot, key, b);
+                    }
+                    case 2 -> {
+                        FilterableMagnetScreen.setBoolean(player, slot, key);
+                    }
+                }
+            } else {
+                NbtCompound nbt = buf.readNbt();
+                int slot = buf.readInt();
+                FilterableMagnetScreen.setNbt(player, slot, nbt);
+            }
+            player.getInventory().markDirty();
+        }));
+
         ClientPlayNetworking.registerGlobalReceiver(USE_CONTROLLER_PACKET_ID, (client, handler, buf, responseSender) -> client.execute(() -> {
             ClientPlayerEntity player = client.player;
             if (player != null) {
@@ -79,4 +105,5 @@ public class GlobalReceiverRegistries {
         }));
 
     }
+
 }

@@ -29,11 +29,11 @@ public class LodestoneScreenHandler extends ScreenHandler {
         return propertyDelegate.get(0);
     }
 
-    public int getDis(){
+    public int getDis() {
         return propertyDelegate.get(1);
     }
 
-    public int getDirection(){
+    public int getDirection() {
         return propertyDelegate.get(2);
     }
 

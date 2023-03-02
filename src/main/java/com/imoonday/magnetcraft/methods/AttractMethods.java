@@ -7,6 +7,9 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.util.math.Box;
@@ -16,6 +19,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class AttractMethods {
 
@@ -44,7 +48,7 @@ public class AttractMethods {
         if (!client) {
             entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
             if (!magnetOff && entityCanAttract && !isEmpty) {
-                attracting(entity, dis);
+                attracting(entity, dis, mainhandStack, offhandStack);
             }
         }
     }
@@ -56,7 +60,7 @@ public class AttractMethods {
         if (!client) {
             entityCanAttract = entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
             if (entityCanAttract) {
-                attracting(entity, dis);
+                attracting(entity, dis, null, null);
             }
         }
     }
@@ -73,7 +77,7 @@ public class AttractMethods {
         }
     }
 
-    public static void attracting(Entity entity, double dis) {
+    public static void attracting(Entity entity, double dis, @Nullable ItemStack mainhandStack, @Nullable ItemStack offhandStack) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
@@ -84,17 +88,14 @@ public class AttractMethods {
             boolean hasNearerEntity = false;
             boolean player = entity.isPlayer();
             boolean client = entity.world.isClient;
-            String item;
-            boolean whitelistPass;
-            boolean blacklistPass;
-            boolean hasDegaussingPlayer;
             boolean pass = true;
             if (e instanceof ItemEntity) {
-                item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
-                whitelistPass = whitelist.contains(item);
-                blacklistPass = !blacklist.contains(item);
-                hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
-                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && !hasDegaussingPlayer;
+                String item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
+                boolean handStackListPass = isSameStack(mainhandStack, (ItemEntity) e) && isSameStack(offhandStack, (ItemEntity) e);
+                boolean whitelistPass = whitelist.contains(item);
+                boolean blacklistPass = !blacklist.contains(item);
+                boolean hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
+                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && handStackListPass && !hasDegaussingPlayer;
             }
             if (pass) {
                 if (!client) {
@@ -169,6 +170,45 @@ public class AttractMethods {
                 }
             }
         });
+    }
+
+    public static boolean isSameStack(ItemStack stack, ItemEntity entity) {
+        String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
+        boolean stackDamagePass = true;
+        boolean stackNbtPass = true;
+        if (stack != null && stack.getNbt() != null && stack.getNbt().get("Whitelist") != null) {
+            NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
+            boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item));
+            if (stack.getNbt().getBoolean("CompareDamage") && inList) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (Objects.equals(list.getCompound(i).getString("id"), item)) {
+                        if (list.getCompound(i).getCompound("tag").getInt("Damage") != entity.getStack().getDamage()) {
+                            stackDamagePass = false;
+                        }
+                    }
+                }
+            }
+            if (stack.getNbt().getBoolean("CompareNbt") && inList) {
+                for (int i = 0; i < list.size(); i++) {
+                    if (Objects.equals(list.getCompound(i).getString("id"), item)) {
+                        NbtList newList = list.copy();
+                        newList.getCompound(i).getCompound("tag").remove("Damage");
+                        ItemStack entityStack = entity.getStack();
+                        NbtCompound nbt = entityStack.getNbt();
+                        if (nbt != null) {
+                            NbtCompound newNbt = nbt.copy();
+                            newNbt.remove("Damage");
+                            if (!Objects.equals(newList.getCompound(i).getCompound("tag"), newNbt)) {
+                                stackNbtPass = false;
+                            }
+                        }
+                    }
+                }
+            }
+            boolean isWhitelist = stack.getNbt().getBoolean("Whitelist");
+            return (!isWhitelist || inList && stackDamagePass && stackNbtPass) && (isWhitelist || !inList || !stackDamagePass || !stackNbtPass);
+        }
+        return true;
     }
 }
 

@@ -36,7 +36,8 @@
       "magnetcraft:magnetic_iron_chestplate",
       "magnetcraft:magnetic_iron_leggings",
       "magnetcraft:magnetic_iron_boots",
-      "magnetcraft:magnetic_iron_horse_armor"
+      "magnetcraft:magnetic_iron_horse_armor",
+      "magnetcraft:magnetic_pressure_plate"
     ]
   }
 }

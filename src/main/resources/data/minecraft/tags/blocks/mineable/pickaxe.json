@@ -6,6 +6,7 @@
     "magnetcraft:magnet_block",
     "magnetcraft:netherite_magnet_block",
     "magnetcraft:raw_magnet_block",
-    "magnetcraft:lodestone"
+    "magnetcraft:lodestone",
+    "magnetcraft:magnetic_pressure_plate"
   ]
 }

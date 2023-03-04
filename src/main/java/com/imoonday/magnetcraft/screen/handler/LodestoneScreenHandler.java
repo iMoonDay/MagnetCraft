@@ -17,7 +17,8 @@ import net.minecraft.util.math.BlockPos;
 public class LodestoneScreenHandler extends ScreenHandler {
 
     private BlockPos pos;
-    public Inventory inventory;
+    private final Inventory inventory;
+    private final PlayerEntity player;
     private final PropertyDelegate propertyDelegate;
 
     public LodestoneScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
@@ -41,8 +42,17 @@ public class LodestoneScreenHandler extends ScreenHandler {
         return pos;
     }
 
+    public Inventory getInventory() {
+        return inventory;
+    }
+
+    public PlayerEntity getPlayer() {
+        return player;
+    }
+
     public LodestoneScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, PropertyDelegate propertyDelegate) {
         super(ScreenRegistries.LODESTONE_SCREEN_HANDLER, syncId);
+        this.player = playerInventory.player;
         this.inventory = inventory;
         this.propertyDelegate = propertyDelegate;
         this.addProperties(propertyDelegate);

@@ -3,8 +3,10 @@ package com.imoonday.magnetcraft.methods;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.*;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
@@ -48,7 +50,7 @@ public class AttractMethods {
         if (!client) {
             entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
             if (!magnetOff && entityCanAttract && !isEmpty) {
-                attracting(entity, dis, mainhandStack, offhandStack);
+                attracting(entity, dis);
             }
         }
     }
@@ -60,7 +62,7 @@ public class AttractMethods {
         if (!client) {
             entityCanAttract = entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
             if (entityCanAttract) {
-                attracting(entity, dis, null, null);
+                attracting(entity, dis);
             }
         }
     }
@@ -77,7 +79,7 @@ public class AttractMethods {
         }
     }
 
-    public static void attracting(Entity entity, double dis, @Nullable ItemStack mainhandStack, @Nullable ItemStack offhandStack) {
+    public static void attracting(Entity entity, double dis) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
@@ -91,11 +93,26 @@ public class AttractMethods {
             boolean pass = true;
             if (e instanceof ItemEntity) {
                 String item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
-                boolean handStackListPass = isSameStack(mainhandStack, (ItemEntity) e) && isSameStack(offhandStack, (ItemEntity) e);
+                boolean StackListPass;
+                boolean mainhandStackListPass = true;
+                boolean offhandStackListPass = true;
+                boolean controllerListPass = true;
+                if (entity instanceof LivingEntity) {
+                    if (((LivingEntity) entity).getMainHandStack().getOrCreateNbt().contains("Filterable")) {
+                        mainhandStackListPass = isSameStack(((LivingEntity) entity).getMainHandStack(), (ItemEntity) e);
+                    }
+                    if (((LivingEntity) entity).getOffHandStack().getOrCreateNbt().contains("Filterable")) {
+                        offhandStackListPass = isSameStack(((LivingEntity) entity).getOffHandStack(), (ItemEntity) e);
+                    }
+                    if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getInventory().containsAny(stack -> (stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) && stack.getNbt() != null && stack.getNbt().contains("Filterable") && !isSameStack(stack, (ItemEntity) e)))) {
+                        controllerListPass = false;
+                    }
+                }
+                StackListPass = mainhandStackListPass && offhandStackListPass && controllerListPass;
                 boolean whitelistPass = whitelist.contains(item);
                 boolean blacklistPass = !blacklist.contains(item);
                 boolean hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
-                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && handStackListPass && !hasDegaussingPlayer;
+                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && StackListPass && !hasDegaussingPlayer;
             }
             if (pass) {
                 if (!client) {
@@ -176,7 +193,7 @@ public class AttractMethods {
         String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
         boolean stackDamagePass = true;
         boolean stackNbtPass = true;
-        if (stack != null && stack.getNbt() != null && stack.getNbt().get("Whitelist") != null) {
+        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
             NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
             boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item));
             if (stack.getNbt().getBoolean("CompareDamage") && inList) {

@@ -1,0 +1,14 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:empty_crafting_module",
+    "magnetcraft:polar_magnet_crafting_module",
+    "magnetcraft:electromagnet_crafting_module",
+    "magnetcraft:permanent_magnet_crafting_module",
+    "magnetcraft:creature_magnet_crafting_module",
+    "magnetcraft:mineral_magnet_crafting_module",
+    "magnetcraft:crop_magnet_crafting_module",
+    "magnetcraft:restore_module",
+    "magnetcraft:filter_module"
+  ]
+}

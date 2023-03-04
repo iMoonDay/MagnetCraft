@@ -1,34 +1,34 @@
 package com.imoonday.magnetcraft.screen.handler;
 
-import com.imoonday.magnetcraft.api.FilterableMagnetItem;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
+import java.util.Arrays;
+
+import static net.minecraft.item.Items.*;
+
 @SuppressWarnings("ConstantValue")
 public class FilterableMagnetScreenHandler extends ScreenHandler {
 
-    private final ItemStack stack;
     private final int slot;
     private final Inventory inventory;
     private final PlayerEntity player;
 
     public FilterableMagnetScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, new SimpleInventory(9), buf.readItemStack(), buf.readInt());
+        this(syncId, inventory, new SimpleInventory(9), buf.readInt());
     }
 
     public Inventory getInventory() {
         return inventory;
-    }
-
-    public ItemStack getStack() {
-        return stack;
     }
 
     public PlayerEntity getPlayer() {
@@ -39,25 +39,45 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
         return slot;
     }
 
-    public FilterableMagnetScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, ItemStack stack, int slot) {
+    public boolean isCropMagnet() {
+        return getStack().isOf(ItemRegistries.CROP_MAGNET_ITEM);
+    }
+
+    public ItemStack getStack() {
+        return slot != -1 ? player.getInventory().getStack(slot) : player.getOffHandStack();
+    }
+
+    public FilterableMagnetScreenHandler(int syncId, PlayerInventory playerInventory, Inventory inventory, int slot) {
         super(ScreenRegistries.FILTERABLE_MAGNET_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
-        this.stack = stack;
         this.slot = slot;
         this.player = playerInventory.player;
         checkSize(inventory, 9);
         int y;
         int x;
         for (x = 0; x < 9; ++x) {
-            this.addSlot(new LockedSlot(inventory, x, 8 + x * 18, 35 + 18));
+            if (isCropMagnet()) {
+                this.addSlot(new CropSlot(inventory, x, 8 + x * 18, 35 + 18));
+            } else {
+                this.addSlot(new LockedSlot(inventory, x, 8 + x * 18, 35 + 18));
+            }
         }
         for (y = 0; y < 3; ++y) {
             for (x = 0; x < 9; ++x) {
-                this.addSlot(new LockedSlot(playerInventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
+                if (isCropMagnet()) {
+                    this.addSlot(new CropSlot(playerInventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
+                } else {
+                    this.addSlot(new LockedSlot(playerInventory, x + y * 9 + 9, 8 + x * 18, 84 + y * 18));
+                }
+
             }
         }
         for (y = 0; y < 9; ++y) {
-            this.addSlot(new LockedSlot(playerInventory, y, 8 + y * 18, 142));
+            if (isCropMagnet()) {
+                this.addSlot(new CropSlot(playerInventory, y, 8 + y * 18, 142));
+            } else {
+                this.addSlot(new LockedSlot(playerInventory, y, 8 + y * 18, 142));
+            }
         }
     }
 
@@ -176,18 +196,18 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
 
         @Override
         public int getMaxItemCount() {
-            if (this.inventory == player.getInventory()) {
+            if (this.inventory instanceof PlayerInventory) {
                 return super.getMaxItemCount();
             }
             return 1;
         }
 
         private boolean stackMovementIsAllowed(ItemStack itemStack) {
-            return !(itemStack.getItem() instanceof FilterableMagnetItem) && itemStack != stack;
+            return itemStack != (getSlot() != -1 ? getPlayer().getInventory().getStack(getSlot()) : getPlayer().getOffHandStack());
         }
 
         private boolean hasSameItem(ItemStack itemStack) {
-            if (this.inventory == player.getInventory()) {
+            if (this.inventory instanceof PlayerInventory) {
                 return false;
             }
             boolean hasSameItem = false;
@@ -195,6 +215,26 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                 hasSameItem = itemStack.isItemEqual(getInventory().getStack(i));
             }
             return hasSameItem;
+        }
+    }
+
+    private class CropSlot extends LockedSlot {
+
+        public CropSlot(Inventory inventory, int index, int x, int y) {
+            super(inventory, index, x, y);
+        }
+
+        @Override
+        public boolean canInsert(ItemStack stack) {
+            return super.stackMovementIsAllowed(stack) && !super.hasSameItem(stack) && isCropItem(stack);
+        }
+
+        private boolean isCropItem(ItemStack itemStack) {
+            if (this.inventory instanceof PlayerInventory) {
+                return false;
+            }
+            Item[] items = new Item[]{WHEAT, CARROT, POTATO, BEETROOT_SEEDS, MELON_SEEDS, PUMPKIN_SEEDS, GLOW_BERRIES, SUGAR_CANE, BAMBOO, CACTUS, KELP, SWEET_BERRIES, NETHER_WART, COCOA_BEANS};
+            return Arrays.asList(items).contains(itemStack.getItem());
         }
     }
 

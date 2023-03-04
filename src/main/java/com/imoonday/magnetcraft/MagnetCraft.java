@@ -1,12 +1,10 @@
 package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.common.recipes.CoresAddRecipe;
+import com.imoonday.magnetcraft.common.recipes.FilterAddRecipe;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.*;
-import com.imoonday.magnetcraft.registries.special.CommandRegistries;
-import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
-import com.imoonday.magnetcraft.registries.special.GlobalReceiverRegistries;
-import com.imoonday.magnetcraft.registries.special.ItemGroupRegistries;
+import com.imoonday.magnetcraft.registries.special.*;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
@@ -20,6 +18,7 @@ public class MagnetCraft implements ModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public static final RecipeSerializer<CoresAddRecipe> CORES_ADD_RECIPE = RecipeSerializer.register("cores_add", new SpecialRecipeSerializer<>(CoresAddRecipe::new));
+    public static final RecipeSerializer<FilterAddRecipe> FILTER_ADD_RECIPE = RecipeSerializer.register("filter_add", new SpecialRecipeSerializer<>(FilterAddRecipe::new));
 
     @Override
     public void onInitialize() {
@@ -30,8 +29,10 @@ public class MagnetCraft implements ModInitializer {
         PotionRegistries.register();
         EnchantmentRegistries.register();
         ItemGroupRegistries.register();
-        GlobalReceiverRegistries.register();
+        ServerReceiverRegistries.register();
         CustomStatRegistries.register();
         CommandRegistries.register();
+        ScreenRegistries.register();
+        CallbackRegistries.register();
     }
 }

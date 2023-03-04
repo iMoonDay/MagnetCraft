@@ -42,6 +42,7 @@ public class ItemRegistries {
     public static final CraftingModuleItem CROP_MAGNET_CRAFTING_MODULE_ITEM = new CraftingModuleItem(new FabricItemSettings().maxCount(16));
 
     public static final Item RESTORE_MODULE_ITEM = new Item(new FabricItemSettings().maxCount(16));
+    public static final Item FILTER_MODULE_ITEM = new Item(new FabricItemSettings().maxCount(16));
 
     public static final PolorMagnetItem POLAR_MAGNET_ITEM = new PolorMagnetItem(new FabricItemSettings().maxCount(1));
     public static final ElectroMagnetItem ELECTROMAGNET_ITEM = new ElectroMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(500));
@@ -94,6 +95,7 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("crop_magnet_crafting_module"), CROP_MAGNET_CRAFTING_MODULE_ITEM);
 
         Registry.register(Registries.ITEM, id("restore_module"), RESTORE_MODULE_ITEM);
+        Registry.register(Registries.ITEM, id("filter_module"), FILTER_MODULE_ITEM);
 
         Registry.register(Registries.ITEM, id("polar_magnet"), POLAR_MAGNET_ITEM);
         Registry.register(Registries.ITEM, id("electromagnet"), ELECTROMAGNET_ITEM);
@@ -115,6 +117,7 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("maglev_detector_rail"), new BlockItem(MAGLEV_DETECTOR_RAIL_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("maglev_activator_rail"), new BlockItem(MAGLEV_ACTIVATOR_RAIL_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("maglev_lever"), new BlockItem(MAGLEV_LEVER_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, id("magnetic_pressure_plate"), new BlockItem(MAGNETIC_PRESSURE_PLATE, new FabricItemSettings()));
 
         Registry.register(Registries.ITEM, id("magnetic_iron_sword"), MAGNETIC_IRON_SWORD);
         Registry.register(Registries.ITEM, id("magnetic_iron_pickaxe"), MAGNETIC_IRON_PICKAXE);

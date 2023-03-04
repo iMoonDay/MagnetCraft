@@ -28,6 +28,7 @@ public class ItemGroupRegistries {
                     content.add(NETHERITE_MAGNET_BLOCK);
                     content.add(LODESTONE_BLOCK);
                     content.add(MAGLEV_LEVER_BLOCK);
+                    content.add(MAGNETIC_PRESSURE_PLATE);
                     content.add(MAGLEV_RAIL_BLOCK);
                     content.add(MAGLEV_POWERED_RAIL_BLOCK);
                     content.add(MAGLEV_DETECTOR_RAIL_BLOCK);
@@ -64,6 +65,7 @@ public class ItemGroupRegistries {
                     content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(RESTORE_MODULE_ITEM);
+                    content.add(FILTER_MODULE_ITEM);
                     content.add(MAGNET_TEMPLATE_ITEM);
                     content.add(POLAR_MAGNET_ITEM.getDefaultStack());
                     content.add(ELECTROMAGNET_ITEM.getDefaultStack());
@@ -92,6 +94,7 @@ public class ItemGroupRegistries {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.BUILDING_BLOCKS).register(content -> {
             content.addAfter(Items.IRON_BLOCK, MAGNET_BLOCK);
             content.addAfter(Items.NETHERITE_BLOCK, NETHERITE_MAGNET_BLOCK);
+            content.addAfter(Items.HEAVY_WEIGHTED_PRESSURE_PLATE, MAGNETIC_PRESSURE_PLATE);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
@@ -113,6 +116,7 @@ public class ItemGroupRegistries {
             content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(RESTORE_MODULE_ITEM);
+            content.add(FILTER_MODULE_ITEM);
             content.add(MAGNET_TEMPLATE_ITEM);
             content.add(POLAR_MAGNET_ITEM.getDefaultStack());
             content.add(ELECTROMAGNET_ITEM.getDefaultStack());
@@ -152,6 +156,7 @@ public class ItemGroupRegistries {
             content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);
             content.addAfter(MAGLEV_DETECTOR_RAIL_BLOCK, MAGLEV_ACTIVATOR_RAIL_BLOCK);
             content.addAfter(Items.LEVER, MAGLEV_LEVER_BLOCK);
+            content.addAfter(Items.HEAVY_WEIGHTED_PRESSURE_PLATE, MAGNETIC_PRESSURE_PLATE);
         });
     }
 }

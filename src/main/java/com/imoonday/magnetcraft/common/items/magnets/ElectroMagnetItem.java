@@ -28,7 +28,7 @@ public class ElectroMagnetItem extends FilterableMagnetItem {
         super(settings);
     }
 
-    public static void register() {
+    public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
             if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
             return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
@@ -68,6 +68,7 @@ public class ElectroMagnetItem extends FilterableMagnetItem {
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         tooltip.add(Text.translatable("item.magnetcraft.electromagnet.tooltip.2")
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+        super.appendTooltip(itemStack, world, tooltip, tooltipContext);
     }
 
     @Override
@@ -82,10 +83,16 @@ public class ElectroMagnetItem extends FilterableMagnetItem {
             sneaking = false;
         }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
-            if (!enableSneakToSwitch) {
-                return super.use(world, user, hand);
+            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+                if (!user.world.isClient) {
+                    openScreen(user, hand, this);
+                }
+            } else {
+                if (!enableSneakToSwitch) {
+                    return super.use(world, user, hand);
+                }
+                EnabledNbtMethods.enabledSwitch(world, user, hand);
             }
-            EnabledNbtMethods.enabledSwitch(world, user, hand);
         } else if (!emptyDamage) {
             if (!world.isClient) {
                 if (hand == Hand.MAIN_HAND) {

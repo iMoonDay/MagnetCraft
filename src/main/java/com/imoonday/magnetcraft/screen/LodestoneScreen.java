@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.screen;
 
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.screen.handler.LodestoneScreenHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -15,20 +16,12 @@ import net.minecraft.util.Identifier;
 
 import java.awt.*;
 
+import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.LODESTONE_PACKET_ID;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
 public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/lodestone.png");
-
-    /**
-     * x:目标x坐标 -1
-     * y:目标y坐标 -1
-     * u:替代x坐标 -1
-     * v:替代y坐标 -1
-     * w:替代的宽度
-     * h:替代的高度
-     */
 
     //第一格坐标159,86,一格大小18*18
     public LodestoneScreen(LodestoneScreenHandler handler, PlayerInventory inventory, Text title) {
@@ -42,9 +35,7 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         if (onRedstone || onLeftClick || onRightClick) {
-            if (client != null && client.player != null) {
-                client.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            }
+            this.handler.getPlayer().playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
             PacketByteBuf buf = PacketByteBufs.create();
             buf.writeBlockPos(this.handler.getPos());
             if (onRedstone) {
@@ -54,14 +45,16 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
             } else {
                 buf.writeInt(2);
             }
-            buf.retain();
-            ClientPlayNetworking.send(id("lodestone"), buf);
+            ClientPlayNetworking.send(LODESTONE_PACKET_ID, buf);
         }
         return true;
     }
 
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+        if (!this.handler.getPlayer().world.getBlockState(this.handler.getPos()).isOf(BlockRegistries.LODESTONE_BLOCK)) {
+            close();
+        }
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);

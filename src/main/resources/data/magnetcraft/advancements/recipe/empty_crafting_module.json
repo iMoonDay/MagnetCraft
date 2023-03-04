@@ -28,7 +28,8 @@
       "magnetcraft:crop_magnet_crafting_module",
       "magnetcraft:crop_magnet",
       "magnetcraft:restore_module",
-      "magnetcraft:magnet_template_from_magnet"
+      "magnetcraft:magnet_template_from_magnet",
+      "magnetcraft:filter_module"
     ]
   }
 }

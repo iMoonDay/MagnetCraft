@@ -21,7 +21,7 @@ public class ItemEntityMixin {
             World world = ((ItemEntity) (Object) this).world;
             if (world == null) return;
             ItemStack stack = entity.getStack();
-            boolean isAttracting = stack.isIn(ItemTags.ATTRACTING_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
+            boolean isAttracting = stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
             int dis = ModConfig.getConfig().value.droppedMagnetAttractDis;
             if (isAttracting) {
                 AttractMethods.attractItems(entity, dis);

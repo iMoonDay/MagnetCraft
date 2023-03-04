@@ -36,7 +36,7 @@ public class CreatureMagnetItem extends Item {
         super(settings);
     }
 
-    public static void register() {
+    public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.CREATURE_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
             if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
             return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;

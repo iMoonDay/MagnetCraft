@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "131",
+    "111"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:gold_ingot"
+    },
+    "2": {
+      "item": "minecraft:hopper"
+    },
+    "3": {
+      "item": "magnetcraft:empty_crafting_module"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:filter_module",
+    "count": 1
+  }
+}

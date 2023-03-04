@@ -46,19 +46,21 @@ public abstract class FilterableMagnetItem extends Item implements ImplementedIn
 
     @Override
     public void appendTooltip(ItemStack itemStack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (itemStack.getOrCreateNbt().getBoolean("Whitelist")) {
-            tooltip.add(Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-        } else {
-            tooltip.add(Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-        }
-        for (int i = 0; i < itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).size(); i++) {
-            NbtCompound filter = itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).getCompound(i);
-            ItemStack stack = ItemStack.fromNbt(filter);
-            String stackName = stack.getTranslationKey();
-            if (stackName.equals(Text.translatable(stackName).getString())) {
-                stackName = stackName.replace("item.", "block.");
+        if (itemStack.getNbt() != null && itemStack.getNbt().getBoolean("Filterable")) {
+            if (itemStack.getOrCreateNbt().getBoolean("Whitelist")) {
+                tooltip.add(Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+            } else {
+                tooltip.add(Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
             }
-            tooltip.add(Text.literal("[" + i + "] ").append(Text.translatable(stackName)).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+            for (int i = 0; i < itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).size(); i++) {
+                NbtCompound filter = itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).getCompound(i);
+                ItemStack stack = ItemStack.fromNbt(filter);
+                String stackName = stack.getTranslationKey();
+                if (stackName.equals(Text.translatable(stackName).getString())) {
+                    stackName = stackName.replace("item.", "block.");
+                }
+                tooltip.add(Text.literal("[" + i + "] ").append(Text.translatable(stackName)).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+            }
         }
     }
 
@@ -86,7 +88,6 @@ public abstract class FilterableMagnetItem extends Item implements ImplementedIn
             player.openHandledScreen(new ExtendedScreenHandlerFactory() {
                 @Override
                 public void writeScreenOpeningData(ServerPlayerEntity serverPlayerEntity, PacketByteBuf buf) {
-                    buf.writeItemStack(stack);
                     buf.writeInt(slot);
                 }
 
@@ -97,7 +98,7 @@ public abstract class FilterableMagnetItem extends Item implements ImplementedIn
 
                 @Override
                 public @me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                    return new FilterableMagnetScreenHandler(syncId, inv, filterableMagnetItem, stack, slot);
+                    return new FilterableMagnetScreenHandler(syncId, inv, filterableMagnetItem, slot);
                 }
             });
         }

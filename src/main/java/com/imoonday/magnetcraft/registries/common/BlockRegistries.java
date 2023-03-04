@@ -5,12 +5,13 @@ import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.sound.BlockSoundGroup;
+import net.minecraft.sound.SoundEvents;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
@@ -28,6 +29,7 @@ public class BlockRegistries {
     public static final MaglevDetectorRailBlock MAGLEV_DETECTOR_RAIL_BLOCK = new MaglevDetectorRailBlock(FabricBlockSettings.copy(Blocks.DETECTOR_RAIL).nonOpaque());
     public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.ACTIVATOR_RAIL).nonOpaque());
     public static final MaglevLever MAGLEV_LEVER_BLOCK = new MaglevLever(FabricBlockSettings.copy(Blocks.LEVER).nonOpaque());
+    public static final MagneticPressurePlateBlock MAGNETIC_PRESSURE_PLATE = new MagneticPressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS,AbstractBlock.Settings.of(Material.METAL).requiresTool().noCollision().strength(0.5f).sounds(BlockSoundGroup.METAL), SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
 
     public static void register() {
         Registry.register(Registries.BLOCK, id("magnetite"), MAGNETITE_BLOCK);
@@ -41,6 +43,7 @@ public class BlockRegistries {
         Registry.register(Registries.BLOCK, id("maglev_detector_rail"), MAGLEV_DETECTOR_RAIL_BLOCK);
         Registry.register(Registries.BLOCK, id("maglev_activator_rail"), MAGLEV_ACTIVATOR_RAIL_BLOCK);
         Registry.register(Registries.BLOCK, id("maglev_lever"), MAGLEV_LEVER_BLOCK);
+        Registry.register(Registries.BLOCK, id("magnetic_pressure_plate"), MAGNETIC_PRESSURE_PLATE);
     }
 
     public static void registerClient() {
@@ -49,5 +52,6 @@ public class BlockRegistries {
         BlockRenderLayerMap.INSTANCE.putBlock(BlockRegistries.MAGLEV_DETECTOR_RAIL_BLOCK, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockRegistries.MAGLEV_ACTIVATOR_RAIL_BLOCK, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(BlockRegistries.MAGLEV_LEVER_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(BlockRegistries.MAGNETIC_PRESSURE_PLATE, RenderLayer.getCutout());
     }
 }

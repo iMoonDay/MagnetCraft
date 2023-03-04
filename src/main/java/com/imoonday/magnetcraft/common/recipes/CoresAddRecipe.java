@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.common.recipes;
 
 import com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem;
-import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -14,6 +13,7 @@ import net.minecraft.world.World;
 
 import static com.imoonday.magnetcraft.MagnetCraft.CORES_ADD_RECIPE;
 import static com.imoonday.magnetcraft.common.tags.ItemTags.CORES;
+import static com.imoonday.magnetcraft.registries.common.ItemRegistries.MINERAL_MAGNET_ITEM;
 
 public class CoresAddRecipe extends SpecialCraftingRecipe {
     public CoresAddRecipe(Identifier id, CraftingRecipeCategory category) {
@@ -27,7 +27,7 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
         for (int i = 0; i < inventory.size(); ++i) {
             ItemStack stack = inventory.getStack(i);
             if (!stack.isEmpty()) {
-                if (stack.isOf(ItemRegistries.MINERAL_MAGNET_ITEM)) {
+                if (stack.isOf(MINERAL_MAGNET_ITEM)) {
                     hasMagnet = true;
                 } else if (stack.isIn(CORES)) {
                     hasCores = true;
@@ -49,13 +49,13 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
         for (int i = 0; i < inventory.size(); ++i) {
             ItemStack stack = inventory.getStack(i);
             if (!stack.isEmpty()) {
-                if (!stack.isOf(ItemRegistries.MINERAL_MAGNET_ITEM) && !stack.isIn(CORES)) {
+                if (!stack.isOf(MINERAL_MAGNET_ITEM) && !stack.isIn(CORES)) {
                     return ItemStack.EMPTY;
                 }
-                if (stack.isOf(ItemRegistries.MINERAL_MAGNET_ITEM) && hasMagnet) {
+                if (stack.isOf(MINERAL_MAGNET_ITEM) && hasMagnet) {
                     return ItemStack.EMPTY;
                 }
-                if (stack.isOf(ItemRegistries.MINERAL_MAGNET_ITEM)) {
+                if (stack.isOf(MINERAL_MAGNET_ITEM)) {
                     hasMagnet = true;
                     magnetStack = stack.copy();
                 }
@@ -104,10 +104,14 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
 
     @Override
     public DefaultedList<ItemStack> getRemainder(CraftingInventory inventory) {
+        return excludeItemRemainder(inventory, MINERAL_MAGNET_ITEM);
+    }
+
+    public static DefaultedList<ItemStack> excludeItemRemainder(CraftingInventory inventory, Item excludeItem){
         DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
         for (int i = 0; i < defaultedList.size(); ++i) {
             Item item = inventory.getStack(i).getItem();
-            if (!item.hasRecipeRemainder() || item == ItemRegistries.MINERAL_MAGNET_ITEM) continue;
+            if (!item.hasRecipeRemainder() || item == excludeItem) continue;
             defaultedList.set(i, new ItemStack(item.getRecipeRemainder()));
         }
         return defaultedList;

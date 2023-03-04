@@ -16,19 +16,6 @@ public class PlayerEntityMixin {
         if (player != null) {
             World world = ((PlayerEntity) (Object) this).world;
             if (world == null) return;
-//            MinecraftClient client = MinecraftClient.getInstance();
-//            HitResult hit = client.crosshairTarget;
-//            if (hit != null) {
-//                if (Objects.requireNonNull(hit.getType()) == HitResult.Type.BLOCK) {
-//                    BlockHitResult blockHit = (BlockHitResult) hit;
-//                    BlockPos blockPos = blockHit.getBlockPos();
-//                    assert client.world != null;
-//                    BlockState blockState = client.world.getBlockState(blockPos);
-//                    if (blockState.isOf(BlockRegistries.LODESTONE_BLOCK)) {
-//                        LodestoneBlock.showState(world, blockPos, player);
-//                    }
-//                }
-//            }
         }
     }
 }

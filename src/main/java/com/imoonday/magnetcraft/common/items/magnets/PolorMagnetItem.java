@@ -3,17 +3,17 @@ package com.imoonday.magnetcraft.common.items.magnets;
 import com.imoonday.magnetcraft.api.FilterableMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
-import com.imoonday.magnetcraft.methods.FilterNbtMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
 import net.minecraft.text.Text;
-import net.minecraft.util.*;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -24,7 +24,7 @@ public class PolorMagnetItem extends FilterableMagnetItem {
         super(settings);
     }
 
-    public static void register() {
+    public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.POLAR_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
             if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
             return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
@@ -71,15 +71,17 @@ public class PolorMagnetItem extends FilterableMagnetItem {
             sneaking = false;
         }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
-            if (!enableSneakToSwitch) {
-                return super.use(world, user, hand);
+            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+                if (!user.world.isClient) {
+                    openScreen(user, hand, this);
+                }
+            } else {
+                if (!enableSneakToSwitch) {
+                    return super.use(world, user, hand);
+                }
+                EnabledNbtMethods.enabledSwitch(world, user, hand);
             }
-            EnabledNbtMethods.enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 30);
-        } else {
-            if (!user.world.isClient) {
-                openScreen(user, hand, this);
-            }
         }
         return super.use(world, user, hand);
     }
@@ -90,13 +92,4 @@ public class PolorMagnetItem extends FilterableMagnetItem {
         EnabledNbtMethods.enabledCheck(stack);
     }
 
-    @Override
-    public boolean onClicked(ItemStack stack, ItemStack otherStack, Slot slot, ClickType clickType, PlayerEntity player, StackReference cursorStackReference) {
-        if (clickType == ClickType.LEFT) {
-            FilterNbtMethods.addFilterItem(stack, otherStack);
-        } else {
-            FilterNbtMethods.removeFilterItem(stack, otherStack);
-        }
-        return super.onClicked(stack, otherStack, slot, clickType, player, cursorStackReference);
-    }
 }

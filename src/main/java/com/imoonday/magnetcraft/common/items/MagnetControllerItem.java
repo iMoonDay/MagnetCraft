@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.items;
 
+import com.imoonday.magnetcraft.api.FilterableMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
@@ -10,7 +11,6 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MagnetControllerItem extends Item {
+public class MagnetControllerItem extends FilterableMagnetItem {
 
     public MagnetControllerItem(Settings settings) {
         super(settings);
@@ -34,7 +34,7 @@ public class MagnetControllerItem extends Item {
     boolean ClientOFF;
     boolean ServerOFF;
 
-    public static void register() {
+    public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
             if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
             return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
@@ -59,16 +59,26 @@ public class MagnetControllerItem extends Item {
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         tooltip.add(Text.translatable("item.magnetcraft.magnet_controller.tooltip.2")
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+        super.appendTooltip(itemStack, world, tooltip, tooltipContext);
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        useTask(user, hand, true);
+        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+            if (!user.isSneaky()) {
+                if (!user.world.isClient) {
+                    openScreen(user, hand, this);
+                }
+            } else {
+                useTask(user, hand, true);
+            }
+        } else {
+            useTask(user, hand, true);
+        }
         return super.use(world, user, hand);
     }
 
     public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
-        boolean display = ModConfig.getConfig().displayActionBar;
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         boolean creative = user.isCreative();
         boolean isEmptyDamage = DamageMethods.isEmptyDamage(user, hand);
@@ -93,25 +103,30 @@ public class MagnetControllerItem extends Item {
                 user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 6 * 20);
             }
         } else {
-            boolean hasTag = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-            boolean isClient = user.world.isClient;
-            Text message;
-            SoundEvent sound;
-            if (hasTag) {
-                user.removeScoreboardTag("MagnetCraft.MagnetOFF");
-                sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
-                message = Text.translatable("text.magnetcraft.message.magnet_on");
-            } else {
-                user.addScoreboardTag("MagnetCraft.MagnetOFF");
-                sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
-                message = Text.translatable("text.magnetcraft.message.magnet_off");
-            }
-            user.playSound(sound, 1, 1);
-            if (display && !isClient) {
-                user.sendMessage(message, true);
-            }
+            changeMagnetEnable(user);
             user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
-            user.getInventory().updateItems();
+            user.getInventory().markDirty();
+        }
+    }
+
+    public static void changeMagnetEnable(PlayerEntity user) {
+        boolean display = ModConfig.getConfig().displayActionBar;
+        boolean hasTag = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
+        boolean isClient = user.world.isClient;
+        Text message;
+        SoundEvent sound;
+        if (hasTag) {
+            user.removeScoreboardTag("MagnetCraft.MagnetOFF");
+            sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
+            message = Text.translatable("text.magnetcraft.message.magnet_on");
+        } else {
+            user.addScoreboardTag("MagnetCraft.MagnetOFF");
+            sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
+            message = Text.translatable("text.magnetcraft.message.magnet_off");
+        }
+        user.playSound(sound, 1, 1);
+        if (display && !isClient) {
+            user.sendMessage(message, true);
         }
     }
 

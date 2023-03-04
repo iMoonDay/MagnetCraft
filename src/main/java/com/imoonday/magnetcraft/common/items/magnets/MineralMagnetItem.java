@@ -3,7 +3,8 @@ package com.imoonday.magnetcraft.common.items.magnets;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
-import com.imoonday.magnetcraft.registries.common.ItemRegistries;
+import com.imoonday.magnetcraft.screen.handler.MineralMagnetScreenHandler;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -12,13 +13,17 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.nbt.NbtString;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.registry.Registries;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -29,11 +34,14 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.imoonday.magnetcraft.common.tags.BlockTags.MAGNETITE_ORES;
+import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags.ORES;
 import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags.QUARTZ_ORES;
+import static net.minecraft.item.Items.*;
 import static net.minecraft.registry.tag.BlockTags.*;
 
 public class MineralMagnetItem extends Item {
@@ -42,9 +50,9 @@ public class MineralMagnetItem extends Item {
         super(settings);
     }
 
-    public static void register() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.MINERAL_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).getItemCooldownManager().isCoolingDown(ItemRegistries.MINERAL_MAGNET_ITEM)) {
+    public static void registerClient() {
+        ModelPredicateProviderRegistry.register(MINERAL_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
+            if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).getItemCooldownManager().isCoolingDown(MINERAL_MAGNET_ITEM)) {
                 return 0.0F;
             }
             return DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;
@@ -53,12 +61,16 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        List<NbtElement> list = stack.getOrCreateNbt().getList("Cores", NbtString.STRING_TYPE).stream().toList();
+        ArrayList<String> list = new ArrayList<>();
+        for (int i = 0; i < stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).size(); i++) {
+            if (stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getBoolean("enable")) {
+                list.add(stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getString("id"));
+            }
+        }
         if (list.isEmpty()) {
             tooltip.add(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.1").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         } else {
-            for (NbtElement nbtElement : list) {
-                String name = nbtElement.toString().replace("'", "").replace("\"", "");
+            for (String name : list) {
                 Identifier identifier = Identifier.tryParse(name);
                 if (identifier != null) {
                     String stackName = "item." + identifier.toTranslationKey();
@@ -77,7 +89,7 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(Items.EMERALD) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(EMERALD) || super.canRepair(stack, ingredient);
     }
 
     @Override
@@ -87,7 +99,7 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public ItemStack getRecipeRemainder(ItemStack stack) {
-        return new ItemStack(ItemRegistries.MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
+        return new ItemStack(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
     }
 
     @Override
@@ -97,13 +109,35 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!DamageMethods.isEmptyDamage(user, hand)) {
-            int value = searchMineral(user, hand);
-            boolean success = value > 0;
-            if (success && !user.isCreative()) {
-                user.getItemCooldownManager().set(this, value * 20);
-            } else {
-                user.getItemCooldownManager().set(this, 20);
+        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable") && user.isSneaky()) {
+            if (!user.world.isClient) {
+                int slot = hand == Hand.MAIN_HAND ? user.getInventory().selectedSlot : -1;
+                user.openHandledScreen(new ExtendedScreenHandlerFactory() {
+                    @Override
+                    public void writeScreenOpeningData(ServerPlayerEntity serverPlayerEntity, PacketByteBuf buf) {
+                        buf.writeInt(slot);
+                    }
+
+                    @Override
+                    public Text getDisplayName() {
+                        return Text.translatable(user.getStackInHand(hand).getItem().getTranslationKey());
+                    }
+
+                    @Override
+                    public @me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+                        return new MineralMagnetScreenHandler(syncId, inv, slot);
+                    }
+                });
+            }
+        } else {
+            if (!DamageMethods.isEmptyDamage(user, hand)) {
+                int value = searchMineral(user, hand);
+                boolean success = value > 0;
+                if (success && !user.isCreative()) {
+                    user.getItemCooldownManager().set(this, value * 20);
+                } else {
+                    user.getItemCooldownManager().set(this, 20);
+                }
             }
         }
         return super.use(world, user, hand);
@@ -160,16 +194,9 @@ public class MineralMagnetItem extends Item {
                         BlockState state = player.world.getBlockState(pos);
                         ServerWorld world = (ServerWorld) player.world;
                         BlockEntity blockEntity = world.getBlockEntity(pos);
-                        List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, Items.IRON_PICKAXE.getDefaultStack());
-                        final boolean[] nbtPass = {false};
-                        droppedStacks.forEach(e -> {
-                            String stackName = Registries.ITEM.getId(e.getItem()).toString();
-                            NbtString nbtString = NbtString.of(NbtString.escape(stackName));
-                            if (!nbtPass[0]) {
-                                nbtPass[0] = player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.STRING_TYPE).contains(nbtString);
-                            }
-                        });
-                        if (state.isIn(ORES) && nbtPass[0]) {
+                        List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, IRON_PICKAXE.getDefaultStack());
+                        boolean nbtPass = droppedStacks.stream().anyMatch(e -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(e.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
+                        if (state.isIn(ORES) && nbtPass) {
                             droppedStacks.forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.breakBlock(pos, false, player);
                             if (state.isIn(COAL_ORES)) {
@@ -262,8 +289,11 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void coresCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("Cores")) {
+        if (stack.getNbt() == null || !stack.getNbt().contains("Cores", NbtElement.LIST_TYPE)) {
             coresSet(stack);
+        }
+        if (!stack.getOrCreateNbt().contains("Filterable")) {
+            stack.getOrCreateNbt().putBoolean("Filterable", false);
         }
     }
 
@@ -273,22 +303,38 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void coresSet(ItemStack stack, Item[] items) {
-        NbtList list = stack.getOrCreateNbt().getList("Cores", NbtElement.STRING_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE);
         String[] names = new String[items.length];
         for (int i = 0; i < items.length; i++) {
             names[i] = Registries.ITEM.getId(items[i]).toString();
-            if (!list.contains(NbtString.of(NbtString.escape(names[i])))) {
-                list.add(NbtString.of(NbtString.escape(names[i])));
+            NbtCompound nbt = new NbtCompound();
+            nbt.putString("id", names[i]);
+            nbt.putBoolean("enable", true);
+            boolean exist = false;
+            for (int j = 0; j < list.size(); j++) {
+                exist = list.getCompound(j).getString("id").equals(names[i]);
+                if (exist) {
+                    break;
+                }
+            }
+            if (!exist) {
+                list.add(nbt);
             }
         }
         stack.getOrCreateNbt().put("Cores", list);
     }
 
     public static ItemStack getAllCoresStack() {
-        ItemStack stack = new ItemStack(ItemRegistries.MINERAL_MAGNET_ITEM);
-        Item[] items = new Item[]{Items.COAL, Items.RAW_IRON, Items.RAW_GOLD, Items.GOLD_NUGGET, Items.DIAMOND, Items.REDSTONE, Items.RAW_COPPER, Items.EMERALD, Items.LAPIS_LAZULI, Items.QUARTZ, ItemRegistries.RAW_MAGNET_ITEM};
+        ItemStack stack = new ItemStack(MINERAL_MAGNET_ITEM);
+        Item[] items = new Item[]{COAL, RAW_IRON, RAW_GOLD, GOLD_NUGGET, DIAMOND, REDSTONE, RAW_COPPER, EMERALD, LAPIS_LAZULI, QUARTZ, RAW_MAGNET_ITEM};
         coresSet(stack, items);
         return stack;
+    }
+
+    public static void EnabledCoreCheck(ItemStack stack, String id) {
+        if (stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(id))) {
+            stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).stream().filter(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(id)).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean("enable", !((NbtCompound) nbtElement).getBoolean("enable")));
+        }
     }
 
 }

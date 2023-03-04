@@ -1,0 +1,11 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:polar_magnet",
+    "magnetcraft:electromagnet",
+    "magnetcraft:permanent_magnet",
+    "magnetcraft:mineral_magnet",
+    "magnetcraft:crop_magnet",
+    "magnetcraft:magnet_controller"
+  ]
+}

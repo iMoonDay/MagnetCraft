@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "magnetcraft:block/attract_sensor_top",
+    "side": "magnetcraft:block/attract_sensor_side"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:demagnetizer"
+    },
+    {
+      "item": "magnetcraft:magnet_controller"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:portable_demagnetizer",
+    "count": 1
+  }
+}

@@ -191,30 +191,20 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
 
         @Override
         public boolean canInsert(ItemStack stack) {
-            return stackMovementIsAllowed(stack) && !hasSameItem(stack);
+            return stackMovementIsAllowed(stack) && noSameItem(stack);
         }
 
         @Override
         public int getMaxItemCount() {
-            if (this.inventory instanceof PlayerInventory) {
-                return super.getMaxItemCount();
-            }
-            return 1;
+            return this.inventory instanceof PlayerInventory ? super.getMaxItemCount() : 1;
         }
 
         private boolean stackMovementIsAllowed(ItemStack itemStack) {
             return itemStack != (getSlot() != -1 ? getPlayer().getInventory().getStack(getSlot()) : getPlayer().getOffHandStack());
         }
 
-        private boolean hasSameItem(ItemStack itemStack) {
-            if (this.inventory instanceof PlayerInventory) {
-                return false;
-            }
-            boolean hasSameItem = false;
-            for (int i = 0; i < getInventory().size() && !hasSameItem; i++) {
-                hasSameItem = itemStack.isItemEqual(getInventory().getStack(i));
-            }
-            return hasSameItem;
+        private boolean noSameItem(ItemStack itemStack) {
+            return !getInventory().containsAny(itemStack::isItemEqual) || this.inventory instanceof PlayerInventory;
         }
     }
 
@@ -226,15 +216,12 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
 
         @Override
         public boolean canInsert(ItemStack stack) {
-            return super.stackMovementIsAllowed(stack) && !super.hasSameItem(stack) && isCropItem(stack);
+            return super.stackMovementIsAllowed(stack) && super.noSameItem(stack) && isCropItem(stack);
         }
 
         private boolean isCropItem(ItemStack itemStack) {
-            if (this.inventory instanceof PlayerInventory) {
-                return false;
-            }
             Item[] items = new Item[]{WHEAT, CARROT, POTATO, BEETROOT_SEEDS, MELON_SEEDS, PUMPKIN_SEEDS, GLOW_BERRIES, SUGAR_CANE, BAMBOO, CACTUS, KELP, SWEET_BERRIES, NETHER_WART, COCOA_BEANS};
-            return Arrays.asList(items).contains(itemStack.getItem());
+            return Arrays.asList(items).contains(itemStack.getItem()) || this.inventory instanceof PlayerInventory;
         }
     }
 

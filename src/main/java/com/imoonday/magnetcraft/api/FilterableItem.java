@@ -7,7 +7,6 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -24,17 +23,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public abstract class FilterableMagnetItem extends Item implements ImplementedInventory {
+public abstract class FilterableItem extends SwitchableItem implements ImplementedInventory {
 
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
 
-    public FilterableMagnetItem(Settings settings) {
+    public FilterableItem(Settings settings) {
         super(settings);
     }
 
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putBoolean("Filterable", true);
         FilterNbtMethods.filterSet(stack);
         return stack;
     }
@@ -74,7 +74,7 @@ public abstract class FilterableMagnetItem extends Item implements ImplementedIn
         return inventory;
     }
 
-    public void openScreen(PlayerEntity player, Hand hand, FilterableMagnetItem filterableMagnetItem) {
+    public void openScreen(PlayerEntity player, Hand hand, FilterableItem filterableMagnetItem) {
         filterableMagnetItem.inventory.clear();
         player.getInventory().markDirty();
         ItemStack stack = player.getStackInHand(hand);

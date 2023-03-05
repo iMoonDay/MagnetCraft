@@ -1,8 +1,7 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.api.FilterableMagnetItem;
+import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
@@ -18,7 +17,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class PolorMagnetItem extends FilterableMagnetItem {
+public class PolorMagnetItem extends FilterableItem {
 
     public PolorMagnetItem(Settings settings) {
         super(settings);
@@ -32,13 +31,6 @@ public class PolorMagnetItem extends FilterableMagnetItem {
     }
 
     @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = super.getDefaultStack();
-        EnabledNbtMethods.enabledSet(stack);
-        return stack;
-    }
-
-    @Override
     public boolean hasRecipeRemainder() {
         return true;
     }
@@ -46,12 +38,6 @@ public class PolorMagnetItem extends FilterableMagnetItem {
     @Override
     public ItemStack getRecipeRemainder(ItemStack stack) {
         return new ItemStack(ItemRegistries.POLAR_MAGNET_CRAFTING_MODULE_ITEM);
-    }
-
-    @Override
-    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
-        super.onCraft(stack, world, player);
-        EnabledNbtMethods.enabledSet(stack);
     }
 
     @Override
@@ -79,7 +65,7 @@ public class PolorMagnetItem extends FilterableMagnetItem {
                 if (!enableSneakToSwitch) {
                     return super.use(world, user, hand);
                 }
-                EnabledNbtMethods.enabledSwitch(world, user, hand);
+                enabledSwitch(world, user, hand);
             }
             user.getItemCooldownManager().set(this, 30);
         }
@@ -87,9 +73,10 @@ public class PolorMagnetItem extends FilterableMagnetItem {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
-        super.inventoryTick(stack, world, user, slot, selected);
-        EnabledNbtMethods.enabledCheck(stack);
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
     }
 
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+    }
 }

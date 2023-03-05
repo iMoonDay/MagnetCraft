@@ -226,6 +226,9 @@ public abstract class LivingEntityMixin {
                     ((ServerPlayerEntity) entity).sendMessage(text, true);
                 }
             }
+            if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && EnchantmentMethods.hasEnchantment(entity.getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {
+                entity.removeStatusEffect(EffectRegistries.UNATTRACT_EFFECT);
+            }
         }
     }
 

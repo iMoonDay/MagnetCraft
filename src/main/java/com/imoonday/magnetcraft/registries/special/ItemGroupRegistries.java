@@ -12,7 +12,6 @@ import static com.imoonday.magnetcraft.registries.common.BlockRegistries.*;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-@SuppressWarnings("CodeBlock2Expr")
 public class ItemGroupRegistries {
 
     public static void register() {
@@ -27,6 +26,8 @@ public class ItemGroupRegistries {
                     content.add(MAGNET_BLOCK);
                     content.add(NETHERITE_MAGNET_BLOCK);
                     content.add(LODESTONE_BLOCK);
+                    content.add(DEMAGNETIZER_BLOCK);
+                    content.add(ATTRACT_SENSOR_BLOCK);
                     content.add(MAGLEV_LEVER_BLOCK);
                     content.add(MAGNETIC_PRESSURE_PLATE);
                     content.add(MAGLEV_RAIL_BLOCK);
@@ -73,8 +74,9 @@ public class ItemGroupRegistries {
                     content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
                     content.add(MINERAL_MAGNET_ITEM.getDefaultStack());
                     content.add(MineralMagnetItem.getAllCoresStack());
-                    content.add(CROP_MAGNET_ITEM);
+                    content.add(CROP_MAGNET_ITEM.getDefaultStack());
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
+                    content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
                 }).build();
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL).register(content -> {
@@ -124,8 +126,9 @@ public class ItemGroupRegistries {
             content.add(CREATURE_MAGNET_ITEM.getDefaultStack());
             content.add(MINERAL_MAGNET_ITEM.getDefaultStack());
             content.add(MineralMagnetItem.getAllCoresStack());
-            content.add(CROP_MAGNET_ITEM);
+            content.add(CROP_MAGNET_ITEM.getDefaultStack());
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
+            content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
             content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);
@@ -148,6 +151,8 @@ public class ItemGroupRegistries {
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {
             content.addAfter(Items.LODESTONE, LODESTONE_BLOCK);
+            content.addAfter(LODESTONE_BLOCK, DEMAGNETIZER_BLOCK);
+            content.addAfter(DEMAGNETIZER_BLOCK, ATTRACT_SENSOR_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(content -> {

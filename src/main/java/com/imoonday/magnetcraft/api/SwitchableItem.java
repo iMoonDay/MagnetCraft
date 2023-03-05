@@ -1,10 +1,12 @@
-package com.imoonday.magnetcraft.methods;
+package com.imoonday.magnetcraft.api;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import me.shedaniel.autoconfig.AutoConfig;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
@@ -12,7 +14,39 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
-public class EnabledNbtMethods {
+public abstract class SwitchableItem extends Item {
+    public SwitchableItem(Settings settings) {
+        super(settings);
+    }
+
+    @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        if (getSwitchable()) {
+            enabledSet(stack);
+        }
+        return stack;
+    }
+
+    @Override
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
+        super.onCraft(stack, world, player);
+        if (getSwitchable()) {
+            enabledSet(stack);
+        }
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
+        super.inventoryTick(stack, world, user, slot, selected);
+        if (getSwitchable()) {
+            enabledCheck(stack);
+        }
+    }
+
+    public boolean getSwitchable() {
+        return true;
+    }
 
     public static void enabledSwitch(World world, PlayerEntity player, Hand hand) {
         boolean display = AutoConfig.getConfigHolder(ModConfig.class).getConfig().displayActionBar;

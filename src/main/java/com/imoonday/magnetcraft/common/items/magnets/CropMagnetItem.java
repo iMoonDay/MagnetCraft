@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.api.FilterableMagnetItem;
+import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
@@ -28,7 +28,7 @@ import java.util.Objects;
 
 import static net.minecraft.state.property.Properties.*;
 
-public class CropMagnetItem extends FilterableMagnetItem {
+public class CropMagnetItem extends FilterableItem {
 
     public CropMagnetItem(Settings settings) {
         super(settings);
@@ -41,6 +41,13 @@ public class CropMagnetItem extends FilterableMagnetItem {
             }
             return DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;
         });
+    }
+
+    @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putBoolean("Filterable", true);
+        return stack;
     }
 
     @Override
@@ -189,4 +196,8 @@ public class CropMagnetItem extends FilterableMagnetItem {
         return true;
     }
 
+    @Override
+    public boolean getSwitchable() {
+        return false;
+    }
 }

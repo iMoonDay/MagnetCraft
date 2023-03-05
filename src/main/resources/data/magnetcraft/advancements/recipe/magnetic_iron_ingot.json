@@ -37,7 +37,10 @@
       "magnetcraft:magnetic_iron_leggings",
       "magnetcraft:magnetic_iron_boots",
       "magnetcraft:magnetic_iron_horse_armor",
-      "magnetcraft:magnetic_pressure_plate"
+      "magnetcraft:magnetic_pressure_plate",
+      "magnetcraft:magnet_fragment_from_magnetic_iron_ingot",
+      "magnetcraft:demagnetizer",
+      "magnetcraft:portable_demagnetizer"
     ]
   }
 }

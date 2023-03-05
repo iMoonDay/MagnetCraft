@@ -4,6 +4,8 @@
     "magnetcraft:magnetite",
     "magnetcraft:deepslate_magnetite",
     "magnetcraft:magnet_block",
-    "magnetcraft:raw_magnet_block"
+    "magnetcraft:raw_magnet_block",
+    "magnetcraft:demagnetizer",
+    "magnetcraft:attract_sensor"
   ]
 }

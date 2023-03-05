@@ -83,6 +83,7 @@ public class MineralMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putBoolean("Filterable", true);
         coresSet(stack);
         return stack;
     }

@@ -1,9 +1,8 @@
 package com.imoonday.magnetcraft.common.items;
 
-import com.imoonday.magnetcraft.api.FilterableMagnetItem;
+import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
-import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -25,7 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MagnetControllerItem extends FilterableMagnetItem {
+public class MagnetControllerItem extends FilterableItem {
 
     public MagnetControllerItem(Settings settings) {
         super(settings);
@@ -39,13 +38,6 @@ public class MagnetControllerItem extends FilterableMagnetItem {
             if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
             return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
         });
-    }
-
-    @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = super.getDefaultStack();
-        EnabledNbtMethods.enabledSet(stack);
-        return stack;
     }
 
     @Override
@@ -132,7 +124,6 @@ public class MagnetControllerItem extends FilterableMagnetItem {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
-        super.inventoryTick(stack, world, user, slot, selected);
         boolean client = user.world.isClient;
         if (client) {
             ClientOFF = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");

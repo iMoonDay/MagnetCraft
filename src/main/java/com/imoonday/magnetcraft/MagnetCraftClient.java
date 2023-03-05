@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
+import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
 import com.imoonday.magnetcraft.common.items.magnets.*;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.special.ClientReceiverRegistries;
@@ -14,7 +15,7 @@ public class MagnetCraftClient implements ClientModInitializer {
     public void onInitializeClient() {
         BlockRegistries.registerClient();
         KeyBindingRegistries.registerClient();
-        ElectroMagnetItem.registerClient();
+        ElectromagnetItem.registerClient();
         MagnetControllerItem.registerClient();
         PermanentMagnetItem.registerClient();
         PolorMagnetItem.registerClient();
@@ -23,5 +24,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         CropMagnetItem.registerClient();
         ScreenRegistries.registerClient();
         ClientReceiverRegistries.registerClient();
+        PortableDemagnetizerItem.registerClient();
     }
 }

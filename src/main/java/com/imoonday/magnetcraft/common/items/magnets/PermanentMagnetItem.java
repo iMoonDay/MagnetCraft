@@ -1,13 +1,11 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.api.FilterableMagnetItem;
+import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -19,7 +17,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class PermanentMagnetItem extends FilterableMagnetItem {
+public class PermanentMagnetItem extends FilterableItem {
 
     public PermanentMagnetItem(Settings settings) {
         super(settings);
@@ -33,13 +31,6 @@ public class PermanentMagnetItem extends FilterableMagnetItem {
     }
 
     @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = super.getDefaultStack();
-        EnabledNbtMethods.enabledSet(stack);
-        return stack;
-    }
-
-    @Override
     public boolean hasRecipeRemainder() {
         return true;
     }
@@ -47,11 +38,6 @@ public class PermanentMagnetItem extends FilterableMagnetItem {
     @Override
     public ItemStack getRecipeRemainder(ItemStack stack) {
         return new ItemStack(ItemRegistries.PERMANENT_MAGNET_CRAFTING_MODULE_ITEM);
-    }
-
-    @Override
-    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
-        EnabledNbtMethods.enabledSet(stack);
     }
 
     @Override
@@ -82,19 +68,13 @@ public class PermanentMagnetItem extends FilterableMagnetItem {
                 if (!enableSneakToSwitch) {
                     return super.use(world, user, hand);
                 }
-                EnabledNbtMethods.enabledSwitch(world, user, hand);
+                enabledSwitch(world, user, hand);
             }
         } else {
             TeleportMethods.teleportSurroundingItemEntitiesToPlayer(world, user, dis, hand);
         }
         user.getItemCooldownManager().set(this, 10);
         return super.use(world, user, hand);
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
-        super.inventoryTick(stack, world, user, slot, selected);
-        EnabledNbtMethods.enabledCheck(stack);
     }
 
 }

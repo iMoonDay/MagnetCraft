@@ -1,6 +1,8 @@
 package com.imoonday.magnetcraft.registries.common;
 
 import com.imoonday.magnetcraft.common.blocks.*;
+import com.imoonday.magnetcraft.common.blocks.entities.AttractSensorEntity;
+import com.imoonday.magnetcraft.common.blocks.entities.DemagnetizerEntity;
 import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -30,8 +32,12 @@ public class BlockRegistries {
     public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.ACTIVATOR_RAIL).nonOpaque());
     public static final MaglevLever MAGLEV_LEVER_BLOCK = new MaglevLever(FabricBlockSettings.copy(Blocks.LEVER).nonOpaque());
     public static final MagneticPressurePlateBlock MAGNETIC_PRESSURE_PLATE = new MagneticPressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS,AbstractBlock.Settings.of(Material.METAL).requiresTool().noCollision().strength(0.5f).sounds(BlockSoundGroup.METAL), SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON);
+    public static final DemagnetizerBlock DEMAGNETIZER_BLOCK = new DemagnetizerBlock(FabricBlockSettings.copy(MAGNET_BLOCK));
+    public static final BlockEntityType<DemagnetizerEntity> DEMAGNETIZER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("demagnetizer"), FabricBlockEntityTypeBuilder.create(DemagnetizerEntity::new, DEMAGNETIZER_BLOCK).build());
+    public static final AttractSensorBlock ATTRACT_SENSOR_BLOCK = new AttractSensorBlock(FabricBlockSettings.copy(MAGNET_BLOCK));
+    public static final BlockEntityType<AttractSensorEntity> ATTRACT_SENSOR_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("attract_sensor"), FabricBlockEntityTypeBuilder.create(AttractSensorEntity::new, ATTRACT_SENSOR_BLOCK).build());
 
-    public static void register() {
+     public static void register() {
         Registry.register(Registries.BLOCK, id("magnetite"), MAGNETITE_BLOCK);
         Registry.register(Registries.BLOCK, id("deepslate_magnetite"), DEEPSLATE_MAGNETITE_BLOCK);
         Registry.register(Registries.BLOCK, id("magnet_block"), MAGNET_BLOCK);
@@ -44,6 +50,8 @@ public class BlockRegistries {
         Registry.register(Registries.BLOCK, id("maglev_activator_rail"), MAGLEV_ACTIVATOR_RAIL_BLOCK);
         Registry.register(Registries.BLOCK, id("maglev_lever"), MAGLEV_LEVER_BLOCK);
         Registry.register(Registries.BLOCK, id("magnetic_pressure_plate"), MAGNETIC_PRESSURE_PLATE);
+        Registry.register(Registries.BLOCK, id("demagnetizer"), DEMAGNETIZER_BLOCK);
+        Registry.register(Registries.BLOCK, id("attract_sensor"), ATTRACT_SENSOR_BLOCK);
     }
 
     public static void registerClient() {

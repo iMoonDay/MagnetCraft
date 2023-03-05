@@ -47,8 +47,14 @@ public class AttractMethods {
         boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
         boolean client = entity.world.isClient;
         boolean entityCanAttract;
+        if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT)) {
+            return;
+        }
         if (!client) {
             entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
+            if (!entity.isPlayer() && !entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof PlayerEntity && ((PlayerEntity) e).getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable")))).isEmpty()) {
+                return;
+            }
             if (!magnetOff && entityCanAttract && !isEmpty) {
                 attracting(entity, dis);
             }
@@ -126,7 +132,7 @@ public class AttractMethods {
                         double move_x = (entity.getX() - e.getX()) * 0.05;
                         double move_y = (entity.getEyeY() - e.getY()) * 0.05;
                         double move_z = (entity.getZ() - e.getZ()) * 0.05;
-                        boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
+                        boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12) && !(e.getX() == entity.getX() && e.getZ() == entity.getY());
                         if (stop) {
                             e.setVelocity(new Vec3d(move_x, 0.25, move_z));
                             e.setVelocityClient(move_x, 0.25, move_z);
@@ -174,7 +180,7 @@ public class AttractMethods {
                         double move_x = (pos.getX() - e.getX()) * 0.05;
                         double move_y = (pos.getY() - e.getY()) * 0.05;
                         double move_z = (pos.getZ() - e.getZ()) * 0.05;
-                        boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12);
+                        boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12) && !(e.getX() == pos.getX() && e.getZ() == pos.getZ());
                         if (stop) {
                             e.setVelocity(new Vec3d(move_x, 0.25, move_z));
                             e.setVelocityClient(move_x, 0.25, move_z);

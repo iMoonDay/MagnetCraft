@@ -45,13 +45,14 @@ public class ItemRegistries {
     public static final Item FILTER_MODULE_ITEM = new Item(new FabricItemSettings().maxCount(16));
 
     public static final PolorMagnetItem POLAR_MAGNET_ITEM = new PolorMagnetItem(new FabricItemSettings().maxCount(1));
-    public static final ElectroMagnetItem ELECTROMAGNET_ITEM = new ElectroMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(500));
+    public static final ElectromagnetItem ELECTROMAGNET_ITEM = new ElectromagnetItem(new FabricItemSettings().maxCount(1).maxDamage(500));
     public static final PermanentMagnetItem PERMANENT_MAGNET_ITEM = new PermanentMagnetItem(new FabricItemSettings().maxCount(1));
     public static final CreatureMagnetItem CREATURE_MAGNET_ITEM = new CreatureMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(100));
     public static final MineralMagnetItem MINERAL_MAGNET_ITEM = new MineralMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(9 * 64));
     public static final CropMagnetItem CROP_MAGNET_ITEM = new CropMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(5 * 64));
 
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100));
+    public static final PortableDemagnetizerItem PORTABLE_DEMAGNETIZER_ITEM = new PortableDemagnetizerItem(new FabricItemSettings().maxCount(1));
 
     public static SwordItem MAGNETIC_IRON_SWORD = new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, new Item.Settings());
     public static CustomPickaxeItem MAGNETIC_IRON_PICKAXE = new CustomPickaxeItem(MagneticIronToolMaterial.INSTANCE, 1, -2.8f, new Item.Settings());
@@ -105,6 +106,7 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("crop_magnet"), CROP_MAGNET_ITEM);
 
         Registry.register(Registries.ITEM, id("magnet_controller"), MAGNET_CONTROLLER_ITEM);
+        Registry.register(Registries.ITEM, id("portable_demagnetizer"), PORTABLE_DEMAGNETIZER_ITEM);
 
         Registry.register(Registries.ITEM, id("magnetite"), new BlockItem(MAGNETITE_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("deepslate_magnetite"), new BlockItem(DEEPSLATE_MAGNETITE_BLOCK, new FabricItemSettings()));
@@ -118,6 +120,8 @@ public class ItemRegistries {
         Registry.register(Registries.ITEM, id("maglev_activator_rail"), new BlockItem(MAGLEV_ACTIVATOR_RAIL_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("maglev_lever"), new BlockItem(MAGLEV_LEVER_BLOCK, new FabricItemSettings()));
         Registry.register(Registries.ITEM, id("magnetic_pressure_plate"), new BlockItem(MAGNETIC_PRESSURE_PLATE, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, id("demagnetizer"), new BlockItem(DEMAGNETIZER_BLOCK, new FabricItemSettings()));
+        Registry.register(Registries.ITEM, id("attract_sensor"), new BlockItem(ATTRACT_SENSOR_BLOCK, new FabricItemSettings()));
 
         Registry.register(Registries.ITEM, id("magnetic_iron_sword"), MAGNETIC_IRON_SWORD);
         Registry.register(Registries.ITEM, id("magnetic_iron_pickaxe"), MAGNETIC_IRON_PICKAXE);

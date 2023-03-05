@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
-import com.imoonday.magnetcraft.methods.EnabledNbtMethods;
 import com.imoonday.magnetcraft.methods.EnchantmentMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
@@ -19,7 +19,6 @@ import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
@@ -30,7 +29,7 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class CreatureMagnetItem extends Item {
+public class CreatureMagnetItem extends SwitchableItem {
 
     public CreatureMagnetItem(Settings settings) {
         super(settings);
@@ -46,7 +45,6 @@ public class CreatureMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        EnabledNbtMethods.enabledSet(stack);
         usedTickSet(stack);
         return stack;
     }
@@ -68,7 +66,6 @@ public class CreatureMagnetItem extends Item {
 
     @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
-        EnabledNbtMethods.enabledSet(stack);
         usedTickSet(stack);
     }
 
@@ -93,7 +90,7 @@ public class CreatureMagnetItem extends Item {
             if (!enableSneakToSwitch) {
                 return super.use(world, user, hand);
             }
-            EnabledNbtMethods.enabledSwitch(world, user, hand);
+            enabledSwitch(world, user, hand);
             user.getItemCooldownManager().set(this, 20);
         }
         return super.use(world, user, hand);
@@ -102,7 +99,6 @@ public class CreatureMagnetItem extends Item {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-        EnabledNbtMethods.enabledCheck(stack);
         usedTickCheck(stack);
     }
 

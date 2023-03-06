@@ -45,7 +45,7 @@ public class CropMagnetItem extends FilterableItem {
 
     @Override
     public ItemStack getDefaultStack() {
-        ItemStack stack = super.getDefaultStack();
+        ItemStack stack = new ItemStack(this);
         stack.getOrCreateNbt().putBoolean("Filterable", true);
         return stack;
     }
@@ -99,7 +99,7 @@ public class CropMagnetItem extends FilterableItem {
     public static int searchCrops(PlayerEntity player, Hand hand) {
         int count = 0;
         if (!player.world.isClient) {
-            DamageMethods.addDamage(player, hand, 1);
+            DamageMethods.addDamage(player, hand, 1,false);
             for (int x = -15; x <= 15; x++) {
                 if (DamageMethods.isEmptyDamage(player, hand)) {
                     break;
@@ -136,27 +136,27 @@ public class CropMagnetItem extends FilterableItem {
                                 world.setBlockState(pos, cropBlock.withAge(0));
                             }
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         } else if ((block instanceof MelonBlock && canBreak(stack, Items.MELON_SEEDS)) || (block instanceof PumpkinBlock && canBreak(stack, Items.PUMPKIN_SEEDS))) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.breakBlock(pos, false, player);
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         } else if ((block instanceof CaveVinesHeadBlock || block instanceof CaveVinesBodyBlock) && state.get(BERRIES) && canBreak(stack, Items.GLOW_BERRIES)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.setBlockState(pos, state.with(BERRIES, false));
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         } else if ((block instanceof SugarCaneBlock && world.getBlockState(pos.down()).isOf(Blocks.SUGAR_CANE) && canBreak(stack, Items.SUGAR_CANE)) || (block instanceof BambooBlock && world.getBlockState(pos.down()).isOf(Blocks.BAMBOO) && canBreak(stack, Items.BAMBOO)) || (block instanceof CactusBlock && world.getBlockState(pos.down()).isOf(Blocks.CACTUS) && canBreak(stack, Items.CACTUS)) || (block instanceof KelpBlock && world.getBlockState(pos.down()).isOf(Blocks.KELP_PLANT)) && canBreak(stack, Items.KELP)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.breakBlock(pos, false, player);
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) > 1 && canBreak(stack, Items.SWEET_BERRIES)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.setBlockState(pos, state.with(AGE_3, 1));
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         } else if (block instanceof NetherWartBlock netherWartBlock && state.get(AGE_3) == 3 && canBreak(stack, Items.NETHER_WART)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.breakBlock(pos, false, player);
@@ -166,7 +166,7 @@ public class CropMagnetItem extends FilterableItem {
                                 world.setBlockState(pos, state.with(AGE_3, 0));
                             }
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         } else if (block instanceof CocoaBlock cocoaBlock && state.get(AGE_2) == 2 && canBreak(stack, Items.COCOA_BEANS)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
                             world.breakBlock(pos, false, player);
@@ -176,7 +176,7 @@ public class CropMagnetItem extends FilterableItem {
                                 world.setBlockState(pos, state.with(AGE_2, 0));
                             }
                             count++;
-                            DamageMethods.addDamage(player, hand, 1);
+                            DamageMethods.addDamage(player, hand, 1,true);
                         }
                     }
                 }

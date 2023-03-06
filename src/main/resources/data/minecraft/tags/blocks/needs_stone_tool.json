@@ -6,6 +6,7 @@
     "magnetcraft:magnet_block",
     "magnetcraft:raw_magnet_block",
     "magnetcraft:demagnetizer",
-    "magnetcraft:attract_sensor"
+    "magnetcraft:attract_sensor",
+    "magnetcraft:advanced_grindstone"
   ]
 }

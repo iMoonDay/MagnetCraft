@@ -36,12 +36,6 @@ public class KeyBindingRegistries {
             ClientPlayerEntity player = client.player;
             ClientWorld world = client.world;
             while (attractEnchantmentsSwitch.wasPressed() && player != null && world != null) {
-//                for (int i = 0; i < player.getInventory().size(); i++) {
-//                    ItemStack stack = player.getInventory().getStack(i);
-//                    if (stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
-//                        stack.use(world, player, Hand.MAIN_HAND);
-//                    }
-//                }
                 ClientPlayNetworking.send(KEYBINDINGS_PACKET_ID, PacketByteBufs.empty());
             }
             while (addOrRemoveBlacklist.wasPressed() && player != null && world != null) {

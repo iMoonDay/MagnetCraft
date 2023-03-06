@@ -121,9 +121,8 @@ public class ServerReceiverRegistries {
             String id = buf.readString();
             int slot = buf.readInt();
             ItemStack stack = slot != -1 ? player.getInventory().getStack(slot) : player.getOffHandStack();
-            server.execute(() -> {
-                EnabledCoreCheck(stack, id);
-            });
+            server.execute(() -> EnabledCoreCheck(stack, id));
         });
+
     }
 }

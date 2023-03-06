@@ -9,6 +9,7 @@
     "magnetcraft:mineral_magnet_crafting_module",
     "magnetcraft:crop_magnet_crafting_module",
     "magnetcraft:restore_module",
-    "magnetcraft:filter_module"
+    "magnetcraft:filter_module",
+    "magnetcraft:extraction_module"
   ]
 }

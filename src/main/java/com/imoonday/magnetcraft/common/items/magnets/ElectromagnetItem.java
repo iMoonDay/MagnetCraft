@@ -10,7 +10,6 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -81,11 +80,7 @@ public class ElectromagnetItem extends FilterableItem {
             }
         } else if (!emptyDamage) {
             if (!world.isClient) {
-                if (hand == Hand.MAIN_HAND) {
-                    user.getMainHandStack().damage(1, user.world.random, (ServerPlayerEntity) user);
-                } else {
-                    user.getOffHandStack().damage(1, user.world.random, (ServerPlayerEntity) user);
-                }
+                DamageMethods.addDamage(user, hand, 1,false);
             }
             TeleportMethods.teleportSurroundingItemEntitiesToPlayer(world, user, dis, hand);
         }

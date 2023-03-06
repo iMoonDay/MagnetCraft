@@ -84,7 +84,7 @@ public class MagnetControllerItem extends FilterableItem {
             if (!creative && isEmptyDamage) {
                 return;
             }
-            DamageMethods.addDamage(user, hand, 1);
+            DamageMethods.addDamage(user, hand, 1,true);
             if (hasEffect) {
                 user.removeStatusEffect(EffectRegistries.DEGAUSSING_EFFECT);
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_MILK, 1, 1);

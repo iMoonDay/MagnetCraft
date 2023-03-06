@@ -9,6 +9,7 @@
     "magnetcraft:lodestone",
     "magnetcraft:magnetic_pressure_plate",
     "magnetcraft:demagnetizer",
-    "magnetcraft:attract_sensor"
+    "magnetcraft:attract_sensor",
+    "magnetcraft:advanced_grindstone"
   ]
 }

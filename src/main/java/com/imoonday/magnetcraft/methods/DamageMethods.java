@@ -3,21 +3,26 @@ package com.imoonday.magnetcraft.methods;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 
 public class DamageMethods {
-    public static void addDamage(LivingEntity user, Hand hand, int damage) {
+    public static void addDamage(LivingEntity user, Hand hand, int damage, boolean checkUnbreaking) {
         ItemStack stack = user.getStackInHand(hand);
-        boolean stackDamageable = stack.isDamageable();
-        boolean creative = user.isPlayer() && ((PlayerEntity) user).isCreative();
-        int stackDamage = stack.getDamage();
-        int stackMaxDamage = stack.getMaxDamage();
-        int setDamage = stackDamage + damage;
-        if (!creative && stackDamageable) {
-            stack.setDamage(setDamage);
-            stackDamage = stack.getDamage();
-            if (stackDamage > stackMaxDamage) {
-                stack.setDamage(stackMaxDamage);
+        if (checkUnbreaking) {
+            stack.damage(damage, user.getRandom(), user instanceof ServerPlayerEntity ? (ServerPlayerEntity) user : null);
+        } else {
+            boolean stackDamageable = stack.isDamageable();
+            boolean creative = user.isPlayer() && ((PlayerEntity) user).isCreative();
+            int stackDamage = stack.getDamage();
+            int stackMaxDamage = stack.getMaxDamage();
+            int setDamage = stackDamage + damage;
+            if (!creative && stackDamageable) {
+                stack.setDamage(setDamage);
+                stackDamage = stack.getDamage();
+                if (stackDamage > stackMaxDamage) {
+                    stack.setDamage(stackMaxDamage);
+                }
             }
         }
     }
@@ -27,15 +32,11 @@ public class DamageMethods {
             return false;
         }
         ItemStack stack = player.getStackInHand(hand);
-        boolean isDamageable = stack.isDamageable();
-        boolean isEmptyDamage = stack.getDamage() >= stack.getMaxDamage();
-        return (isDamageable && isEmptyDamage);
+        return stack.isDamageable() && stack.getDamage() >= stack.getMaxDamage();
     }
 
     public static boolean isEmptyDamage(ItemStack stack) {
-        boolean isDamageable = stack.isDamageable();
-        boolean isEmptyDamage = stack.getDamage() >= stack.getMaxDamage();
-        return (isDamageable && isEmptyDamage);
+        return stack.isDamageable() && stack.getDamage() >= stack.getMaxDamage();
     }
 
 }

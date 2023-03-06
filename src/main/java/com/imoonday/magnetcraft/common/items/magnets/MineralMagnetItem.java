@@ -171,7 +171,7 @@ public class MineralMagnetItem extends Item {
             int others = 0;
             int value;
             boolean isEmptyDamage = false;
-            DamageMethods.addDamage(player, hand, 1);
+            DamageMethods.addDamage(player, hand, 1,false);
             if (player.experienceLevel < requiredExperienceLevel && !player.isCreative()) {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
@@ -240,7 +240,7 @@ public class MineralMagnetItem extends Item {
                             }
                             total++;
                             totalValue += value;
-                            DamageMethods.addDamage(player, hand, value);
+                            DamageMethods.addDamage(player, hand, value,true);
                         }
                     }
                 }

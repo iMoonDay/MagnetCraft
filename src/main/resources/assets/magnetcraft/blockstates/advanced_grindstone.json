@@ -1,0 +1,57 @@
+{
+  "variants": {
+    "face=ceiling,facing=east": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 180,
+      "y": 270
+    },
+    "face=ceiling,facing=north": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 180,
+      "y": 180
+    },
+    "face=ceiling,facing=south": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 180
+    },
+    "face=ceiling,facing=west": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 180,
+      "y": 90
+    },
+    "face=floor,facing=east": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "y": 90
+    },
+    "face=floor,facing=north": {
+      "model": "magnetcraft:block/advanced_grindstone"
+    },
+    "face=floor,facing=south": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "y": 180
+    },
+    "face=floor,facing=west": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "y": 270
+    },
+    "face=wall,facing=east": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 90,
+      "y": 90
+    },
+    "face=wall,facing=north": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 90
+    },
+    "face=wall,facing=south": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 90,
+      "y": 180
+    },
+    "face=wall,facing=west": {
+      "model": "magnetcraft:block/advanced_grindstone",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

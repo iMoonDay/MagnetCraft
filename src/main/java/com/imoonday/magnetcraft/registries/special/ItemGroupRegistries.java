@@ -28,6 +28,7 @@ public class ItemGroupRegistries {
                     content.add(LODESTONE_BLOCK);
                     content.add(DEMAGNETIZER_BLOCK);
                     content.add(ATTRACT_SENSOR_BLOCK);
+                    content.add(ADVANCED_GRINDSTONE_BLOCK);
                     content.add(MAGLEV_LEVER_BLOCK);
                     content.add(MAGNETIC_PRESSURE_PLATE);
                     content.add(MAGLEV_RAIL_BLOCK);
@@ -67,6 +68,7 @@ public class ItemGroupRegistries {
                     content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(RESTORE_MODULE_ITEM);
                     content.add(FILTER_MODULE_ITEM);
+                    content.add(EXTRACTION_MODULE_ITEM);
                     content.add(MAGNET_TEMPLATE_ITEM);
                     content.add(POLAR_MAGNET_ITEM.getDefaultStack());
                     content.add(ELECTROMAGNET_ITEM.getDefaultStack());
@@ -119,6 +121,7 @@ public class ItemGroupRegistries {
             content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(RESTORE_MODULE_ITEM);
             content.add(FILTER_MODULE_ITEM);
+            content.add(EXTRACTION_MODULE_ITEM);
             content.add(MAGNET_TEMPLATE_ITEM);
             content.add(POLAR_MAGNET_ITEM.getDefaultStack());
             content.add(ELECTROMAGNET_ITEM.getDefaultStack());
@@ -153,6 +156,7 @@ public class ItemGroupRegistries {
             content.addAfter(Items.LODESTONE, LODESTONE_BLOCK);
             content.addAfter(LODESTONE_BLOCK, DEMAGNETIZER_BLOCK);
             content.addAfter(DEMAGNETIZER_BLOCK, ATTRACT_SENSOR_BLOCK);
+            content.addAfter(ATTRACT_SENSOR_BLOCK, ADVANCED_GRINDSTONE_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.REDSTONE).register(content -> {

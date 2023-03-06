@@ -130,13 +130,13 @@ public abstract class LivingEntityMixin {
                 NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
                 nbt.putInt("usedTick", 0);
                 entity.getMainHandStack().setNbt(nbt);
-                DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1);
+                DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1,true);
             }
             if (offhandCreature && offhandUsedTick >= 200) {
                 NbtCompound nbt = entity.getOffHandStack().getOrCreateNbt();
                 nbt.putInt("usedTick", 0);
                 entity.getOffHandStack().setNbt(nbt);
-                DamageMethods.addDamage(entity, Hand.OFF_HAND, 1);
+                DamageMethods.addDamage(entity, Hand.OFF_HAND, 1,true);
             }
             if (handCreature && !hasTag && ((playerHand == AttractMethods.Hand.MAINHAND && !mainhandEmptyDamage) || (playerHand == AttractMethods.Hand.OFFHAND && !offhandEmptyDamage) || (playerHand == AttractMethods.Hand.HAND && !mainhandEmptyDamage && !offhandEmptyDamage))) {
                 CreatureMagnetItem.attractCreatures(mainhandStack, offhandStack, entity, creatureDis, playerHand);

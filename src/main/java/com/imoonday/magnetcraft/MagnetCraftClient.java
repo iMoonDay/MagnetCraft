@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft;
 
+import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
 import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
 import com.imoonday.magnetcraft.common.items.magnets.*;
@@ -25,5 +26,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         ScreenRegistries.registerClient();
         ClientReceiverRegistries.registerClient();
         PortableDemagnetizerItem.registerClient();
+        MagneticFluid.registerClient();
     }
 }

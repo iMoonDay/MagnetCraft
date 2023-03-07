@@ -9,6 +9,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import static com.imoonday.magnetcraft.registries.common.BlockRegistries.*;
+import static com.imoonday.magnetcraft.registries.common.FluidRegistries.MAGNETIC_FLUID_BUCKET;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
@@ -30,6 +31,12 @@ public class ItemGroupRegistries {
                     content.add(ATTRACT_SENSOR_BLOCK);
                     content.add(ADVANCED_GRINDSTONE_BLOCK);
                     content.add(MAGLEV_LEVER_BLOCK);
+                    content.add(MAGLEV_OAK_BUTTON_BLOCK);
+                    content.add(MAGLEV_STONE_BUTTON_BLOCK);
+                    content.add(MAGLEV_OAK_DOOR_BLOCK);
+                    content.add(MAGLEV_IRON_DOOR_BLOCK);
+                    content.add(MAGLEV_REPEATER_BLOCK);
+                    content.add(MAGLEV_COMPARATOR_BLOCK);
                     content.add(MAGNETIC_PRESSURE_PLATE);
                     content.add(MAGLEV_RAIL_BLOCK);
                     content.add(MAGLEV_POWERED_RAIL_BLOCK);
@@ -37,6 +44,7 @@ public class ItemGroupRegistries {
                     content.add(MAGLEV_ACTIVATOR_RAIL_BLOCK);
                     content.add(RAW_MAGNET_ITEM);
                     content.add(MAGNET_FRAGMENT_ITEM);
+                    content.add(MAGNETIC_SUSPENDED_POWDER_ITEM);
                     content.add(MAGNETIC_IRON_INGOT);
                     content.add(NETHERITE_MAGNETIC_IRON_INGOT);
                     content.add(MAGNET_POWDER);
@@ -79,6 +87,7 @@ public class ItemGroupRegistries {
                     content.add(CROP_MAGNET_ITEM.getDefaultStack());
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                     content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
+                    content.add(MAGNETIC_FLUID_BUCKET);
                 }).build();
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL).register(content -> {
@@ -90,6 +99,7 @@ public class ItemGroupRegistries {
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.INGREDIENTS).register(content -> {
             content.addAfter(Items.RAW_IRON, RAW_MAGNET_ITEM);
             content.addAfter(Items.IRON_NUGGET, MAGNET_FRAGMENT_ITEM);
+            content.addAfter(MAGNET_FRAGMENT_ITEM, MAGNETIC_SUSPENDED_POWDER_ITEM);
             content.addAfter(Items.IRON_INGOT, MAGNETIC_IRON_INGOT);
             content.addAfter(Items.NETHERITE_INGOT, NETHERITE_MAGNETIC_IRON_INGOT);
             content.addAfter(Items.GUNPOWDER, MAGNET_POWDER);
@@ -99,6 +109,10 @@ public class ItemGroupRegistries {
             content.addAfter(Items.IRON_BLOCK, MAGNET_BLOCK);
             content.addAfter(Items.NETHERITE_BLOCK, NETHERITE_MAGNET_BLOCK);
             content.addAfter(Items.HEAVY_WEIGHTED_PRESSURE_PLATE, MAGNETIC_PRESSURE_PLATE);
+            content.addAfter(Items.OAK_BUTTON, MAGLEV_OAK_BUTTON_BLOCK);
+            content.addAfter(Items.STONE_BUTTON, MAGLEV_STONE_BUTTON_BLOCK);
+            content.addAfter(Items.OAK_DOOR, MAGLEV_OAK_DOOR_BLOCK);
+            content.addAfter(Items.IRON_DOOR, MAGLEV_IRON_DOOR_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.TOOLS).register(content -> {
@@ -136,6 +150,7 @@ public class ItemGroupRegistries {
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
             content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);
             content.addAfter(MAGLEV_DETECTOR_RAIL_BLOCK, MAGLEV_ACTIVATOR_RAIL_BLOCK);
+            content.addAfter(Items.WATER_BUCKET, MAGNETIC_FLUID_BUCKET);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.COMBAT).register(content -> {
@@ -166,6 +181,12 @@ public class ItemGroupRegistries {
             content.addAfter(MAGLEV_DETECTOR_RAIL_BLOCK, MAGLEV_ACTIVATOR_RAIL_BLOCK);
             content.addAfter(Items.LEVER, MAGLEV_LEVER_BLOCK);
             content.addAfter(Items.HEAVY_WEIGHTED_PRESSURE_PLATE, MAGNETIC_PRESSURE_PLATE);
+            content.addAfter(Items.OAK_BUTTON, MAGLEV_OAK_BUTTON_BLOCK);
+            content.addAfter(Items.STONE_BUTTON, MAGLEV_STONE_BUTTON_BLOCK);
+            content.addAfter(Items.OAK_DOOR, MAGLEV_OAK_DOOR_BLOCK);
+            content.addAfter(Items.IRON_DOOR, MAGLEV_IRON_DOOR_BLOCK);
+            content.addAfter(Items.REPEATER, MAGLEV_REPEATER_BLOCK);
+            content.addAfter(Items.COMPARATOR, MAGLEV_COMPARATOR_BLOCK);
         });
     }
 }

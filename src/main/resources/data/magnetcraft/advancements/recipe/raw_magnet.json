@@ -23,7 +23,8 @@
       "magnetcraft:magnet_fragment_from_smelting_magnetite",
       "magnetcraft:magnet_fragment_from_smelting_raw_magnet",
       "magnetcraft:magnetic_iron_ingot_from_magnet_fragment",
-      "magnetcraft:netherite_magnetic_iron_ingot_from_magnetic_iron_ingot"
+      "magnetcraft:netherite_magnetic_iron_ingot_from_magnetic_iron_ingot",
+      "magnetcraft:magnetic_suspended_powder"
     ]
   }
 }

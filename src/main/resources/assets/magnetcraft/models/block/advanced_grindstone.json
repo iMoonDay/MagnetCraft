@@ -5,7 +5,7 @@
         "round": "magnetcraft:block/advanced_grindstone_round",
         "side": "magnetcraft:block/advanced_grindstone_side",
         "particle": "magnetcraft:block/advanced_grindstone_side",
-        "leg": "minecraft:block/dark_oak_log"
+        "leg": "minecraft:block/gold_block"
     },
     "elements": [
         {

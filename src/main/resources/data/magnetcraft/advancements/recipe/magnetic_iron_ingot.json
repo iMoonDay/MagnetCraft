@@ -18,11 +18,6 @@
       "magnetcraft:magnet_template",
       "magnetcraft:magnet_controller",
       "magnetcraft:magnet_block",
-      "magnetcraft:maglev_rail",
-      "magnetcraft:maglev_powered_rail",
-      "magnetcraft:maglev_detector_rail",
-      "magnetcraft:maglev_activator_rail",
-      "magnetcraft:maglev_lever",
       "magnetcraft:lodestone",
       "magnetcraft:empty_crafting_module",
       "magnetcraft:magnet_powder_from_smelting",
@@ -40,7 +35,8 @@
       "magnetcraft:magnetic_pressure_plate",
       "magnetcraft:magnet_fragment_from_magnetic_iron_ingot",
       "magnetcraft:demagnetizer",
-      "magnetcraft:portable_demagnetizer"
+      "magnetcraft:portable_demagnetizer",
+      "magnetcraft:advanced_grindstone"
     ]
   }
 }

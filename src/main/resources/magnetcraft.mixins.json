@@ -13,8 +13,6 @@
     "PlayerEntityMixin",
     "TridentEntityMixin"
   ],
-  "client": [
-  ],
   "injectors": {
     "defaultRequire": 1
   }

@@ -1,16 +1,16 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "1 1",
     "121",
-    "1 1"
+    "121",
+    "121"
   ],
   "key": {
     "1": {
       "item": "minecraft:activator_rail"
     },
     "2": {
-      "item": "magnetcraft:magnetic_iron_ingot"
+      "item": "magnetcraft:magnetic_suspended_powder"
     }
   },
   "result": {

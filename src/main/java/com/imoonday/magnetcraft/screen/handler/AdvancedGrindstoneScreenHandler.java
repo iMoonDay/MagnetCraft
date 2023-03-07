@@ -106,6 +106,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
         if (!this.input.getStack(0).isOf(Items.AIR) && !this.input.getStack(0).hasEnchantments()) {
             player.getInventory().offerOrDrop(AdvancedGrindstoneScreenHandler.this.input.getStack(0));
             this.input.setStack(0, ItemStack.EMPTY);
+            this.input.markDirty();
         }
     }
 
@@ -118,7 +119,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
             enchantedBookStack = new ItemStack(Items.ENCHANTED_BOOK);
             Map<Enchantment, Integer> enchantments = EnchantmentHelper.get(enchantedStack);
             this.maxIndex = enchantments.size() - 1;
-            if (enchantments.size() == 0) {
+            if (enchantments.size() == 0 || this.index > this.maxIndex || this.index < 0) {
                 return;
             }
             Enchantment enchantment = enchantments.keySet().stream().toList().get(index);
@@ -147,7 +148,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
 
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
-        if (id < 0 || id >= 2) {
+        if (id < 0 || id > 1) {
             return false;
         }
         switch (id) {
@@ -157,9 +158,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
                 } else {
                     this.index--;
                 }
-                this.input.markDirty();
-                this.onContentChanged(input);
-                return true;
+
             }
             case 1 -> {
                 if (index + 1 > maxIndex) {
@@ -167,12 +166,10 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
                 } else {
                     this.index++;
                 }
-                this.input.markDirty();
-                this.onContentChanged(input);
-                return true;
             }
         }
-        return super.onButtonClick(player, id);
+        this.input.markDirty();
+        return true;
     }
 
     @Override

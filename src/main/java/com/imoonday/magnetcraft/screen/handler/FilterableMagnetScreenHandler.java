@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.screen.handler;
 
+import com.imoonday.magnetcraft.methods.FilterNbtMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.minecraft.entity.player.PlayerEntity;
@@ -11,9 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
+import static com.imoonday.magnetcraft.common.items.MagnetControllerItem.changeMagnetEnable;
 import static net.minecraft.item.Items.*;
 
 @SuppressWarnings("ConstantValue")
@@ -82,6 +86,51 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
     }
 
     @Override
+    public void close(PlayerEntity player) {
+        super.close(player);
+        this.inventory.clear();
+    }
+
+    @Override
+    public void onContentChanged(Inventory inventory) {
+        super.onContentChanged(inventory);
+        ArrayList<ItemStack> stacks = new ArrayList<>();
+        for (int i = 0; i < this.inventory.size(); i++) {
+            stacks.add(this.inventory.getStack(i));
+        }
+        FilterNbtMethods.setFilterItems(getStack(), stacks);
+        this.sendContentUpdates();
+    }
+
+    @Override
+    public void onSlotClick(int slotIndex, int button, SlotActionType actionType, PlayerEntity player) {
+        super.onSlotClick(slotIndex, button, actionType, player);
+        this.onContentChanged(this.inventory);
+    }
+
+    @Override
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (id < 0 || id > 4) {
+            return false;
+        }
+        switch (id) {
+            case 0 -> FilterNbtMethods.setBoolean(getStack(), "Whitelist", true);
+            case 1 -> FilterNbtMethods.setBoolean(getStack(), "Whitelist", false);
+            case 2 -> FilterNbtMethods.setBoolean(getStack(), "CompareDamage");
+            case 3 -> FilterNbtMethods.setBoolean(getStack(), "CompareNbt");
+            case 4 -> {
+                if (getStack().isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
+                    changeMagnetEnable(player);
+                } else {
+                    FilterNbtMethods.setBoolean(getStack(), "Enable");
+                }
+            }
+        }
+        this.onContentChanged(this.inventory);
+        return super.onButtonClick(player, id);
+    }
+
+    @Override
     public ItemStack quickMove(PlayerEntity player, int invSlot) {
         ItemStack newStack;
         Slot slot = this.slots.get(invSlot);
@@ -104,6 +153,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                 slot.setStack(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
+                FilterableMagnetScreenHandler.this.onContentChanged(this.inventory);
             }
         } else {
             newStack = ItemStack.EMPTY;
@@ -133,11 +183,13 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                         stack.setCount(0);
                         itemStack.setCount(j);
                         slot.markDirty();
+                        FilterableMagnetScreenHandler.this.onContentChanged(this.inventory);
                         bl = true;
                     } else if (itemStack.getCount() < stack.getMaxCount()) {
                         stack.decrement(stack.getMaxCount() - itemStack.getCount());
                         itemStack.setCount(stack.getMaxCount());
                         slot.markDirty();
+                        FilterableMagnetScreenHandler.this.onContentChanged(this.inventory);
                         bl = true;
                     }
                 }
@@ -160,6 +212,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                         slot.setStack(stack.split(stack.getCount()));
                     }
                     slot.markDirty();
+                    FilterableMagnetScreenHandler.this.onContentChanged(this.inventory);
                     bl = true;
                     break;
                 }
@@ -199,8 +252,14 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
             return this.inventory instanceof PlayerInventory ? super.getMaxItemCount() : 1;
         }
 
+        @Override
+        public void onTakeItem(PlayerEntity player, ItemStack stack) {
+            super.onTakeItem(player, stack);
+            FilterableMagnetScreenHandler.this.onContentChanged(this.inventory);
+        }
+
         private boolean stackMovementIsAllowed(ItemStack itemStack) {
-            return itemStack != (getSlot() != -1 ? getPlayer().getInventory().getStack(getSlot()) : getPlayer().getOffHandStack());
+            return itemStack != FilterableMagnetScreenHandler.this.getStack();
         }
 
         private boolean noSameItem(ItemStack itemStack) {

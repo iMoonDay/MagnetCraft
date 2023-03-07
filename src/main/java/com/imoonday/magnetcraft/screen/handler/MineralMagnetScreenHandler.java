@@ -3,10 +3,17 @@ package com.imoonday.magnetcraft.screen.handler;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.registry.Registries;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
+
+import static com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem.changeAllCoreEnable;
+import static com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem.changeCoreEnable;
+import static com.imoonday.magnetcraft.registries.common.ItemRegistries.RAW_MAGNET_ITEM;
+import static net.minecraft.item.Items.*;
 
 @SuppressWarnings("ConstantValue")
 public class MineralMagnetScreenHandler extends ScreenHandler {
@@ -40,6 +47,26 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
         for (y = 0; y < 9; ++y) {
             this.addSlot(new Slot(inventory, y, 8 + y * 18, 142));
         }
+    }
+
+    @Override
+    public boolean onButtonClick(PlayerEntity player, int id) {
+        if (id < 0 || id > 12) {
+            return false;
+        }
+        ItemStack stack = this.slot != -1 ? player.getInventory().getStack(this.slot) : player.getOffHandStack();
+        if (id <= 10) {
+            Item[] items = new Item[]{QUARTZ, RAW_MAGNET_ITEM, COAL, RAW_IRON, RAW_GOLD, GOLD_NUGGET, DIAMOND, REDSTONE, RAW_COPPER, EMERALD, LAPIS_LAZULI};
+            String item = Registries.ITEM.getId(items[id]).toString();
+            changeCoreEnable(stack, item);
+        } else if (id == 11) {
+            changeAllCoreEnable(stack, false);
+        } else if (id == 12) {
+            changeAllCoreEnable(stack, true);
+        }
+
+        this.onContentChanged(this.inventory);
+        return super.onButtonClick(player, id);
     }
 
     @Override

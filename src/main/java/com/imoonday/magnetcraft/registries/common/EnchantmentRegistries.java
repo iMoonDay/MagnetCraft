@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.registries.common;
 
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.common.enchantments.AttractEnchantment;
 import com.imoonday.magnetcraft.common.enchantments.AutomaticCollectionEnchantment;
 import com.imoonday.magnetcraft.common.enchantments.AutomaticLootingEnchantment;
@@ -18,13 +19,10 @@ public class EnchantmentRegistries {
     public static final Enchantment DEGAUSSING_PROTECTION_ENCHANTMENT = register("degaussing_protection", new DegaussingProtectionEnchantment());
 
     public static void register() {
-//        Registry.register(Registries.ENCHANTMENT, id("attract"), ATTRACT_ENCHANTMENT);
-//        Registry.register(Registries.ENCHANTMENT, id("automatic_collection"), AUTOMATIC_COLLECTION_ENCHANTMENT);
-//        Registry.register(Registries.ENCHANTMENT, id("automatic_looting"), AUTOMATIC_LOOTING_ENCHANTMENT);
-//        Registry.register(Registries.ENCHANTMENT, id("degaussing_protection"), DEGAUSSING_PROTECTION_ENCHANTMENT);
+        MagnetCraft.LOGGER.info("EnchantmentRegistries.class Loaded");
     }
 
-    private static <T extends Enchantment> T register(String id, T enchantment) {
+    static <T extends Enchantment> T register(String id, T enchantment) {
         Registry.register(Registries.ENCHANTMENT, id(id), enchantment);
         return enchantment;
     }

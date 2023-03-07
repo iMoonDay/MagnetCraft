@@ -1,29 +1,19 @@
 package com.imoonday.magnetcraft.screen;
 
-import com.imoonday.magnetcraft.methods.FilterNbtMethods;
 import com.imoonday.magnetcraft.screen.handler.FilterableMagnetScreenHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.GameRenderer;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
 import java.awt.*;
-import java.util.ArrayList;
 
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.CHANGE_FILTER_PACKET_ID;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
 public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreenHandler> {
@@ -35,94 +25,50 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
     }
 
     @Override
-    protected void onMouseClick(Slot slot, int slotId, int button, SlotActionType actionType) {
-        super.onMouseClick(slot, slotId, button, actionType);
-        updateFilter();
-    }
-
-    @Override
     public void close() {
         super.close();
         this.handler.getInventory().clear();
     }
 
     @Override
-    protected void handledScreenTick() {
-        this.handler.getPlayer().getInventory().markDirty();
-    }
-
-    @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        int slot = this.handler.getSlot();
-        Inventory inventory = this.handler.getInventory();
         PlayerEntity player = this.handler.getPlayer();
         boolean onEnable = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.enable")) && mouseY >= y + 6 && mouseY <= y + 6 + 8;
         boolean onWhitelist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")) && mouseY >= y + 22 && mouseY <= y + 22 + 8;
         boolean onBlacklist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")) && mouseY >= y + 38 && mouseY <= y + 38 + 8;
         boolean onCompareDamage = mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.damage")) && mouseX <= x + 157 + 8 && mouseY >= y + 22 && mouseY <= y + 22 + 8;
         boolean onCompareNbt = mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.nbt")) && mouseX <= x + 157 + 8 && mouseY >= y + 38 && mouseY <= y + 38 + 8;
-        ArrayList<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < inventory.size(); i++) {
-            stacks.add(inventory.getStack(i));
-        }
-        ItemStack newStack = this.handler.getStack().copy();
-        FilterNbtMethods.setFilterItems(newStack, stacks);
-        PacketByteBuf buf = PacketByteBufs.create();
-        if (onWhitelist) {
+        boolean onButton = onEnable || onWhitelist || onBlacklist || onCompareDamage || onCompareNbt;
+        int id;
+        if (onButton) {
+            if (onWhitelist) {
+                id = 0;
+            } else if (onBlacklist) {
+                id = 1;
+            } else if (onCompareDamage && !this.handler.isCropMagnet()) {
+                id = 2;
+            } else if (onCompareNbt && !this.handler.isCropMagnet()) {
+                id = 3;
+            } else if (onEnable && !this.handler.isCropMagnet()) {
+                id = 4;
+            } else {
+                id = -1;
+            }
+            if (this.client != null) {
+                this.handler.onButtonClick(this.client.player, id);
+                if (this.client.interactionManager != null) {
+                    this.client.interactionManager.clickButton(this.handler.syncId, id);
+                }
+            }
             player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            buf.writeBoolean(true);
-            buf.writeNbt(newStack.getOrCreateNbt());
-            buf.writeInt(1);
-            buf.writeInt(slot);
-            buf.writeString("Whitelist");
-            buf.writeBoolean(true);
-            ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
-        } else if (onBlacklist) {
-            player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            buf.writeBoolean(true);
-            buf.writeNbt(newStack.getOrCreateNbt());
-            buf.writeInt(1);
-            buf.writeInt(slot);
-            buf.writeString("Whitelist");
-            buf.writeBoolean(false);
-            ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
-        } else if (onCompareDamage && !this.handler.isCropMagnet()) {
-            player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            buf.writeBoolean(true);
-            buf.writeNbt(newStack.getOrCreateNbt());
-            buf.writeInt(2);
-            buf.writeInt(slot);
-            buf.writeString("CompareDamage");
-            ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
-        } else if (onCompareNbt && !this.handler.isCropMagnet()) {
-            player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            buf.writeBoolean(true);
-            buf.writeNbt(newStack.getOrCreateNbt());
-            buf.writeInt(2);
-            buf.writeInt(slot);
-            buf.writeString("CompareNbt");
-            ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
-        } else if (onEnable && !this.handler.isCropMagnet()) {
-            player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            buf.writeBoolean(true);
-            buf.writeNbt(newStack.getOrCreateNbt());
-            buf.writeInt(2);
-            buf.writeInt(slot);
-            buf.writeString("Enable");
-            ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
-        } else {
-            buf.writeBoolean(false);
-            buf.writeNbt(newStack.getOrCreateNbt());
-            buf.writeInt(slot);
-            ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
+            return true;
         }
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        ItemStack stack = this.handler.getStack();
-        NbtCompound nbt = stack.getOrCreateNbt();
+        NbtCompound nbt = this.handler.getStack().getOrCreateNbt();
         boolean whitelist = nbt.getBoolean("Whitelist");
         boolean enable = nbt.getBoolean("Enable");
         boolean compareDamage = nbt.getBoolean("CompareDamage");
@@ -224,21 +170,6 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
         } else {
             titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
         }
-}
-
-    public void updateFilter() {
-        Inventory inventory = this.handler.getInventory();
-        ArrayList<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < inventory.size(); i++) {
-            stacks.add(inventory.getStack(i));
-        }
-        ItemStack newStack = this.handler.getStack().copy();
-        FilterNbtMethods.setFilterItems(newStack, stacks);
-        PacketByteBuf buf = PacketByteBufs.create();
-        buf.writeBoolean(false);
-        buf.writeNbt(newStack.getOrCreateNbt());
-        buf.writeInt(this.handler.getSlot());
-        ClientPlayNetworking.send(CHANGE_FILTER_PACKET_ID, buf);
     }
 
 }

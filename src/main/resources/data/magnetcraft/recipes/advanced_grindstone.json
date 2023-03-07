@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "313",
+    "121",
+    "313"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    },
+    "2": {
+      "item": "minecraft:grindstone"
+    },
+    "3": {
+      "item": "minecraft:gold_ingot"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:advanced_grindstone",
+    "count": 1
+  }
+}

@@ -33,23 +33,14 @@ public class AdvancedGrindstoneScreen extends HandledScreen<AdvancedGrindstoneSc
         boolean onLeftButton = mouseX >= x + 128 && mouseX <= x + 128 + 7 && mouseY >= y + 53 && mouseY <= y + 53 + 11;
         boolean onRightButton = mouseX >= x + 139 && mouseX <= x + 139 + 7 && mouseY >= y + 53 && mouseY <= y + 53 + 11;
         int id;
-        if (onLeftButton) {
-            id = 0;
-            if (client != null && client.player != null) {
-                this.handler.onButtonClick(client.player, id);
+        if (onLeftButton || onRightButton) {
+            id = onLeftButton ? 0 : 1;
+            if (this.client != null && this.client.player != null) {
                 if (this.client.interactionManager != null) {
+                    this.handler.onButtonClick(this.client.player, id);
                     this.client.interactionManager.clickButton(this.handler.syncId, id);
                 }
-                client.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
-            }
-        } else if (onRightButton) {
-            id = 1;
-            if (client != null && client.player != null) {
-                this.handler.onButtonClick(client.player, id);
-                if (this.client.interactionManager != null) {
-                    this.client.interactionManager.clickButton(this.handler.syncId, id);
-                }
-                client.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
+                this.client.player.playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
             }
         }
         this.handler.updateToClient();

@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "222"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:comparator"
+    },
+    "2": {
+      "item": "magnetcraft:magnetic_suspended_powder"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:maglev_comparator",
+    "count": 1
+  }
+}

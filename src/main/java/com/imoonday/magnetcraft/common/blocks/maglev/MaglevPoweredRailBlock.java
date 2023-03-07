@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.blocks;
+package com.imoonday.magnetcraft.common.blocks.maglev;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;

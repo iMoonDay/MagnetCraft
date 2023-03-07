@@ -22,6 +22,7 @@ import net.minecraft.network.listener.ClientPlayPacketListener;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
@@ -154,7 +155,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
     @org.jetbrains.annotations.Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-        return new LodestoneScreenHandler(syncId, inv, this, propertyDelegate);
+        return new LodestoneScreenHandler(syncId, inv, this, propertyDelegate, ScreenHandlerContext.create(world, pos));
     }
 
     @Override

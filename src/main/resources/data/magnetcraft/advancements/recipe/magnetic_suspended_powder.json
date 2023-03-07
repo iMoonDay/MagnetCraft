@@ -1,0 +1,31 @@
+{
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "magnetcraft:magnetic_suspended_powder"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "recipes": [
+      "magnetcraft:maglev_rail",
+      "magnetcraft:maglev_powered_rail",
+      "magnetcraft:maglev_detector_rail",
+      "magnetcraft:maglev_activator_rail",
+      "magnetcraft:maglev_lever",
+      "magnetcraft:maglev_oak_door",
+      "magnetcraft:maglev_iron_door",
+      "magnetcraft:maglev_oak_button",
+      "magnetcraft:maglev_stone_button",
+      "magnetcraft:maglev_repeater",
+      "magnetcraft:maglev_comparator"
+    ]
+  }
+}

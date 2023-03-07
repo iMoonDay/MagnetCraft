@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.registries.common;
 
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.common.effects.AttractEffect;
 import com.imoonday.magnetcraft.common.effects.DegaussingEffect;
 import com.imoonday.magnetcraft.common.effects.UnattractEffect;
@@ -16,12 +17,10 @@ public class EffectRegistries {
     public static final UnattractEffect UNATTRACT_EFFECT = register("unattract", new UnattractEffect());
 
     public static void register() {
-//        Registry.register(Registries.STATUS_EFFECT, id("attract"), ATTRACT_EFFECT);
-//        Registry.register(Registries.STATUS_EFFECT, id("degaussing"), DEGAUSSING_EFFECT);
-//        Registry.register(Registries.STATUS_EFFECT, id("unattract"), UNATTRACT_EFFECT);
+        MagnetCraft.LOGGER.info("EffectRegistries.class Loaded");
     }
 
-    private static <T extends StatusEffect> T register(String id, T effect) {
+    static <T extends StatusEffect> T register(String id, T effect) {
         Registry.register(Registries.STATUS_EFFECT, id(id), effect);
         return effect;
     }

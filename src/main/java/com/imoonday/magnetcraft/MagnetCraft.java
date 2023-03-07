@@ -15,7 +15,7 @@ public class MagnetCraft implements ModInitializer {
 
     public static final String MOD_ID = "magnetcraft";
     @SuppressWarnings("unused")
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+    public static final Logger LOGGER = LoggerFactory.getLogger("MagnetCraft");
 
     public static final RecipeSerializer<CoresAddRecipe> CORES_ADD_RECIPE = RecipeSerializer.register("cores_add", new SpecialRecipeSerializer<>(CoresAddRecipe::new));
     public static final RecipeSerializer<FilterAddRecipe> FILTER_ADD_RECIPE = RecipeSerializer.register("filter_add", new SpecialRecipeSerializer<>(FilterAddRecipe::new));
@@ -34,5 +34,6 @@ public class MagnetCraft implements ModInitializer {
         CommandRegistries.register();
         ScreenRegistries.register();
         CallbackRegistries.register();
+        FluidRegistries.register();
     }
 }

@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:magnetic_suspended_powder"
+    },
+    {
+      "item": "minecraft:oak_button"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:maglev_oak_button",
+    "count": 2
+  }
+}

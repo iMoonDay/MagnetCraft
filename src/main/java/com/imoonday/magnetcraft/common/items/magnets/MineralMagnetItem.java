@@ -110,7 +110,7 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable") && user.isSneaky()) {
+        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
             if (!user.world.isClient) {
                 int slot = hand == Hand.MAIN_HAND ? user.getInventory().selectedSlot : -1;
                 user.openHandledScreen(new ExtendedScreenHandlerFactory() {
@@ -329,13 +329,18 @@ public class MineralMagnetItem extends Item {
         ItemStack stack = new ItemStack(MINERAL_MAGNET_ITEM);
         Item[] items = new Item[]{COAL, RAW_IRON, RAW_GOLD, GOLD_NUGGET, DIAMOND, REDSTONE, RAW_COPPER, EMERALD, LAPIS_LAZULI, QUARTZ, RAW_MAGNET_ITEM};
         coresSet(stack, items);
+        stack.getOrCreateNbt().putBoolean("Filterable", true);
         return stack;
     }
 
-    public static void EnabledCoreCheck(ItemStack stack, String id) {
+    public static void changeCoreEnable(ItemStack stack, String id) {
         if (stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(id))) {
             stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).stream().filter(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(id)).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean("enable", !((NbtCompound) nbtElement).getBoolean("enable")));
         }
+    }
+
+    public static void changeAllCoreEnable(ItemStack stack,boolean enable){
+        stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean("enable", enable));
     }
 
 }

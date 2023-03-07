@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "12",
+    "21"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnet_fragment"
+    },
+    "2": {
+      "item": "minecraft:iron_nugget"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:magnetic_suspended_powder"
+  }
+}

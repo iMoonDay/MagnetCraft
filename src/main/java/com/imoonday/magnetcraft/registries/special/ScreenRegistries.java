@@ -29,7 +29,7 @@ public class ScreenRegistries {
     }
 
     public static void register(){
-        System.out.println("Screen Registries Loaded");
+        System.out.println("ScreenRegistries.class Loaded");
     }
 
     public static void registerClient(){

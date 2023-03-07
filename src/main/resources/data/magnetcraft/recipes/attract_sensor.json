@@ -1,23 +1,23 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "misc",
-  "key": {
-    "1": {
-      "item": "magnetcraft:magnetic_iron_ingot"
-    },
-    "2": {
-      "item": "minecraft:iron_bars"
-    },
-    "3": {
-      "item": "minecraft:flint"
-    }
-  },
   "pattern": [
     "111",
     "232",
     "111"
   ],
+  "key": {
+    "1": {
+      "item": "minecraft:cobblestone"
+    },
+    "2": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    },
+    "3": {
+      "item": "magnetcraft:polar_magnet_crafting_module"
+    }
+  },
   "result": {
-    "item": "magnetcraft:demagnetizer"
+    "item": "magnetcraft:attract_sensor",
+    "count": 1
   }
 }

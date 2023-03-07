@@ -104,10 +104,10 @@ public class AttractMethods {
                 boolean offhandStackListPass = true;
                 boolean controllerListPass = true;
                 if (entity instanceof LivingEntity) {
-                    if (((LivingEntity) entity).getMainHandStack().getOrCreateNbt().contains("Filterable")) {
+                    if (((LivingEntity) entity).getMainHandStack().getNbt() != null && ((LivingEntity) entity).getMainHandStack().getNbt().contains("Filterable")) {
                         mainhandStackListPass = isSameStack(((LivingEntity) entity).getMainHandStack(), (ItemEntity) e);
                     }
-                    if (((LivingEntity) entity).getOffHandStack().getOrCreateNbt().contains("Filterable")) {
+                    if (((LivingEntity) entity).getOffHandStack().getNbt() != null && ((LivingEntity) entity).getOffHandStack().getNbt().contains("Filterable")) {
                         offhandStackListPass = isSameStack(((LivingEntity) entity).getOffHandStack(), (ItemEntity) e);
                     }
                     if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getInventory().containsAny(stack -> (stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) && stack.getNbt() != null && stack.getNbt().contains("Filterable") && !isSameStack(stack, (ItemEntity) e)))) {
@@ -233,5 +233,11 @@ public class AttractMethods {
         }
         return true;
     }
+
+    public static boolean isAttracting(Entity entity) {
+        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
+        return entity.getScoreboardTags().contains("MagnetCraft.isAttracting") && entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && o.distanceTo(entity) <= degaussingDis && !o.isSpectator())).isEmpty() && (!(entity instanceof LivingEntity) || !((LivingEntity) entity).hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT)) && (entity instanceof PlayerEntity || entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> (o instanceof PlayerEntity && ((PlayerEntity) o).getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable")))).isEmpty());
+    }
+
 }
 

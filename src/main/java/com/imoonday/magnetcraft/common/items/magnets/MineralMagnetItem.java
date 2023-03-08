@@ -2,7 +2,6 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
-import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.screen.handler.MineralMagnetScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
@@ -198,7 +197,7 @@ public class MineralMagnetItem extends Item {
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, IRON_PICKAXE.getDefaultStack());
                         boolean nbtPass = droppedStacks.stream().anyMatch(e -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(e.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
                         if (state.isIn(ORES) && nbtPass) {
-                            droppedStacks.forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            droppedStacks.forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);
                             if (state.isIn(COAL_ORES)) {
                                 coal++;

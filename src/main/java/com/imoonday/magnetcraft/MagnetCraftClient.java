@@ -9,7 +9,10 @@ import com.imoonday.magnetcraft.registries.special.ClientReceiverRegistries;
 import com.imoonday.magnetcraft.registries.special.KeyBindingRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
+@Environment(EnvType.CLIENT)
 public class MagnetCraftClient implements ClientModInitializer {
 
     @Override

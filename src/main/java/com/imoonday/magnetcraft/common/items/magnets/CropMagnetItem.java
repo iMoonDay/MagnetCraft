@@ -3,7 +3,6 @@ package com.imoonday.magnetcraft.common.items.magnets;
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
-import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
@@ -128,7 +127,7 @@ public class CropMagnetItem extends FilterableItem {
                             } else if (state.isOf(Blocks.BEETROOTS) && !canBreak(stack, Items.BEETROOT_SEEDS)) {
                                 continue;
                             }
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);
                             ItemStack seed = cropBlock.getPickStack(world, pos, state);
                             if (player.getInventory().contains(seed)) {
@@ -138,27 +137,27 @@ public class CropMagnetItem extends FilterableItem {
                             count++;
                             DamageMethods.addDamage(player, hand, 1, true);
                         } else if ((block instanceof MelonBlock && canBreak(stack, Items.MELON_SEEDS)) || (block instanceof PumpkinBlock && canBreak(stack, Items.PUMPKIN_SEEDS))) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);
                             count++;
                             DamageMethods.addDamage(player, hand, 1, true);
                         } else if ((block instanceof CaveVinesHeadBlock || block instanceof CaveVinesBodyBlock) && state.get(BERRIES) && canBreak(stack, Items.GLOW_BERRIES)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.setBlockState(pos, state.with(BERRIES, false));
                             count++;
                             DamageMethods.addDamage(player, hand, 1, true);
                         } else if ((block instanceof SugarCaneBlock && world.getBlockState(pos.down()).isOf(Blocks.SUGAR_CANE) && canBreak(stack, Items.SUGAR_CANE)) || (block instanceof BambooBlock && world.getBlockState(pos.down()).isOf(Blocks.BAMBOO) && canBreak(stack, Items.BAMBOO)) || (block instanceof CactusBlock && world.getBlockState(pos.down()).isOf(Blocks.CACTUS) && canBreak(stack, Items.CACTUS)) || (block instanceof KelpBlock && world.getBlockState(pos.down()).isOf(Blocks.KELP_PLANT)) && canBreak(stack, Items.KELP)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);
                             count++;
                             DamageMethods.addDamage(player, hand, 1, true);
                         } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) > 1 && canBreak(stack, Items.SWEET_BERRIES)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.setBlockState(pos, state.with(AGE_3, 1));
                             count++;
                             DamageMethods.addDamage(player, hand, 1, true);
                         } else if (block instanceof NetherWartBlock netherWartBlock && state.get(AGE_3) == 3 && canBreak(stack, Items.NETHER_WART)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);
                             ItemStack seed = netherWartBlock.getPickStack(world, pos, state);
                             if (player.getInventory().contains(seed)) {
@@ -168,7 +167,7 @@ public class CropMagnetItem extends FilterableItem {
                             count++;
                             DamageMethods.addDamage(player, hand, 1, true);
                         } else if (block instanceof CocoaBlock cocoaBlock && state.get(AGE_2) == 2 && canBreak(stack, Items.COCOA_BEANS)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
+                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);
                             ItemStack seed = cocoaBlock.getPickStack(world, pos, state);
                             if (player.getInventory().contains(seed)) {

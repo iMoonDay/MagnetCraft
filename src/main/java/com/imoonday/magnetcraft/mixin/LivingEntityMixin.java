@@ -8,7 +8,6 @@ import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.methods.EnchantmentMethods;
-import com.imoonday.magnetcraft.methods.TeleportMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -268,7 +267,7 @@ public abstract class LivingEntityMixin {
                             int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
                             player.addExperience(amount);
                         } else {
-                            TeleportMethods.giveItemStackToPlayer(player, ((ItemEntity) e).getStack());
+                            player.getInventory().offerOrDrop(((ItemEntity) e).getStack());
                         }
                         e.kill();
                     });

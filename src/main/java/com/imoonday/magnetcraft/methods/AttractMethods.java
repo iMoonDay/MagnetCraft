@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.methods;
 
+import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
@@ -236,7 +237,27 @@ public class AttractMethods {
 
     public static boolean isAttracting(Entity entity) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        return entity.getScoreboardTags().contains("MagnetCraft.isAttracting") && entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && o.distanceTo(entity) <= degaussingDis && !o.isSpectator())).isEmpty() && (!(entity instanceof LivingEntity) || !((LivingEntity) entity).hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT)) && (entity instanceof PlayerEntity || entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> (o instanceof PlayerEntity && ((PlayerEntity) o).getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable")))).isEmpty());
+        boolean hasTag = entity.getScoreboardTags().contains("MagnetCraft.isAttracting");
+        boolean noDegaussingEffect = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && o.distanceTo(entity) <= degaussingDis && !o.isSpectator()).isEmpty();
+        boolean isLivingEntity = entity instanceof LivingEntity;
+        boolean isPlayerEntity = entity instanceof PlayerEntity;
+        if (hasTag && noDegaussingEffect) {
+            if (isLivingEntity) {
+                boolean hasStatusEffect = ((LivingEntity) entity).hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT);
+                if (!hasStatusEffect) {
+                    if (!isPlayerEntity) {
+                        return entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> o instanceof PlayerEntity && ((PlayerEntity) o).getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable"))).isEmpty();
+                    }
+                    return true;
+                }
+                return false;
+            }
+            return true;
+        } else if (entity instanceof ItemEntity) {
+            ItemStack stack = ((ItemEntity) entity).getStack();
+            return stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
+        }
+        return false;
     }
 
 }

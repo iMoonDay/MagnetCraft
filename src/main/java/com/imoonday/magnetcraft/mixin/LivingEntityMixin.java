@@ -3,6 +3,7 @@ package com.imoonday.magnetcraft.mixin;
 //import com.imoonday.magnetcraft.config.ModConfig;
 
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
+import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.methods.DamageMethods;
@@ -13,6 +14,8 @@ import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.TridentEntity;
@@ -37,12 +40,30 @@ public abstract class LivingEntityMixin {
     protected double serverHeadYaw;
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
-    public void checkAttract(CallbackInfo info) {
+    public void tick(CallbackInfo info) {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity != null) {
             World world = ((LivingEntity) (Object) this).world;
             if (world == null) return;
             if (entity.isPlayer() && entity.isSpectator()) return;
+            if (entity.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
+                StatusEffectInstance effect = entity.getStatusEffect(StatusEffects.SLOWNESS);
+                int i = effect != null ? effect.getDuration() + 2 : 2;
+                if (i > 60 * 5 * 20) {
+                    i--;
+                }
+                int a = effect != null ? effect.getAmplifier() : 0;
+                int b = Math.max(a, i / (60 * 20));
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, i, b, false, false, false));
+                StatusEffectInstance effect1 = entity.getStatusEffect(EffectRegistries.ATTRACT_EFFECT);
+                i = effect1 != null ? effect1.getDuration() + 2 : 2;
+                if (i > 60 * 5 * 20) {
+                    i--;
+                }
+                a = effect1 != null ? effect1.getAmplifier() : 0;
+                b = Math.max(a, i / (60 * 20));
+                entity.addStatusEffect(new StatusEffectInstance(EffectRegistries.ATTRACT_EFFECT, i, b, false, false, false));
+            }
             ModConfig config = ModConfig.getConfig();
             double[] minDis = new double[]{config.value.electromagnetAttractMinDis, config.value.permanentMagnetAttractMinDis, config.value.polarMagnetAttractMinDis};//电磁铁,永磁铁,无极磁铁最小范围
             double creatureDis = config.value.creatureMagnetAttractDis;
@@ -99,7 +120,6 @@ public abstract class LivingEntityMixin {
             boolean offhandEmptyDamage = DamageMethods.isEmptyDamage(entity, Hand.OFF_HAND);
             boolean display = config.displayActionBar;
             boolean player = entity.isPlayer();
-            boolean client = entity.world.isClient;
             boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
             boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
             boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
@@ -130,13 +150,13 @@ public abstract class LivingEntityMixin {
                 NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
                 nbt.putInt("usedTick", 0);
                 entity.getMainHandStack().setNbt(nbt);
-                DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1,true);
+                DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1, true);
             }
             if (offhandCreature && offhandUsedTick >= 200) {
                 NbtCompound nbt = entity.getOffHandStack().getOrCreateNbt();
                 nbt.putInt("usedTick", 0);
                 entity.getOffHandStack().setNbt(nbt);
-                DamageMethods.addDamage(entity, Hand.OFF_HAND, 1,true);
+                DamageMethods.addDamage(entity, Hand.OFF_HAND, 1, true);
             }
             if (handCreature && !hasTag && ((playerHand == AttractMethods.Hand.MAINHAND && !mainhandEmptyDamage) || (playerHand == AttractMethods.Hand.OFFHAND && !offhandEmptyDamage) || (playerHand == AttractMethods.Hand.HAND && !mainhandEmptyDamage && !offhandEmptyDamage))) {
                 CreatureMagnetItem.attractCreatures(mainhandStack, offhandStack, entity, creatureDis, playerHand);
@@ -222,7 +242,7 @@ public abstract class LivingEntityMixin {
                     message = ": " + creatureDis;
                     text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
                 }
-                if (!client) {
+                if (entity instanceof ServerPlayerEntity) {
                     ((ServerPlayerEntity) entity).sendMessage(text, true);
                 }
             }

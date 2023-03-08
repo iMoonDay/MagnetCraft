@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:magnetic_fluid",
+    "magnetcraft:flowing_magnetic_fluid"
+  ]
+}

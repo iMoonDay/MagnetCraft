@@ -198,7 +198,7 @@ public class MineralMagnetItem extends Item {
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, IRON_PICKAXE.getDefaultStack());
                         boolean nbtPass = droppedStacks.stream().anyMatch(e -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(e.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
                         if (state.isIn(ORES) && nbtPass) {
-                            droppedStacks.forEach(e -> TeleportMethods.giveItemStackToPlayer(player.world, player, e));
+                            droppedStacks.forEach(e -> TeleportMethods.giveItemStackToPlayer(player, e));
                             world.breakBlock(pos, false, player);
                             if (state.isIn(COAL_ORES)) {
                                 coal++;

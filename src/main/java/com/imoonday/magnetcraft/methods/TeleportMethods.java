@@ -30,7 +30,7 @@ public class TeleportMethods {
                 int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
                 player.addExperience(amount);
             } else {
-                giveItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
+                giveItemStackToPlayer(player, ((ItemEntity) e).getStack());
                 e.kill();
             }
             player.incrementStat(CustomStatRegistries.ITEMS_TELEPORTED_TO_PLAYER);
@@ -43,9 +43,12 @@ public class TeleportMethods {
         }
     }
 
-    public static void giveItemStackToPlayer(World world, PlayerEntity player, ItemStack stack) {
-        boolean message = ModConfig.getConfig().displayMessageFeedback;
+    public static void giveItemStackToPlayer(PlayerEntity player, ItemStack stack) {
         player.getInventory().offerOrDrop(stack);
+//        boolean message = ModConfig.getConfig().displayMessageFeedback;
+//        if (!world.isClient && message && !player.isCreative()&&(player.getInventory().getEmptySlot()==-1||!player.getInventory().containsAny(stack1 -> ItemStack.canCombine(stack,stack1)))) {
+//            player.sendMessage(Text.translatable("text.magnetcraft.message.inventory_full"));
+//        }
 //        PlayerInventory inventory = player.getInventory();
 //        boolean hasSlot = inventory.getEmptySlot() != -1;
 //        ItemEntity itemEntity = new ItemEntity(world, player.getX(), player.getY(), player.getZ(), stack);
@@ -64,9 +67,5 @@ public class TeleportMethods {
 //                    }
 //                }
 //            }
-//            world.spawnEntity(itemEntity);
-        if (!world.isClient && message && !player.isCreative()) {
-            player.sendMessage(Text.translatable("text.magnetcraft.message.inventory_full"));
-        }
     }
 }

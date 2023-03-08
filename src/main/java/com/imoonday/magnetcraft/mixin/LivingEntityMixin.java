@@ -268,7 +268,7 @@ public abstract class LivingEntityMixin {
                             int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
                             player.addExperience(amount);
                         } else {
-                            TeleportMethods.giveItemStackToPlayer(world, player, ((ItemEntity) e).getStack());
+                            TeleportMethods.giveItemStackToPlayer(player, ((ItemEntity) e).getStack());
                         }
                         e.kill();
                     });

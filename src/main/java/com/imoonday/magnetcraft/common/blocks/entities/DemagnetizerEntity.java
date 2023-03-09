@@ -23,7 +23,7 @@ public class DemagnetizerEntity extends BlockEntity {
     public static void tick(World world, BlockPos pos) {
         if (world.isReceivingRedstonePower(pos)) {
             int dis = world.getReceivedRedstonePower(pos) * 2;
-            world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(dis), e -> (e instanceof LivingEntity && !e.isSpectator() && !EnchantmentMethods.hasEnchantment(((LivingEntity) e).getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) && e.getScoreboardTags().contains("MagnetCraft.isAttracting")).forEach(e -> ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(EffectRegistries.UNATTRACT_EFFECT, 20, 0, false, false, false)));
+            world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(dis), e -> (e instanceof LivingEntity && !e.isSpectator() && !EnchantmentMethods.hasEnchantment(((LivingEntity) e).getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) && e.getScoreboardTags().contains("MagnetCraft.isAttracting")).forEach(e -> ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(EffectRegistries.UNATTRACT_EFFECT, 2, 0, false, false, false)));
         }
     }
 }

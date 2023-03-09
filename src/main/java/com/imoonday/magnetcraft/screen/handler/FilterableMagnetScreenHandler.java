@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.screen.handler;
 
-import com.imoonday.magnetcraft.methods.FilterNbtMethods;
+import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.minecraft.entity.player.PlayerEntity;
@@ -98,7 +98,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
         for (int i = 0; i < this.inventory.size(); i++) {
             stacks.add(this.inventory.getStack(i));
         }
-        FilterNbtMethods.setFilterItems(getStack(), stacks);
+        FilterableItem.setFilterItems(getStack(), stacks);
         this.sendContentUpdates();
     }
 
@@ -114,15 +114,15 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
             return false;
         }
         switch (id) {
-            case 0 -> FilterNbtMethods.setBoolean(getStack(), "Whitelist", true);
-            case 1 -> FilterNbtMethods.setBoolean(getStack(), "Whitelist", false);
-            case 2 -> FilterNbtMethods.setBoolean(getStack(), "CompareDamage");
-            case 3 -> FilterNbtMethods.setBoolean(getStack(), "CompareNbt");
+            case 0 -> FilterableItem.setBoolean(getStack(), "Whitelist", true);
+            case 1 -> FilterableItem.setBoolean(getStack(), "Whitelist", false);
+            case 2 -> FilterableItem.setBoolean(getStack(), "CompareDamage");
+            case 3 -> FilterableItem.setBoolean(getStack(), "CompareNbt");
             case 4 -> {
                 if (getStack().isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
                     changeMagnetEnable(player);
                 } else {
-                    FilterNbtMethods.setBoolean(getStack(), "Enable");
+                    FilterableItem.setBoolean(getStack(), "Enable");
                 }
             }
         }

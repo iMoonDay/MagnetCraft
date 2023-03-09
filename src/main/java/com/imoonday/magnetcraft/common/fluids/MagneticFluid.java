@@ -1,14 +1,21 @@
 package com.imoonday.magnetcraft.common.fluids;
 
 import com.imoonday.magnetcraft.api.AbstractMagneticFluid;
+import com.imoonday.magnetcraft.common.tags.FluidTags;
+import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.render.RenderLayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.FluidState;
 import net.minecraft.item.Item;
+import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Identifier;
@@ -16,6 +23,7 @@ import net.minecraft.util.Identifier;
 import static com.imoonday.magnetcraft.registries.common.FluidRegistries.*;
 
 public class MagneticFluid extends AbstractMagneticFluid {
+
     @Override
     public Fluid getFlowing() {
         return FLOWING_MAGNETIC_FLUID;
@@ -62,6 +70,7 @@ public class MagneticFluid extends AbstractMagneticFluid {
         public boolean isStill(FluidState fluidState) {
             return false;
         }
+
     }
 
     public static class Still extends MagneticFluid {
@@ -74,6 +83,7 @@ public class MagneticFluid extends AbstractMagneticFluid {
         public boolean isStill(FluidState fluidState) {
             return true;
         }
+
     }
 
     public static void registerClient() {
@@ -83,5 +93,34 @@ public class MagneticFluid extends AbstractMagneticFluid {
                 0XA2A2A2
         ));
         BlockRenderLayerMap.INSTANCE.putFluids(RenderLayer.getTranslucent(), STILL_MAGNETIC_FLUID, FLOWING_MAGNETIC_FLUID);
+    }
+
+    public static void tick(LivingEntity entity) {
+        FluidState state = entity.getBlockStateAtPos().getFluidState();
+        if (state.isIn(FluidTags.MAGNETIC_FLUID) && entity.isTouchingWater()) {
+            double fluidHeight = state.getHeight();
+            int level = state.getLevel();
+            double multiplier = 0.9 - level * 0.05;
+            if (fluidHeight > 0.0) {
+                entity.setVelocity(entity.getVelocity().multiply(multiplier));
+                if (!entity.world.isClient && !(entity instanceof PlayerEntity)) {
+                    PlayerLookup.tracking(entity).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(entity)));
+                }
+            }
+            StatusEffectInstance effect = entity.getStatusEffect(EffectRegistries.ATTRACT_EFFECT);
+            int i;
+            int b;
+            if (entity.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
+                i = effect != null ? effect.getDuration() + 2 : 2;
+                if (i > 60 * 5 * 20) {
+                    i--;
+                }
+                b = Math.max(effect != null ? effect.getAmplifier() : 0, i / (60 * 20));
+            } else {
+                i = 2;
+                b = 0;
+            }
+            entity.addStatusEffect(new StatusEffectInstance(EffectRegistries.ATTRACT_EFFECT, i, b, false, false, false));
+        }
     }
 }

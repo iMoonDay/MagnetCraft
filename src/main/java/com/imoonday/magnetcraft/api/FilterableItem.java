@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.api;
 
-import com.imoonday.magnetcraft.methods.FilterNbtMethods;
 import com.imoonday.magnetcraft.screen.handler.FilterableMagnetScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.client.item.TooltipContext;
@@ -19,9 +18,13 @@ import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import static net.minecraft.item.Items.AIR;
 
 public abstract class FilterableItem extends SwitchableItem implements ImplementedInventory {
 
@@ -35,13 +38,12 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
         stack.getOrCreateNbt().putBoolean("Filterable", true);
-        FilterNbtMethods.filterSet(stack);
+        filterSet(stack);
         return stack;
     }
 
     @Override
-    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
-        FilterNbtMethods.filterSet(stack);
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {filterSet(stack);
     }
 
     @Override
@@ -66,7 +68,7 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        FilterNbtMethods.filterCheck(stack);
+        filterCheck(stack);
     }
 
     @Override
@@ -97,10 +99,62 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
                 }
 
                 @Override
-                public @me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+                public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
                     return new FilterableMagnetScreenHandler(syncId, inv, filterableMagnetItem, slot);
                 }
             });
         }
     }
+
+    public static void filterCheck(ItemStack stack) {
+        if (stack.getNbt() == null || !stack.getNbt().contains("Filter") || !stack.getNbt().contains("Whitelist") || !stack.getNbt().contains("CompareDamage") || !stack.getNbt().contains("CompareNbt") || !stack.getNbt().contains("Filterable")) {
+            filterSet(stack);
+        }
+    }
+
+    public static void filterSet(ItemStack stack) {
+        if (!stack.getOrCreateNbt().contains("Filterable")) {
+            stack.getOrCreateNbt().putBoolean("Filterable", false);
+        }
+        if (stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
+            if (!stack.getOrCreateNbt().contains("Whitelist")) {
+                stack.getOrCreateNbt().putBoolean("Whitelist", false);
+            }
+            if (!stack.getOrCreateNbt().contains("Filter")) {
+                stack.getOrCreateNbt().put("Filter", new NbtList());
+            }
+            if (!stack.getOrCreateNbt().contains("CompareDamage")) {
+                stack.getOrCreateNbt().putBoolean("CompareDamage", false);
+            }
+            if (!stack.getOrCreateNbt().contains("CompareNbt")) {
+                stack.getOrCreateNbt().putBoolean("CompareNbt", false);
+            }
+        }
+    }
+
+    public static void setFilterItems(ItemStack stack, ArrayList<ItemStack> stacks) {
+        filterCheck(stack);
+        NbtList list = stack.getOrCreateNbt().getList("Filter", NbtElement.STRING_TYPE);
+        list.clear();
+        for (ItemStack otherStack : stacks) {
+            NbtCompound otherStackNbt = otherStack.writeNbt(new NbtCompound());
+            if (otherStack.isOf(AIR)) {
+                continue;
+            }
+            otherStackNbt.putInt("Count", 1);
+            if (!list.contains(otherStackNbt)) {
+                list.add(otherStackNbt);
+            }
+        }
+        stack.getOrCreateNbt().put("Filter", list);
+    }
+
+    public static void setBoolean(ItemStack stack, String key, boolean b) {
+        stack.getOrCreateNbt().putBoolean(key, b);
+    }
+
+    public static void setBoolean(ItemStack stack, String key) {
+        stack.getOrCreateNbt().putBoolean(key, !stack.getOrCreateNbt().getBoolean(key));
+    }
+
 }

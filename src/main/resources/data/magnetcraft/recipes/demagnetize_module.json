@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "232",
+    "121"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:flint"
+    },
+    "2": {
+      "item": "magnetcraft:demagnetized_powder"
+    },
+    "3": {
+      "item": "magnetcraft:empty_crafting_module"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:demagnetize_module",
+    "count": 1
+  }
+}

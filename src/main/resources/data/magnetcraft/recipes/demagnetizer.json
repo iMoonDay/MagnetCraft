@@ -9,7 +9,7 @@
       "item": "minecraft:iron_bars"
     },
     "3": {
-      "item": "minecraft:flint"
+      "item": "magnetcraft:demagnetize_module"
     }
   },
   "pattern": [

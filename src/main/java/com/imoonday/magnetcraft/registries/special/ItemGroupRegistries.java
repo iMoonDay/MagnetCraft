@@ -45,6 +45,7 @@ public class ItemGroupRegistries {
                     content.add(RAW_MAGNET_ITEM);
                     content.add(MAGNET_FRAGMENT_ITEM);
                     content.add(MAGNETIC_SUSPENDED_POWDER_ITEM);
+                    content.add(DEMAGNETIZED_POWDER_ITEM);
                     content.add(MAGNETIC_IRON_INGOT);
                     content.add(NETHERITE_MAGNETIC_IRON_INGOT);
                     content.add(MAGNET_POWDER);
@@ -77,6 +78,7 @@ public class ItemGroupRegistries {
                     content.add(RESTORE_MODULE_ITEM);
                     content.add(FILTER_MODULE_ITEM);
                     content.add(EXTRACTION_MODULE_ITEM);
+                    content.add(DEMAGNETIZE_MODULE_ITEM);
                     content.add(MAGNET_TEMPLATE_ITEM);
                     content.add(POLAR_MAGNET_ITEM.getDefaultStack());
                     content.add(ELECTROMAGNET_ITEM.getDefaultStack());
@@ -100,6 +102,7 @@ public class ItemGroupRegistries {
             content.addAfter(Items.RAW_IRON, RAW_MAGNET_ITEM);
             content.addAfter(Items.IRON_NUGGET, MAGNET_FRAGMENT_ITEM);
             content.addAfter(MAGNET_FRAGMENT_ITEM, MAGNETIC_SUSPENDED_POWDER_ITEM);
+            content.addAfter(MAGNETIC_SUSPENDED_POWDER_ITEM, DEMAGNETIZED_POWDER_ITEM);
             content.addAfter(Items.IRON_INGOT, MAGNETIC_IRON_INGOT);
             content.addAfter(Items.NETHERITE_INGOT, NETHERITE_MAGNETIC_IRON_INGOT);
             content.addAfter(Items.GUNPOWDER, MAGNET_POWDER);
@@ -136,6 +139,7 @@ public class ItemGroupRegistries {
             content.add(RESTORE_MODULE_ITEM);
             content.add(FILTER_MODULE_ITEM);
             content.add(EXTRACTION_MODULE_ITEM);
+            content.add(DEMAGNETIZE_MODULE_ITEM);
             content.add(MAGNET_TEMPLATE_ITEM);
             content.add(POLAR_MAGNET_ITEM.getDefaultStack());
             content.add(ELECTROMAGNET_ITEM.getDefaultStack());

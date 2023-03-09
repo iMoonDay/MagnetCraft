@@ -137,13 +137,10 @@ public class AttractMethods {
                         double move_x = (entity.getX() - e.getX()) * 0.05;
                         double move_y = (entity.getEyeY() - e.getY()) * 0.05;
                         double move_z = (entity.getZ() - e.getZ()) * 0.05;
-                        boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12) && !(e.getX() == entity.getX() && e.getZ() == entity.getY());
-                        if (stop) {
+                        if (e.horizontalCollision) {
                             e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                            e.setVelocityClient(move_x, 0.25, move_z);
                         } else {
                             e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                            e.setVelocityClient(move_x, move_y, move_z);
                         }
                         PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
                     }
@@ -185,13 +182,10 @@ public class AttractMethods {
                         double move_x = (pos.getX() - e.getX()) * 0.05;
                         double move_y = (pos.getY() - e.getY()) * 0.05;
                         double move_z = (pos.getZ() - e.getZ()) * 0.05;
-                        boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0) && (e.getVelocity().getY() > 0.0 || e.getVelocity().getY() < -0.12) && !(e.getX() == pos.getX() && e.getZ() == pos.getZ());
-                        if (stop) {
+                        if (e.horizontalCollision) {
                             e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                            e.setVelocityClient(move_x, 0.25, move_z);
                         } else {
                             e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                            e.setVelocityClient(move_x, move_y, move_z);
                         }
                         PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
                     }

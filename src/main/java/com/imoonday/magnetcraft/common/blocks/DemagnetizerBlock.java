@@ -33,4 +33,5 @@ public class DemagnetizerBlock extends BlockWithEntity {
     public BlockRenderType getRenderType(BlockState state) {
         return BlockRenderType.MODEL;
     }
+
 }

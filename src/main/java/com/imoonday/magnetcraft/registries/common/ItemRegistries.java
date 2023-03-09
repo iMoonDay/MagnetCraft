@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.registries.common;
 
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.common.items.CraftingModuleItem;
+import com.imoonday.magnetcraft.common.items.GlintItem;
 import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
@@ -33,7 +34,9 @@ public class ItemRegistries {
     public static final Item NETHERITE_MAGNETIC_IRON_INGOT = register("netherite_magnetic_iron_ingot", new Item(new FabricItemSettings().fireproof()));
     public static final Item MAGNET_POWDER = register("magnet_powder", new Item(new FabricItemSettings()));
     public static final Item MAGNET_TEMPLATE_ITEM = register("magnet_template", new Item(new FabricItemSettings()));
-    public static final Item MAGNETIC_SUSPENDED_POWDER_ITEM = register("magnetic_suspended_powder", new Item(new FabricItemSettings()));
+    public static final Item DEMAGNETIZED_POWDER_ITEM = register("demagnetized_powder", new Item(new FabricItemSettings()));
+
+    public static final Item MAGNETIC_SUSPENDED_POWDER_ITEM = register("magnetic_suspended_powder", new GlintItem(new FabricItemSettings().recipeRemainder(DEMAGNETIZED_POWDER_ITEM)));
 
     public static final CraftingModuleItem EMPTY_CRAFTING_MODULE_ITEM = register("empty_crafting_module", new CraftingModuleItem(new FabricItemSettings().maxCount(16)));
     public static final CraftingModuleItem POLAR_MAGNET_CRAFTING_MODULE_ITEM = register("polar_magnet_crafting_module", new CraftingModuleItem(new FabricItemSettings().maxCount(16)));
@@ -46,6 +49,7 @@ public class ItemRegistries {
     public static final Item RESTORE_MODULE_ITEM = register("restore_module", new Item(new FabricItemSettings().maxCount(16)));
     public static final Item FILTER_MODULE_ITEM = register("filter_module", new Item(new FabricItemSettings().maxCount(16)));
     public static final Item EXTRACTION_MODULE_ITEM = register("extraction_module", new Item(new FabricItemSettings().maxCount(16)));
+    public static final Item DEMAGNETIZE_MODULE_ITEM = register("demagnetize_module", new Item(new FabricItemSettings().maxCount(16)));
 
     public static final PolorMagnetItem POLAR_MAGNET_ITEM = register("polar_magnet", new PolorMagnetItem(new FabricItemSettings().maxCount(1)));
     public static final ElectromagnetItem ELECTROMAGNET_ITEM = register("electromagnet", new ElectromagnetItem(new FabricItemSettings().maxCount(1).maxDamage(12 * 64)));

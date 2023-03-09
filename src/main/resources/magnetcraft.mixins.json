@@ -8,6 +8,7 @@
     "ArrowEntityMixin",
     "BlockMixin",
     "BrewingMixin",
+    "EntityMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",

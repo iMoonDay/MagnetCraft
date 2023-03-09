@@ -3,7 +3,6 @@ package com.imoonday.magnetcraft.mixin;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.common.PotionRegistries;
 import net.minecraft.item.Item;
-import net.minecraft.item.Items;
 import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.recipe.BrewingRecipeRegistry;
@@ -20,7 +19,7 @@ public class BrewingMixin {
     @Inject(at = @At("HEAD"), method = "registerDefaults")
     private static void registerDefaults(CallbackInfo ci) {
         BrewingMixin.registerPotionRecipe(Potions.AWKWARD, ItemRegistries.MAGNET_POWDER, PotionRegistries.ATTRACT_POTION);
-        BrewingMixin.registerPotionRecipe(Potions.AWKWARD, Items.FLINT, PotionRegistries.DEGAUSSING_POTION);
+        BrewingMixin.registerPotionRecipe(Potions.AWKWARD, ItemRegistries.DEMAGNETIZED_POWDER_ITEM, PotionRegistries.DEGAUSSING_POTION);
     }
 
     @Invoker("registerPotionRecipe")

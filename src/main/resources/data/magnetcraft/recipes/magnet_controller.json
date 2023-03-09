@@ -12,11 +12,11 @@
     "2": {
       "item": "minecraft:redstone"
     },
-    "3": {
+    "4": {
       "item": "minecraft:emerald"
     },
-    "4": {
-      "item": "minecraft:flint"
+    "3": {
+      "item": "magnetcraft:demagnetize_module"
     }
   },
   "result": {

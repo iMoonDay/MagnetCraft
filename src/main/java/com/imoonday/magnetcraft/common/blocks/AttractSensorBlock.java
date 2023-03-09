@@ -8,13 +8,16 @@ import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Objects;
 
 public class AttractSensorBlock extends BlockWithEntity {
     public AttractSensorBlock(Settings settings) {
@@ -45,6 +48,35 @@ public class AttractSensorBlock extends BlockWithEntity {
 
     @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return Objects.requireNonNull(world.getBlockEntity(pos)).createNbt().getInt("Power");
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity != null) {
+            if (entity instanceof AttractSensorEntity sensorEntity) {
+                Direction entityDirection = sensorEntity.getDirection();
+                if (direction.equals(entityDirection) || !sensorEntity.isHasDirection()) {
+                    return sensorEntity.getPower();
+                }
+            }
+        }
+        return 0;
+    }
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (world.isClient) {
+            return ActionResult.SUCCESS;
+        }
+        BlockEntity entity = world.getBlockEntity(pos);
+        if (entity != null) {
+            if (entity instanceof AttractSensorEntity sensorEntity) {
+                boolean hasDirection = sensorEntity.isHasDirection();
+                sensorEntity.setHasDirection(!hasDirection);
+                if (!hasDirection) {
+                    player.sendMessage(Text.translatable("block.magnetcraft.attract_sensor.message.1"), true);
+                } else {
+                    player.sendMessage(Text.translatable("block.magnetcraft.attract_sensor.message.2"), true);
+                }
+            }
+        }
+        return super.onUse(state, world, pos, player, hand, hit);
     }
 }

@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.methods;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
-import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
@@ -11,7 +11,6 @@ import net.minecraft.entity.*;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
@@ -23,127 +22,71 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Objects;
 
 public class AttractMethods {
 
-    public enum Hand {
-        MAINHAND,
-        OFFHAND,
-        HAND,
-        NONE
-    }
-
-    public static void attractItems(@Nullable ItemStack mainhandStack, @Nullable ItemStack offhandStack, LivingEntity entity, boolean selected, double dis, Hand hand) {
-        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        boolean isMainhand = hand == Hand.MAINHAND;
-        boolean isOffhand = hand == Hand.OFFHAND;
-        boolean isHand = hand == Hand.HAND;
-        boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean equipmentsHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.HEAD, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.FEET, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.LEGS, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean mainhandEmpty = selected && !equipmentsHasEnch && !offhandHasEnch && mainhandStack == ItemStack.EMPTY && isMainhand && entity.getMainHandStack().getItem() == Items.AIR;
-        boolean offhandEmpty = selected && !equipmentsHasEnch && !mainhandHasEnch && offhandStack == ItemStack.EMPTY && isOffhand && entity.getOffHandStack().getItem() == Items.AIR;
-        boolean handEmpty = selected && !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && isHand && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;
-        boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
-        boolean client = entity.world.isClient;
-        boolean entityCanAttract;
-        if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT)) {
-            return;
-        }
-        if (!client) {
-            entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
-            if (!entity.isPlayer() && !entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof PlayerEntity && ((PlayerEntity) e).getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable")))).isEmpty()) {
-                return;
-            }
-            if (!magnetOff && entityCanAttract && !isEmpty) {
-                attracting(entity, dis);
-            }
-        }
-    }
-
-    public static void attractItems(Entity entity, double dis) {
-        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        boolean client = entity.world.isClient;
-        boolean entityCanAttract;
-        if (!client) {
-            entityCanAttract = entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator())).isEmpty();
-            if (entityCanAttract) {
-                attracting(entity, dis);
-            }
-        }
-    }
-
     public static void attractItems(World world, Vec3d pos, double dis) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        boolean client = world.isClient;
-        boolean entityCanAttract;
-        if (!client) {
-            entityCanAttract = world.getOtherEntities(null, new Box(pos.getX() - degaussingDis, pos.getY() - degaussingDis, pos.getZ() - degaussingDis, pos.getX() + degaussingDis, pos.getY() + degaussingDis, pos.getZ() + degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= degaussingDis && !e.isSpectator())).isEmpty();
-            if (entityCanAttract) {
+        if (!world.isClient) {
+            boolean blockCanAttract = world.getOtherEntities(null, Box.from(pos).expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && pos.isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator())).isEmpty();
+            if (blockCanAttract) {
                 attracting(world, pos, dis);
             }
         }
     }
 
     public static void attracting(Entity entity, double dis) {
+        if (entity.world.isClient) {
+            return;
+        }
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
         ArrayList<String> whitelist = ModConfig.getConfig().whitelist.list;
         ArrayList<String> blacklist = ModConfig.getConfig().blacklist.list;
-        entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && e.distanceTo(entity) <= dis && e.distanceTo(entity) > 0.5)).forEach(e -> {
-            boolean hasNearerPlayer;
-            boolean hasNearerEntity = false;
-            boolean player = entity.isPlayer();
-            boolean client = entity.world.isClient;
+        entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), targetEntity -> ((targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(entity.getPos(), dis) && !targetEntity.getPos().isInRange(entity.getPos(), 0.5))).forEach(targetEntity -> {
             boolean pass = true;
-            if (e instanceof ItemEntity) {
-                String item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
-                boolean StackListPass;
+            if (targetEntity instanceof ItemEntity itemEntity) {
+                String item = Registries.ITEM.getId(itemEntity.getStack().getItem()).toString();
                 boolean mainhandStackListPass = true;
                 boolean offhandStackListPass = true;
                 boolean controllerListPass = true;
-                if (entity instanceof LivingEntity) {
-                    if (((LivingEntity) entity).getMainHandStack().getNbt() != null && ((LivingEntity) entity).getMainHandStack().getNbt().contains("Filterable")) {
-                        mainhandStackListPass = isSameStack(((LivingEntity) entity).getMainHandStack(), (ItemEntity) e);
+                if (entity instanceof LivingEntity livingEntity) {
+                    if (livingEntity.getMainHandStack().getNbt() != null && livingEntity.getMainHandStack().getNbt().contains("Filterable")) {
+                        mainhandStackListPass = isSameStack(livingEntity.getMainHandStack(), itemEntity);
                     }
-                    if (((LivingEntity) entity).getOffHandStack().getNbt() != null && ((LivingEntity) entity).getOffHandStack().getNbt().contains("Filterable")) {
-                        offhandStackListPass = isSameStack(((LivingEntity) entity).getOffHandStack(), (ItemEntity) e);
+                    if (livingEntity.getOffHandStack().getNbt() != null && livingEntity.getOffHandStack().getNbt().contains("Filterable")) {
+                        offhandStackListPass = isSameStack(livingEntity.getOffHandStack(), itemEntity);
                     }
-                    if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getInventory().containsAny(stack -> (stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) && stack.getNbt() != null && stack.getNbt().contains("Filterable") && !isSameStack(stack, (ItemEntity) e)))) {
+                    if (entity instanceof PlayerEntity player && player.getInventory().containsAny(stack -> (stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) && stack.getNbt() != null && stack.getNbt().contains("Filterable") && !isSameStack(stack, itemEntity)))) {
                         controllerListPass = false;
                     }
                 }
-                StackListPass = mainhandStackListPass && offhandStackListPass && controllerListPass;
+                boolean StackListPass = mainhandStackListPass && offhandStackListPass && controllerListPass;
                 boolean whitelistPass = whitelist.contains(item);
                 boolean blacklistPass = !blacklist.contains(item);
-                boolean hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
+                boolean hasDegaussingPlayer = !targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
                 pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && StackListPass && !hasDegaussingPlayer;
             }
             if (pass) {
-                if (!client) {
-                    if (player) {
-                        hasNearerPlayer = e.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != entity;
-                    } else {
-                        hasNearerPlayer = e.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != null;
-                        hasNearerEntity = !e.world.getOtherEntities(e, entity.getBoundingBox().expand(dis), o -> (!(o.isPlayer()) && o.distanceTo(e) < entity.distanceTo(e) && o.getScoreboardTags().contains("MagnetCraft.isAttracting"))).isEmpty();
+                boolean hasNearerPlayer;
+                boolean hasNearerEntity = false;
+                if (entity instanceof PlayerEntity) {
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, otherEntity -> (((EntityAttractNbt) otherEntity).isAttracting())) != entity;
+                } else {
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, otherEntity -> (((EntityAttractNbt) otherEntity).isAttracting())) != null;
+                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && (((EntityAttractNbt) otherEntity).isAttracting()))).isEmpty();
+                }
+                if (!hasNearerPlayer && !hasNearerEntity) {
+                    Vec3d vec = entity.getPos().subtract(targetEntity.getPos()).multiply(0.05);
+                    if (targetEntity.horizontalCollision) {
+                        vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
                     }
-                    if (!hasNearerPlayer && !hasNearerEntity) {
-                        double move_x = (entity.getX() - e.getX()) * 0.05;
-                        double move_y = (entity.getEyeY() - e.getY()) * 0.05;
-                        double move_z = (entity.getZ() - e.getZ()) * 0.05;
-                        if (e.horizontalCollision) {
-                            e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                        } else {
-                            e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                        }
-                        PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
-                    }
+                    targetEntity.setVelocity(vec);
+                    PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                 }
             }
         });
@@ -155,77 +98,56 @@ public class AttractMethods {
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
         ArrayList<String> whitelist = ModConfig.getConfig().whitelist.list;
         ArrayList<String> blacklist = ModConfig.getConfig().blacklist.list;
-        world.getOtherEntities(null, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), e -> (e instanceof ItemEntity || e instanceof ExperienceOrbEntity && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) <= dis && MathHelper.sqrt((float) e.squaredDistanceTo(pos.getX(), pos.getY(), pos.getZ())) > 0.5)).forEach(e -> {
-            float f = (float) (pos.getX() - e.getX());
-            float g = (float) (pos.getY() - e.getY());
-            float h = (float) (pos.getZ() - e.getZ());
+        world.getOtherEntities(null, Box.from(pos).expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity && targetEntity.getPos().isInRange(pos, dis) && !targetEntity.getPos().isInRange(pos, 0.5))).forEach(targetEntity -> {
+            float f = (float) (pos.getX() - targetEntity.getX());
+            float g = (float) (pos.getY() - targetEntity.getY());
+            float h = (float) (pos.getZ() - targetEntity.getZ());
             float blockDistanceTo = MathHelper.sqrt(f * f + g * g + h * h);
-            boolean client = world.isClient;
-            boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, o -> (o.getScoreboardTags().contains("MagnetCraft.isAttracting"))) != null;
-            String item;
-            boolean whitelistPass;
-            boolean blacklistPass;
-            boolean hasDegaussingPlayer;
             boolean pass = true;
-            boolean hasNearerEntity;
-            if (e instanceof ItemEntity) {
-                item = Registries.ITEM.getId(((ItemEntity) e).getStack().getItem()).toString();
-                whitelistPass = whitelist.contains(item);
-                blacklistPass = !blacklist.contains(item);
-                hasDegaussingPlayer = !e.world.getOtherEntities(e, e.getBoundingBox().expand(degaussingDis), o -> (o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && e.distanceTo(o) <= degaussingDis)).isEmpty();
-                pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && !hasDegaussingPlayer;
+            if (targetEntity instanceof ItemEntity itemEntity) {
+                String item = Registries.ITEM.getId(itemEntity.getStack().getItem()).toString();
+                boolean noDegaussingEntity = targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity && ((LivingEntity) otherEntity).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
+                pass = (!whitelistEnable || whitelist.contains(item)) && (!blacklistEnable || !blacklist.contains(item)) && noDegaussingEntity;
             }
-            if (pass) {
-                if (!client) {
-                    hasNearerEntity = !world.getOtherEntities(e, new Box(pos.getX() - dis, pos.getY() - dis, pos.getZ() - dis, pos.getX() + dis, pos.getY() + dis, pos.getZ() + dis), o -> (!(o.isPlayer()) && o.distanceTo(e) < blockDistanceTo && o.getScoreboardTags().contains("MagnetCraft.isAttracting"))).isEmpty();
-                    if (!hasNearerPlayer && !hasNearerEntity) {
-                        double move_x = (pos.getX() - e.getX()) * 0.05;
-                        double move_y = (pos.getY() - e.getY()) * 0.05;
-                        double move_z = (pos.getZ() - e.getZ()) * 0.05;
-                        if (e.horizontalCollision) {
-                            e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                        } else {
-                            e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                        }
-                        PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
+            if (pass && !world.isClient) {
+                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && (((EntityAttractNbt) otherEntity).isAttracting()))).isEmpty();
+                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, otherEntity -> ((((EntityAttractNbt) otherEntity).isAttracting()))) != null;
+                if (!hasNearerPlayer && !hasNearerEntity) {
+                    Vec3d vec = pos.subtract(targetEntity.getPos()).multiply(0.05);
+                    if (targetEntity.horizontalCollision) {
+                        vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
                     }
+                    targetEntity.setVelocity(vec);
+                    PlayerLookup.tracking(targetEntity).forEach(player -> player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                 }
             }
         });
     }
 
     public static boolean isSameStack(ItemStack stack, ItemEntity entity) {
-        String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
-        boolean stackDamagePass = true;
-        boolean stackNbtPass = true;
         if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
+            boolean stackDamagePass = true;
+            boolean stackNbtPass = true;
             NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
-            boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item));
+            String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
+            boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item));
             if (stack.getNbt().getBoolean("CompareDamage") && inList) {
-                for (int i = 0; i < list.size(); i++) {
-                    if (Objects.equals(list.getCompound(i).getString("id"), item)) {
-                        if (list.getCompound(i).getCompound("tag").getInt("Damage") != entity.getStack().getDamage()) {
-                            stackDamagePass = false;
-                        }
-                    }
-                }
+                stackDamagePass = list.stream()
+                        .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
+                        .anyMatch(nbtElement -> ((NbtCompound) nbtElement).getInt("Damage") == entity.getStack().getDamage());
             }
             if (stack.getNbt().getBoolean("CompareNbt") && inList) {
-                for (int i = 0; i < list.size(); i++) {
-                    if (Objects.equals(list.getCompound(i).getString("id"), item)) {
-                        NbtList newList = list.copy();
-                        newList.getCompound(i).getCompound("tag").remove("Damage");
-                        ItemStack entityStack = entity.getStack();
-                        NbtCompound nbt = entityStack.getNbt();
-                        if (nbt != null) {
-                            NbtCompound newNbt = nbt.copy();
-                            newNbt.remove("Damage");
-                            if (!Objects.equals(newList.getCompound(i).getCompound("tag"), newNbt)) {
-                                stackNbtPass = false;
-                            }
-                        }
-                    }
+                NbtCompound nbt = entity.getStack().getNbt();
+                NbtCompound nbtWithoutDamage = new NbtCompound();
+                if (nbt != null) {
+                    nbtWithoutDamage = nbt.copy();
+                    nbtWithoutDamage.remove("Damage");
                 }
+                NbtCompound finalNbt = nbtWithoutDamage;
+                stackNbtPass = list.stream()
+                        .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
+                        .peek(nbtElement -> ((NbtCompound) nbtElement).getCompound("tag").remove("Damage"))
+                        .anyMatch(nbtElement -> ((NbtCompound) nbtElement).getCompound("tag").equals(finalNbt));
             }
             boolean isWhitelist = stack.getNbt().getBoolean("Whitelist");
             return (!isWhitelist || inList && stackDamagePass && stackNbtPass) && (isWhitelist || !inList || !stackDamagePass || !stackNbtPass);
@@ -233,29 +155,21 @@ public class AttractMethods {
         return true;
     }
 
-    public static boolean isAttracting(Entity entity) {
+    public static boolean canAttract(Entity entity) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        boolean hasTag = entity.getScoreboardTags().contains("MagnetCraft.isAttracting");
-        boolean noDegaussingEffect = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> o instanceof LivingEntity && ((LivingEntity) o).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && o.distanceTo(entity) <= degaussingDis && !o.isSpectator()).isEmpty();
-        boolean isLivingEntity = entity instanceof LivingEntity;
-        boolean isPlayerEntity = entity instanceof PlayerEntity;
-        if (hasTag && noDegaussingEffect) {
-            if (isLivingEntity) {
-                boolean hasStatusEffect = ((LivingEntity) entity).hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT);
-                if (!hasStatusEffect) {
-                    if (!isPlayerEntity) {
-                        return entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), o -> o instanceof PlayerEntity && ((PlayerEntity) o).getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable"))).isEmpty();
-                    }
-                    return true;
-                }
+        if (!entity.world.getEntitiesByClass(LivingEntity.class, entity.getBoundingBox().expand(degaussingDis), otherEntity -> otherEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && entity.getPos().isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator()).isEmpty()) {
+            return false;
+        }
+        if (entity instanceof LivingEntity livingEntity) {
+            if (livingEntity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT)) {
                 return false;
             }
+            if (!(livingEntity instanceof PlayerEntity)) {
+                return livingEntity.world.getEntitiesByClass(PlayerEntity.class, entity.getBoundingBox().expand(degaussingDis), player -> player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable"))).isEmpty();
+            }
             return true;
-        } else if (entity instanceof ItemEntity) {
-            ItemStack stack = ((ItemEntity) entity).getStack();
-            return stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
         }
-        return false;
+        return true;
     }
 
     public static void tickCheck(LivingEntity entity) {
@@ -270,6 +184,7 @@ public class AttractMethods {
         double disPerLvl = config.value.disPerLvl;
         double magnetSetMultiplier = config.value.magnetSetMultiplier >= 1 ? config.value.magnetSetMultiplier : 1.5;
         double netheriteMagnetSetMultiplier = config.value.netheriteMagnetSetMultiplier >= 1 ? config.value.netheriteMagnetSetMultiplier : 2;
+        EntityAttractNbt entityWithNbt = (EntityAttractNbt) entity;
         ItemStack head = entity.getEquippedStack(EquipmentSlot.HEAD);
         ItemStack chest = entity.getEquippedStack(EquipmentSlot.CHEST);
         ItemStack legs = entity.getEquippedStack(EquipmentSlot.LEGS);
@@ -294,13 +209,10 @@ public class AttractMethods {
         boolean handCreature = mainhandCreature || offhandCreature;
         boolean handMagnet = mainhandMagnet || offhandMagnet;
         boolean hasEnch = (EnchantmentMethods.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT));
-        boolean hasTag = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
+        boolean enable = entityWithNbt.getEnable();
         boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
-        boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean selected = mainhandMagnet || mainhandHasEnch || offhandMagnet || offhandHasEnch || mainhandCreature || offhandCreature;
-        boolean horseArmorAttracting = entity instanceof HorseEntity && ((HorseEntity) entity).getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
-        boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && !hasTag;
+        boolean horseArmorAttracting = entity instanceof HorseEntity horseEntity && horseEntity.getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
+        boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && enable;
         boolean hasMagneticIronHelmet = head.isOf(ItemRegistries.MAGNETIC_IRON_HELMET);
         boolean hasMagneticIronChestcplate = chest.isOf(ItemRegistries.MAGNETIC_IRON_CHESTPLATE);
         boolean hasMagneticIronLeggings = legs.isOf(ItemRegistries.MAGNETIC_IRON_LEGGINGS);
@@ -314,7 +226,6 @@ public class AttractMethods {
         boolean mainhandEmptyDamage = DamageMethods.isEmptyDamage(entity, net.minecraft.util.Hand.MAIN_HAND);
         boolean offhandEmptyDamage = DamageMethods.isEmptyDamage(entity, net.minecraft.util.Hand.OFF_HAND);
         boolean display = config.displayActionBar;
-        boolean player = entity.isPlayer();
         boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
         boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
         boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
@@ -325,22 +236,6 @@ public class AttractMethods {
         double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;
         double telDis;
         double finalTelDis = 0;
-        AttractMethods.Hand playerHand = AttractMethods.Hand.NONE;
-        ItemStack mainhandStack = ItemStack.EMPTY;
-        ItemStack offhandStack = ItemStack.EMPTY;
-        if (mainhandMagnet || mainhandHasEnch || mainhandCreature) {
-            mainhandStack = entity.getMainHandStack();
-            playerHand = AttractMethods.Hand.MAINHAND;
-        }
-        if (offhandMagnet || offhandHasEnch || offhandCreature) {
-            offhandStack = entity.getOffHandStack();
-            if (mainhandMagnet || mainhandCreature) playerHand = AttractMethods.Hand.HAND;
-            else playerHand = AttractMethods.Hand.OFFHAND;
-        }
-        if (playerHand == AttractMethods.Hand.HAND && (mainhandEmptyDamage || offhandEmptyDamage)) {
-            if (mainhandEmptyDamage) playerHand = AttractMethods.Hand.OFFHAND;
-            if (offhandEmptyDamage) playerHand = AttractMethods.Hand.MAINHAND;
-        }
         if (mainhandCreature && mainhandUsedTick >= 200) {
             NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
             nbt.putInt("usedTick", 0);
@@ -353,10 +248,11 @@ public class AttractMethods {
             entity.getOffHandStack().setNbt(nbt);
             DamageMethods.addDamage(entity, net.minecraft.util.Hand.OFF_HAND, 1, true);
         }
-        if (handCreature && !hasTag && ((playerHand == AttractMethods.Hand.MAINHAND && !mainhandEmptyDamage) || (playerHand == AttractMethods.Hand.OFFHAND && !offhandEmptyDamage) || (playerHand == AttractMethods.Hand.HAND && !mainhandEmptyDamage && !offhandEmptyDamage))) {
-            CreatureMagnetItem.attractCreatures(mainhandStack, offhandStack, entity, creatureDis, playerHand);
+        if (enable && ((mainhandCreature && !mainhandEmptyDamage) || (offhandCreature && !offhandEmptyDamage))) {
+            CreatureMagnetItem.attractCreatures(entity);
         }
-        if (isAttracting) {
+        //检测吸引
+        if (isAttracting && canAttract(entity)) {
             int amplifier;
             double dis;
             if (handMagnet || hasEnch) {
@@ -390,12 +286,12 @@ public class AttractMethods {
             }
             if (hasMagneticIronSuit) finalDis *= magnetSetMultiplier;
             if (hasNetheriteMagneticIronSuit) finalDis *= netheriteMagnetSetMultiplier;
-            AttractMethods.attractItems(mainhandStack, offhandStack, entity, selected, finalDis, playerHand);
-            entity.addScoreboardTag("MagnetCraft.isAttracting");
+            entityWithNbt.setAttracting(true, finalDis);
         } else {
-            entity.removeScoreboardTag("MagnetCraft.isAttracting");
+            entityWithNbt.setAttracting(false);
         }
-        if ((isAttracting || handCreature) && display && player) {
+        //信息栏
+        if ((entityWithNbt.isAttracting() || handCreature) && display && entity.isPlayer()) {
             String message;
             Text text;
             if (finalDis > 0) {
@@ -437,8 +333,8 @@ public class AttractMethods {
                 message = ": " + creatureDis;
                 text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
             }
-            if (entity instanceof ServerPlayerEntity) {
-                ((ServerPlayerEntity) entity).sendMessage(text, true);
+            if (entity instanceof ServerPlayerEntity serverPlayer) {
+                serverPlayer.sendMessage(text, true);
             }
         }
         if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && EnchantmentMethods.hasEnchantment(entity.getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {

@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.world.World;
 
-import static com.imoonday.magnetcraft.MagnetCraft.CORES_ADD_RECIPE;
+import static com.imoonday.magnetcraft.registries.special.RecipeRegistries.*;
 import static com.imoonday.magnetcraft.common.tags.ItemTags.CORES;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.MINERAL_MAGNET_ITEM;
 

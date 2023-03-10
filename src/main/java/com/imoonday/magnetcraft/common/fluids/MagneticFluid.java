@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.common.fluids;
 
 import com.imoonday.magnetcraft.api.AbstractMagneticFluid;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
@@ -96,15 +97,16 @@ public class MagneticFluid extends AbstractMagneticFluid {
     }
 
     public static void tick(LivingEntity entity) {
-        FluidState state = entity.getBlockStateAtPos().getFluidState();
-        if (state.isIn(FluidTags.MAGNETIC_FLUID) && entity.isTouchingWater()) {
-            double fluidHeight = state.getHeight();
-            int level = state.getLevel();
+        FluidState fluidState = entity.getBlockStateAtPos().getFluidState();
+        BlockState blockState = entity.getBlockStateAtPos();
+        if ((fluidState.isIn(FluidTags.MAGNETIC_FLUID) && entity.isTouchingWater()) || blockState.isOf(BlockRegistries.MAGNETIC_FLUID_CAULDRON)) {
+            double fluidHeight = fluidState.getHeight();
+            int level = fluidState.getLevel();
             double multiplier = 0.9 - level * 0.05;
             if (fluidHeight > 0.0) {
                 entity.setVelocity(entity.getVelocity().multiply(multiplier));
                 if (!entity.world.isClient && !(entity instanceof PlayerEntity)) {
-                    PlayerLookup.tracking(entity).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(entity)));
+                    PlayerLookup.tracking(entity).forEach(player -> player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(entity)));
                 }
             }
             StatusEffectInstance effect = entity.getStatusEffect(EffectRegistries.ATTRACT_EFFECT);

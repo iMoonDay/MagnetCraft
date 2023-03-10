@@ -10,7 +10,7 @@ import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.util.Identifier;
 
-public class CallbackRegistries {
+public class EventRegistries {
 
     private static final Identifier IRON_GOLEM_LOOT_TABLE_ID = EntityType.IRON_GOLEM.getLootTableId();
 

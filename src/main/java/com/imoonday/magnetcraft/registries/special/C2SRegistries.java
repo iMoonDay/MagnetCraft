@@ -7,7 +7,7 @@ import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
-public class ServerReceiverRegistries {
+public class C2SRegistries {
 
     public static void register() {
         ServerPlayNetworking.registerGlobalReceiver(KEYBINDINGS_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {

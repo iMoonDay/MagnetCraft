@@ -49,25 +49,26 @@ public class PolorMagnetItem extends FilterableItem {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        boolean reversal = ModConfig.getConfig().rightClickReversal;
+        int percent = ModConfig.getConfig().value.coolingPercentage;
+        int cooldown = 30 * percent / 100;
         boolean sneaking = user.isSneaking();
-        boolean flying = user.getAbilities().flying;
-        if (sneaking && flying) {
+        if (sneaking && user.getAbilities().flying) {
             sneaking = false;
         }
-        if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal)) {
+        if ((sneaking && !reversal) || (!sneaking && reversal)) {
             if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
                 }
             } else {
-                if (!enableSneakToSwitch) {
+                if (!sneakToSwitch) {
                     return super.use(world, user, hand);
                 }
                 enabledSwitch(world, user, hand);
             }
-            user.getItemCooldownManager().set(this, 30);
+            user.getItemCooldownManager().set(this, cooldown);
         }
         return super.use(world, user, hand);
     }

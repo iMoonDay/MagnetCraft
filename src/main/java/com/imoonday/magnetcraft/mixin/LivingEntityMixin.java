@@ -48,14 +48,14 @@ public abstract class LivingEntityMixin {
                 stack = sourceEntity instanceof TridentEntity ? ((TridentEntity) sourceEntity).asItemStack() : player.getMainHandStack();
                 boolean hasEnchantment = EnchantmentMethods.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
                 if (hasEnchantment) {
-                    world.getOtherEntities(null, entity.getBoundingBox(), e -> ((e instanceof ItemEntity || e instanceof ExperienceOrbEntity) && e.age == 0)).forEach(e -> {
-                        if (e instanceof ExperienceOrbEntity) {
-                            int amount = ((ExperienceOrbEntity) e).getExperienceAmount();
+                    world.getOtherEntities(null, entity.getBoundingBox(), targetEntity -> ((targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.age == 0)).forEach(targetEntity -> {
+                        if (targetEntity instanceof ExperienceOrbEntity) {
+                            int amount = ((ExperienceOrbEntity) targetEntity).getExperienceAmount();
                             player.addExperience(amount);
                         } else {
-                            player.getInventory().offerOrDrop(((ItemEntity) e).getStack());
+                            player.getInventory().offerOrDrop(((ItemEntity) targetEntity).getStack());
                         }
-                        e.kill();
+                        targetEntity.kill();
                     });
                 }
             }

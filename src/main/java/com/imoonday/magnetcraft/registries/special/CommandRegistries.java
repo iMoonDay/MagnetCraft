@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.registries.special;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -34,6 +35,35 @@ public class CommandRegistries {
     public static void register() {
         CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> dispatcher.register(literal("magnet")
                         .then(literal("nbthelper")
+                                .then(literal("self")
+                                        .then(literal("get")
+                                                .executes(context -> {
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                String text = "None";
+                                                                NbtCompound nbt = ((EntityAttractNbt) player).getAttractData();
+                                                                if (nbt != null) {
+                                                                    text = nbt.toString();
+                                                                }
+                                                                player.sendMessage(Text.literal(text));
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
+                                        .then(literal("initialize")
+                                                .executes(context -> {
+                                                            ServerPlayerEntity player = context.getSource().getPlayer();
+                                                            if (player != null) {
+                                                                if(((EntityAttractNbt) player).clearAttractData()){
+                                                                    player.sendMessage(Text.literal("Success"));
+                                                                }
+                                                            }
+                                                            return 0;
+                                                        }
+                                                )
+                                        )
+                                )
                                 .then(literal("mainhand")
                                         .executes(context -> {
                                                     ServerPlayerEntity player = context.getSource().getPlayer();
@@ -178,7 +208,7 @@ public class CommandRegistries {
                                 )
                         )
                         .requires(ServerCommandSource::isExecutedByPlayer)
-                        .requires(e -> e.hasPermissionLevel(4))
+                        .requires(source -> source.hasPermissionLevel(4))
                         .then(literal("blacklist")
                                 .then(literal("add")
                                         .executes(context -> {

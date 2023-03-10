@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.methods.EnchantmentMethods;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
@@ -23,7 +24,7 @@ public class DemagnetizerEntity extends BlockEntity {
     public static void tick(World world, BlockPos pos) {
         if (world.isReceivingRedstonePower(pos)) {
             int dis = world.getReceivedRedstonePower(pos) * 2;
-            world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(dis), e -> (e instanceof LivingEntity && !e.isSpectator() && !EnchantmentMethods.hasEnchantment(((LivingEntity) e).getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) && e.getScoreboardTags().contains("MagnetCraft.isAttracting")).forEach(e -> ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(EffectRegistries.UNATTRACT_EFFECT, 2, 0, false, false, false)));
+            world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(dis), entity -> (entity instanceof LivingEntity && !entity.isSpectator() && !EnchantmentMethods.hasEnchantment(((LivingEntity) entity).getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) && (((EntityAttractNbt)entity).isAttracting())).forEach(e -> ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(EffectRegistries.UNATTRACT_EFFECT, 2, 0, false, false, false)));
         }
     }
 }

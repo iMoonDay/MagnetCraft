@@ -70,7 +70,7 @@ public abstract class SwitchableItem extends Item {
             message = isMainhand ? Text.translatable("text.magnetcraft.message.mainhand_off") : Text.translatable("text.magnetcraft.message.offhand_off");
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
             if (stack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
-                player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), e -> (e.getScoreboardTags().contains(player.getEntityName()) && e instanceof LivingEntity && e.distanceTo(player) <= dis)).forEach(e -> e.removeScoreboardTag(player.getEntityName()));
+                player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), entity -> (entity.getScoreboardTags().contains(player.getEntityName()) && entity instanceof LivingEntity && entity.getPos().isInRange(player.getPos(),dis))).forEach(entity -> entity.removeScoreboardTag(player.getEntityName()));
             }
         }
         if (client) {

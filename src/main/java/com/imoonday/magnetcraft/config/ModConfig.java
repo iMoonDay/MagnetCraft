@@ -85,9 +85,13 @@ public class ModConfig implements ConfigData {
         public int requiredExperienceLevel = 5;
         @ConfigEntry.BoundedDiscrete(max = 5 * 64)
         public int removeFoodLevelEveryCount = 32;
+        //使用冷却增减百分比
+        @ConfigEntry.BoundedDiscrete(max = 200)
+        public int coolingPercentage = 100;
         //装备乘数
         public double magnetSetMultiplier = 1.5;
         public double netheriteMagnetSetMultiplier = 2;
+
     }
 
     public static void register() {

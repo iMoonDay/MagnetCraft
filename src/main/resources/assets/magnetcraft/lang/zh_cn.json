@@ -112,6 +112,7 @@
   "block.magnetcraft.maglev_oak_door": "磁悬浮橡木门",
   "block.magnetcraft.maglev_repeater": "磁悬浮红石中继器",
   "block.magnetcraft.maglev_comparator": "磁悬浮红石比较器",
+  "block.magnetcraft.magnetic_fluid_cauldron": "装有磁流体的炼药锅",
   "container.magnetcraft.advanced_grindstone_title": "附魔提取",
   "effect.magnetcraft.attract": "吸引",
   "effect.magnetcraft.degaussing": "消磁",
@@ -211,6 +212,7 @@
   "text.autoconfig.magnetcraft.option.value.maxEnchLvl": "最大附魔等级",
   "text.autoconfig.magnetcraft.option.value.requiredExperienceLevel": "矿物磁铁每次使用所需要的等级",
   "text.autoconfig.magnetcraft.option.value.removeFoodLevelEveryCount": "作物磁铁每次使用消耗一点饱食度的最低限度(0则不消耗)",
+  "text.autoconfig.magnetcraft.option.value.coolingPercentage": "百分比调整物品使用冷却时间",
   "text.autoconfig.magnetcraft.option.value.magnetSetMultiplier": "磁铁套装提升范围的倍率",
   "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "下界磁铁套装提升范围的倍率"
 }

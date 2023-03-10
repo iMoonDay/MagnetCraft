@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
-import com.imoonday.magnetcraft.methods.AttractMethods;
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -28,8 +28,8 @@ public class AttractSensorEntity extends BlockEntity {
             return;
         }
         HashMap<Double, Direction> disList = new HashMap<>();
-        world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(30), AttractMethods::isAttracting)
-                .forEach(e -> disList.put(Math.sqrt(pos.getSquaredDistance(e.getPos())), Direction.getFacing(pos.getX() - e.getX(), pos.getY() - e.getY(), pos.getZ() - e.getZ())));
+        world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(30), otherEntity -> ((EntityAttractNbt) otherEntity).isAttracting())
+                .forEach(otherEntity -> disList.put(Math.sqrt(pos.getSquaredDistance(otherEntity.getPos())), Direction.getFacing(pos.getX() - otherEntity.getX(), pos.getY() - otherEntity.getY(), pos.getZ() - otherEntity.getZ())));
         if (!disList.isEmpty()) {
             int minDis = Collections.min(disList.keySet()).intValue();
             entity.direction = disList.getOrDefault(Collections.min(disList.keySet()), Direction.UP);

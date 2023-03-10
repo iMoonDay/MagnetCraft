@@ -7,10 +7,10 @@ import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
 
 public class DamageMethods {
-    public static void addDamage(LivingEntity user, Hand hand, int damage, boolean checkUnbreaking) {
+    public static void addDamage(LivingEntity user, Hand hand, int damage, boolean unbreaking) {
         ItemStack stack = user.getStackInHand(hand);
-        if (checkUnbreaking) {
-            stack.damage(damage, user.getRandom(), user instanceof ServerPlayerEntity ? (ServerPlayerEntity) user : null);
+        if (unbreaking) {
+            stack.damage(damage, user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
         } else {
             boolean stackDamageable = stack.isDamageable();
             boolean creative = user.isPlayer() && ((PlayerEntity) user).isCreative();

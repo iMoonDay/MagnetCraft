@@ -1,18 +1,15 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethods;
-import com.imoonday.magnetcraft.methods.EnchantmentMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
-import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.boss.WitherEntity;
 import net.minecraft.entity.boss.dragon.EnderDragonEntity;
@@ -104,64 +101,47 @@ public class CreatureMagnetItem extends SwitchableItem {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
-        boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
+        boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
+        boolean reversal = ModConfig.getConfig().rightClickReversal;
+        int percent = ModConfig.getConfig().value.coolingPercentage;
+        int cooldown = 20 * percent / 100;
         boolean sneaking = user.isSneaking();
-        boolean enabled = stack.getOrCreateNbt().getBoolean("Enable");
         boolean cooling = user.getItemCooldownManager().isCoolingDown(this);
-        boolean entityCanAttract = !(entity.isPlayer()) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
+        boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
         boolean creative = user.isCreative();
-        if ((((!sneaking && !rightClickReversal) || (sneaking && rightClickReversal)) || !enableSneakToSwitch) && enabled && !cooling && entityCanAttract) {
+        boolean enable = stack.getOrCreateNbt().getBoolean("Enable");
+        if ((((!sneaking && !reversal) || (sneaking && reversal)) || !sneakToSwitch) && enable && !cooling && entityCanAttract) {
             if (!entity.addScoreboardTag(user.getEntityName())) {
                 entity.removeScoreboardTag(user.getEntityName());
             }
             if (!creative) {
-                user.getItemCooldownManager().set(this, 20);
+                user.getItemCooldownManager().set(this, cooldown);
             }
         }
         return ActionResult.PASS;
     }
 
-    public static void attractCreatures(ItemStack mainhandStack, ItemStack offhandStack, LivingEntity entity, double dis, AttractMethods.Hand hand) {
+    public static void attractCreatures(LivingEntity entity) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        boolean magnetOff = entity.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        boolean isMainhand = hand == AttractMethods.Hand.MAINHAND;
-        boolean isOffhand = hand == AttractMethods.Hand.OFFHAND;
-        boolean isHand = hand == AttractMethods.Hand.HAND;
-        boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.MAINHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.OFFHAND, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean equipmentsHasEnch = EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.HEAD, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.FEET, EnchantmentRegistries.ATTRACT_ENCHANTMENT) || EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.LEGS, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean mainhandEmpty = !equipmentsHasEnch && !offhandHasEnch && mainhandStack == ItemStack.EMPTY && isMainhand && entity.getMainHandStack().getItem() == Items.AIR;
-        boolean offhandEmpty = !equipmentsHasEnch && !mainhandHasEnch && offhandStack == ItemStack.EMPTY && isOffhand && entity.getOffHandStack().getItem() == Items.AIR;
-        boolean handEmpty = !equipmentsHasEnch && mainhandStack == ItemStack.EMPTY && offhandStack == ItemStack.EMPTY && isHand && entity.getMainHandStack().getItem() == Items.AIR && entity.getOffHandStack().getItem() == Items.AIR;
-        boolean isEmpty = mainhandEmpty || offhandEmpty || handEmpty;
-        boolean player = entity.isPlayer();
-        boolean client = entity.world.isClient;
-        boolean spectator = entity.isSpectator();
-        boolean creative = player && ((PlayerEntity) entity).isCreative();
-        boolean entityCanAttract;
-        if (!client) {
-            entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), e -> (e instanceof LivingEntity && ((LivingEntity) e).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && e.distanceTo(entity) <= degaussingDis && !e.isSpectator()).isEmpty();
-            if (!magnetOff && entityCanAttract && !isEmpty) {
-                entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), e -> (e.getScoreboardTags().contains(entity.getEntityName()) && e instanceof LivingEntity && e.distanceTo(entity) <= dis)).forEach(e -> {
-                    double move_x = (entity.getX() - e.getX()) * 0.05;
-                    double move_y = (entity.getY() - e.getY()) * 0.05;
-                    double move_z = (entity.getZ() - e.getZ()) * 0.05;
-                    ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
-                    ((LivingEntity) e).addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
-                    e.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, new Vec3d(entity.getX(), entity.getY() + 1, entity.getZ()));
-                    boolean stop = (e.getVelocity().getX() == 0.0 || e.getVelocity().getZ() == 0.0);
-                    if (stop) {
-                        e.setVelocity(new Vec3d(move_x, 0.25, move_z));
-                        e.setVelocityClient(move_x, 0.25, move_z);
-                    } else {
-                        e.setVelocity(new Vec3d(move_x, move_y, move_z));
-                        e.setVelocityClient(move_x, move_y, move_z);
+        int dis = ModConfig.getConfig().value.creatureMagnetAttractDis;
+        boolean handingMagnet = entity.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) || entity.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM);
+        if (!entity.world.isClient && handingMagnet) {
+            boolean entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && entity.getPos().isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator()).isEmpty();
+            if (((EntityAttractNbt) entity).getEnable() && entityCanAttract) {
+                entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), otherEntity -> (otherEntity.getScoreboardTags().contains(entity.getEntityName()) && otherEntity instanceof LivingEntity && otherEntity.getPos().isInRange(entity.getPos(), dis))).forEach(targetEntity -> {
+                    LivingEntity livingEntity = (LivingEntity) targetEntity;
+                    Vec3d vec = entity.getPos().subtract(targetEntity.getPos()).multiply(0.05);
+                    if (targetEntity.horizontalCollision) {
+                        vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
                     }
-                    PlayerLookup.tracking(e).forEach(o -> o.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(e)));
-                    if (!spectator && !creative) {
+                    livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
+                    livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
+                    targetEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
+                    targetEntity.setVelocity(vec);
+                    PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
+                    if (!entity.isSpectator() && !(entity instanceof PlayerEntity player && player.isCreative())) {
                         ItemStack stack;
-                        if (isMainhand || isHand) {
+                        if (entity.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
                             stack = entity.getMainHandStack();
                             int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
                             stack.getOrCreateNbt().putInt("UsedTick", tick);

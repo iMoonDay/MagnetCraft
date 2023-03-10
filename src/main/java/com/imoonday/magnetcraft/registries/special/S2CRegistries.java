@@ -6,7 +6,7 @@ import net.minecraft.client.network.ClientPlayerEntity;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.USE_CONTROLLER_PACKET_ID;
 
-public class ClientReceiverRegistries {
+public class S2CRegistries {
 
     public static void registerClient() {
 

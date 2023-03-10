@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.PotionRegistries;
@@ -26,11 +27,8 @@ public class ArrowEntityMixin {
             if (world == null) return;
             boolean isAttracting = this.potion == PotionRegistries.ATTRACT_POTION;
             double dis = ModConfig.getConfig().value.arrowAttractDis;
-            if (isAttracting) {
-                entity.addScoreboardTag("MagnetCraft.isAttracting");
-                if (!world.isClient) {
-                    AttractMethods.attractItems(entity, dis);
-                }
+            if (isAttracting && AttractMethods.canAttract(entity)) {
+                ((EntityAttractNbt) entity).setAttracting(true, dis);
             }
         }
     }

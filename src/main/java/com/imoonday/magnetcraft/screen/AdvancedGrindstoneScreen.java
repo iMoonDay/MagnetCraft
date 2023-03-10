@@ -64,7 +64,7 @@ public class AdvancedGrindstoneScreen extends HandledScreen<AdvancedGrindstoneSc
         }
         List<Text> tooltip = new ArrayList<>();
         NbtCompound nbtCompound = EnchantedBookItem.getEnchantmentNbt(this.handler.getResult().getStack(0)).getCompound(0);
-        Registries.ENCHANTMENT.getOrEmpty(EnchantmentHelper.getIdFromNbt(nbtCompound)).ifPresent(e -> tooltip.add(e.getName(EnchantmentHelper.getLevelFromNbt(nbtCompound))));
+        Registries.ENCHANTMENT.getOrEmpty(EnchantmentHelper.getIdFromNbt(nbtCompound)).ifPresent(enchantment -> tooltip.add(enchantment.getName(EnchantmentHelper.getLevelFromNbt(nbtCompound))));
         if (!tooltip.isEmpty()) {
             int textWidth = textRenderer.getWidth(tooltip.get(0));
             int half = textWidth / 2;

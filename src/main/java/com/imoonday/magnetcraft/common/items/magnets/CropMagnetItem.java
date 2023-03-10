@@ -72,15 +72,18 @@ public class CropMagnetItem extends FilterableItem {
             }
         } else {
             int levelEveryCount = ModConfig.getConfig().value.removeFoodLevelEveryCount;
+            int percent = ModConfig.getConfig().value.coolingPercentage;
             if (!DamageMethods.isEmptyDamage(user, hand)) {
                 int crops = searchCrops(user, hand);
                 int removeFoodLevel = levelEveryCount != 0 ? crops / levelEveryCount + (crops % levelEveryCount == 0 ? 0 : 1) : 0;
                 boolean success = crops > 0;
                 if (success && !user.isCreative()) {
+                    int cooldown = (1 + removeFoodLevel) * 5 * 20 * percent / 100;
                     user.getHungerManager().setFoodLevel(user.getHungerManager().getFoodLevel() - removeFoodLevel);
-                    user.getItemCooldownManager().set(this, (1 + removeFoodLevel) * 5 * 20);
+                    user.getItemCooldownManager().set(this, cooldown);
                 } else {
-                    user.getItemCooldownManager().set(this, 20);
+                    int cooldown = 20 * percent / 100;
+                    user.getItemCooldownManager().set(this, cooldown);
                 }
             }
         }
@@ -90,8 +93,8 @@ public class CropMagnetItem extends FilterableItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
-        if (user instanceof PlayerEntity && user.isSpectator() && ((PlayerEntity) user).getItemCooldownManager().isCoolingDown(this)) {
-            ((PlayerEntity) user).getItemCooldownManager().remove(this);
+        if (user instanceof PlayerEntity player && user.isSpectator() && player.getItemCooldownManager().isCoolingDown(this)) {
+            player.getItemCooldownManager().remove(this);
         }
     }
 

@@ -112,6 +112,7 @@
   "block.magnetcraft.maglev_oak_door": "Maglev Oak Door",
   "block.magnetcraft.maglev_repeater": "Maglev Repeater",
   "block.magnetcraft.maglev_comparator": "Maglev Comparator",
+  "block.magnetcraft.magnetic_fluid_cauldron": "Magnetic Fluid Cauldron",
   "container.magnetcraft.advanced_grindstone_title": "Enchantment Extraction",
   "effect.magnetcraft.attract": "Attract",
   "effect.magnetcraft.degaussing": "Degaussing",
@@ -211,6 +212,7 @@
   "text.autoconfig.magnetcraft.option.value.maxEnchLvl": "Max enchant level",
   "text.autoconfig.magnetcraft.option.value.requiredExperienceLevel": "The experience level required for each use of mineral magnet",
   "text.autoconfig.magnetcraft.option.value.removeFoodLevelEveryCount": "Crop magnet consume a minimum of food level once per use (0 is not consumed)",
+  "text.autoconfig.magnetcraft.option.value.coolingPercentage": "Percentage adjusts item usage cooldown",
   "text.autoconfig.magnetcraft.option.value.magnetSetMultiplier": "Magnet set lifting range multiplier",
   "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "Netherite Magnet set lifting range multiplier"
 }

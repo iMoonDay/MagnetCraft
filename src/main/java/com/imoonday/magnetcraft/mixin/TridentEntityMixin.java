@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
@@ -16,7 +17,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @Mixin(TridentEntity.class)
 public class TridentEntityMixin {
 
-    @Shadow private ItemStack tridentStack;
+    @Shadow
+    private ItemStack tridentStack;
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
     public void checkAttract(CallbackInfo info) {
@@ -26,15 +28,14 @@ public class TridentEntityMixin {
             if (world == null) return;
             ModConfig config = ModConfig.getConfig();
             ItemStack stack = this.tridentStack;
-            int enchLvl = EnchantmentHelper.getLevel(EnchantmentRegistries.ATTRACT_ENCHANTMENT,stack);
+            int enchLvl = EnchantmentHelper.getLevel(EnchantmentRegistries.ATTRACT_ENCHANTMENT, stack);
             boolean isAttracting = enchLvl > 0;
             double enchDefaultDis = config.value.enchDefaultDis;
             double disPerLvl = config.value.disPerLvl;
             double enchMinDis = enchDefaultDis + disPerLvl;
             double dis = enchMinDis + (enchLvl - 1) * disPerLvl;
-            if (isAttracting) {
-                entity.addScoreboardTag("MagnetCraft.isAttracting");
-                AttractMethods.attractItems(entity,dis);
+            if (isAttracting && AttractMethods.canAttract(entity)) {
+                ((EntityAttractNbt) entity).setAttracting(true, dis);
             }
         }
     }

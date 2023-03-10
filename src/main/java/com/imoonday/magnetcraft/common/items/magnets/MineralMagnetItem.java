@@ -131,12 +131,15 @@ public class MineralMagnetItem extends Item {
             }
         } else {
             if (!DamageMethods.isEmptyDamage(user, hand)) {
+                int percent = ModConfig.getConfig().value.coolingPercentage;
                 int value = searchMineral(user, hand);
                 boolean success = value > 0;
                 if (success && !user.isCreative()) {
-                    user.getItemCooldownManager().set(this, value * 20);
+                    int cooldown = value * 20 * percent / 100;
+                    user.getItemCooldownManager().set(this, cooldown);
                 } else {
-                    user.getItemCooldownManager().set(this, 20);
+                    int cooldown = 20 * percent / 100;
+                    user.getItemCooldownManager().set(this, cooldown);
                 }
             }
         }
@@ -195,7 +198,7 @@ public class MineralMagnetItem extends Item {
                         ServerWorld world = (ServerWorld) player.world;
                         BlockEntity blockEntity = world.getBlockEntity(pos);
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, IRON_PICKAXE.getDefaultStack());
-                        boolean nbtPass = droppedStacks.stream().anyMatch(e -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(e.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
+                        boolean nbtPass = droppedStacks.stream().anyMatch(stack -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(stack.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
                         if (state.isIn(ORES) && nbtPass) {
                             droppedStacks.forEach(e -> player.getInventory().offerOrDrop(e));
                             world.breakBlock(pos, false, player);

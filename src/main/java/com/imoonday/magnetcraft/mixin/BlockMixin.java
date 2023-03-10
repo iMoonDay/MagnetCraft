@@ -27,7 +27,7 @@ public class BlockMixin {
     public void afterBreak(World world, PlayerEntity player, BlockPos pos, BlockState state, BlockEntity blockEntity, ItemStack stack, CallbackInfo ci) {
         boolean hasEnchantment = EnchantmentMethods.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_COLLECTION_ENCHANTMENT);
         if (hasEnchantment) {
-            Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, stack).forEach(e -> player.getInventory().offerOrDrop(e));
+            Block.getDroppedStacks(state, (ServerWorld) world, pos, blockEntity, player, stack).forEach(itemStack -> player.getInventory().offerOrDrop(itemStack));
             ci.cancel();
         }
     }

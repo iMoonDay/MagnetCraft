@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.items;
 
+import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.DamageMethods;
@@ -29,9 +30,6 @@ public class MagnetControllerItem extends FilterableItem {
     public MagnetControllerItem(Settings settings) {
         super(settings);
     }
-
-    boolean ClientOFF;
-    boolean ServerOFF;
 
     public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
@@ -72,20 +70,16 @@ public class MagnetControllerItem extends FilterableItem {
 
     public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
-        boolean creative = user.isCreative();
-        boolean isEmptyDamage = DamageMethods.isEmptyDamage(user, hand);
-        boolean hasEffect = user.getActiveStatusEffects().containsKey(EffectRegistries.DEGAUSSING_EFFECT);
         boolean sneaking = user.isSneaking();
-        boolean flying = user.getAbilities().flying;
-        if (sneaking && flying) {
+        if (sneaking && user.getAbilities().flying) {
             sneaking = false;
         }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal) && selected) {
-            if (!creative && isEmptyDamage) {
+            if (!user.isCreative() && DamageMethods.isEmptyDamage(user, hand)) {
                 return;
             }
-            DamageMethods.addDamage(user, hand, 1,true);
-            if (hasEffect) {
+            DamageMethods.addDamage(user, hand, 1, true);
+            if (user.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) {
                 user.removeStatusEffect(EffectRegistries.DEGAUSSING_EFFECT);
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_MILK, 1, 1);
                 user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
@@ -102,45 +96,28 @@ public class MagnetControllerItem extends FilterableItem {
     }
 
     public static void changeMagnetEnable(PlayerEntity user) {
+        EntityAttractNbt nbt = (EntityAttractNbt) user;
         boolean display = ModConfig.getConfig().displayActionBar;
-        boolean hasTag = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        boolean isClient = user.world.isClient;
         Text message;
         SoundEvent sound;
-        if (hasTag) {
-            user.removeScoreboardTag("MagnetCraft.MagnetOFF");
-            sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
-            message = Text.translatable("text.magnetcraft.message.magnet_on");
-        } else {
-            user.addScoreboardTag("MagnetCraft.MagnetOFF");
+        if (nbt.getEnable()) {
+            nbt.setEnable(false);
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
             message = Text.translatable("text.magnetcraft.message.magnet_off");
+        } else {
+            nbt.setEnable(true);
+            sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
+            message = Text.translatable("text.magnetcraft.message.magnet_on");
         }
         user.playSound(sound, 1, 1);
-        if (display && !isClient) {
+        if (display && !user.world.isClient) {
             user.sendMessage(message, true);
         }
     }
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
-        boolean client = user.world.isClient;
-        if (client) {
-            ClientOFF = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        } else {
-            ServerOFF = user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        }
-        if (ClientOFF != ServerOFF) {
-            if (client) {
-                if (ServerOFF) {
-                    user.addScoreboardTag("MagnetCraft.MagnetOFF");
-                } else {
-                    user.removeScoreboardTag("MagnetCraft.MagnetOFF");
-                }
-            }
-        }
-        boolean enabled = !user.getScoreboardTags().contains("MagnetCraft.MagnetOFF");
-        stack.getOrCreateNbt().putBoolean("Enable", enabled);
+        stack.getOrCreateNbt().putBoolean("Enable", ((EntityAttractNbt) user).getEnable());
     }
 }
 

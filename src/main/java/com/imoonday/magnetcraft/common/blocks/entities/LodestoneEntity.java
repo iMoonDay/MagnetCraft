@@ -164,9 +164,9 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
     }
 
     public static void putItemEntityIn(World world, BlockPos blockPos, LodestoneEntity blockEntity, Direction direction) {
-        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).forEach(e -> {
+        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).forEach(entity -> {
             DefaultedList<ItemStack> inventory = blockEntity.inventory;
-            ItemStack stack = ((ItemEntity) e).getStack();
+            ItemStack stack = ((ItemEntity) entity).getStack();
             boolean hasEmptySlot = false;
             boolean hasSameStack = false;
             boolean overflow = false;
@@ -187,7 +187,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
             }
             if (hasEmptySlot) {
                 inventory.set(slot, stack);
-                e.kill();
+                entity.kill();
             } else if (hasSameStack) {
                 if (overflow) {
                     inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
@@ -195,7 +195,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                 } else {
                     stack.increment(inventory.get(slot).getCount());
                     inventory.set(slot, stack);
-                    e.kill();
+                    entity.kill();
                 }
             }
         });

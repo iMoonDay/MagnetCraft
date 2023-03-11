@@ -39,11 +39,18 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
         ItemStack stack = super.getDefaultStack();
         stack.getOrCreateNbt().putBoolean("Filterable", true);
         filterSet(stack);
+        if (canTeleportItems()) {
+            shulkerBoxCheck(stack);
+        }
         return stack;
     }
 
     @Override
-    public void onCraft(ItemStack stack, World world, PlayerEntity player) {filterSet(stack);
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
+        filterSet(stack);
+        if (canTeleportItems()) {
+            shulkerBoxSet(stack);
+        }
     }
 
     @Override
@@ -69,6 +76,9 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
         filterCheck(stack);
+        if (canTeleportItems()) {
+            shulkerBoxCheck(stack);
+        }
     }
 
     @Override
@@ -78,7 +88,6 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
 
     public void openScreen(PlayerEntity player, Hand hand, FilterableItem filterableMagnetItem) {
         filterableMagnetItem.inventory.clear();
-        player.getInventory().markDirty();
         ItemStack stack = player.getStackInHand(hand);
         int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : -1;
         NbtList list = stack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
@@ -134,7 +143,7 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
 
     public static void setFilterItems(ItemStack stack, ArrayList<ItemStack> stacks) {
         filterCheck(stack);
-        NbtList list = stack.getOrCreateNbt().getList("Filter", NbtElement.STRING_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
         list.clear();
         for (ItemStack otherStack : stacks) {
             NbtCompound otherStackNbt = otherStack.writeNbt(new NbtCompound());
@@ -155,6 +164,33 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
 
     public static void setBoolean(ItemStack stack, String key) {
         stack.getOrCreateNbt().putBoolean(key, !stack.getOrCreateNbt().getBoolean(key));
+    }
+
+    public static void shulkerBoxCheck(ItemStack stack) {
+        if (stack.getNbt() == null || !stack.getNbt().contains("ShulkerBox")) {
+            shulkerBoxSet(stack);
+        }
+    }
+
+    public static void shulkerBoxSet(ItemStack stack) {
+        if (!stack.getOrCreateNbt().contains("ShulkerBox")) {
+            stack.getOrCreateNbt().put("ShulkerBox", new NbtCompound());
+        }
+    }
+
+    public static void setShulkerBoxItems(ItemStack stack, ArrayList<ItemStack> stacks) {
+        shulkerBoxCheck(stack);
+        NbtList list = stack.getOrCreateNbt().getList("ShulkerBox", NbtElement.COMPOUND_TYPE);
+        list.clear();
+        for (ItemStack otherStack : stacks) {
+            NbtCompound otherStackNbt = otherStack.writeNbt(new NbtCompound());
+            list.add(otherStackNbt);
+        }
+        stack.getOrCreateNbt().put("ShulkerBox", list);
+    }
+
+    public boolean canTeleportItems() {
+        return false;
     }
 
 }

@@ -206,4 +206,9 @@ public class CropMagnetItem extends FilterableItem {
         return 14;
     }
 
+    @Override
+    public boolean canTeleportItems() {
+        return true;
+    }
+
 }

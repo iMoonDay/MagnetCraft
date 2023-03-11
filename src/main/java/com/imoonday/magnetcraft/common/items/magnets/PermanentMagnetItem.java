@@ -86,4 +86,9 @@ public class PermanentMagnetItem extends FilterableItem {
         return 16;
     }
 
+    @Override
+    public boolean canTeleportItems() {
+        return true;
+    }
+
 }

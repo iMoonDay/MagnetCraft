@@ -99,7 +99,7 @@ public class MineralMagnetScreen extends HandledScreen<MineralMagnetScreenHandle
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
-        drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        drawTexture(matrices, x, y, 0, 0, backgroundWidth + 23, backgroundHeight);
         Item[] items = new Item[]{QUARTZ, RAW_MAGNET_ITEM};
         for (int i = 0; i < 2; i++) {
             if (canDestory(items[i])) {

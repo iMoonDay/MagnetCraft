@@ -27,7 +27,8 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
     @Override
     public void close() {
         super.close();
-        this.handler.getInventory().clear();
+        this.handler.getFilterSlots().clear();
+        this.handler.getShulkerBoxSlots().clear();
     }
 
     @Override
@@ -72,12 +73,14 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
         boolean enable = nbt.getBoolean("Enable");
         boolean compareDamage = nbt.getBoolean("CompareDamage");
         boolean compareNbt = nbt.getBoolean("CompareNbt");
+        boolean crop = this.handler.isCropMagnet();
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
-        drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        int width = crop ? backgroundWidth : backgroundWidth + 23;
+        drawTexture(matrices, x, y, 0, 0, width, backgroundHeight);
         boolean onEnable = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.enable")) && mouseY >= y + 6 && mouseY <= y + 6 + 8;
         boolean onWhitelist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")) && mouseY >= y + 22 && mouseY <= y + 22 + 8;
         boolean onBlacklist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")) && mouseY >= y + 38 && mouseY <= y + 38 + 8;
@@ -106,7 +109,7 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
                 drawTexture(matrices, x + 11, y + 38, 0, 174, 8, 8);
             }
         }
-        if (!this.handler.isCropMagnet()) {
+        if (!crop) {
             if (compareDamage) {
                 if (onCompareDamage) {
                     drawTexture(matrices, x + 157, y + 22, 8, 174, 8, 8);

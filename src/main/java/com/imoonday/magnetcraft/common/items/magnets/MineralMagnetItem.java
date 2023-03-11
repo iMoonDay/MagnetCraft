@@ -37,6 +37,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.imoonday.magnetcraft.api.FilterableItem.shulkerBoxCheck;
+import static com.imoonday.magnetcraft.api.FilterableItem.shulkerBoxSet;
+import static com.imoonday.magnetcraft.common.items.magnets.ElectromagnetItem.tryInsertIntoShulkerBox;
 import static com.imoonday.magnetcraft.common.tags.BlockTags.MAGNETITE_ORES;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags.ORES;
@@ -85,6 +88,7 @@ public class MineralMagnetItem extends Item {
         ItemStack stack = super.getDefaultStack();
         stack.getOrCreateNbt().putBoolean("Filterable", true);
         coresSet(stack);
+        shulkerBoxSet(stack);
         return stack;
     }
 
@@ -106,6 +110,7 @@ public class MineralMagnetItem extends Item {
     @Override
     public void onCraft(ItemStack stack, World world, PlayerEntity player) {
         coresCheck(stack);
+        shulkerBoxCheck(stack);
     }
 
     @Override
@@ -136,7 +141,6 @@ public class MineralMagnetItem extends Item {
                 boolean success = value > 0;
                 if (success && !user.isCreative()) {
                     CooldownMethods.setCooldown(user, user.getStackInHand(hand), value * 20);
-
                 } else {
                     CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
 
@@ -150,6 +154,7 @@ public class MineralMagnetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
         coresCheck(stack);
+        shulkerBoxCheck(stack);
         if (user instanceof PlayerEntity player && user.isSpectator() && player.getItemCooldownManager().isCoolingDown(this)) {
             player.getItemCooldownManager().remove(this);
         }
@@ -200,7 +205,7 @@ public class MineralMagnetItem extends Item {
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, IRON_PICKAXE.getDefaultStack());
                         boolean nbtPass = droppedStacks.stream().anyMatch(stack -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(stack.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
                         if (state.isIn(ORES) && nbtPass) {
-                            droppedStacks.forEach(e -> player.getInventory().offerOrDrop(e));
+                            droppedStacks.forEach(stack -> tryInsertIntoShulkerBox(player, hand, stack));
                             world.breakBlock(pos, false, player);
                             if (state.isIn(COAL_ORES)) {
                                 coal++;

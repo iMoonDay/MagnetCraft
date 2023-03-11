@@ -133,7 +133,9 @@ public class CreatureMagnetItem extends SwitchableItem {
                         vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
                     }
                     livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
-                    livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
+                    if (!livingEntity.isOnGround()) {
+                        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
+                    }
                     targetEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
                     if (targetEntity.getPos().isInRange(entity.getPos(), 1)) {
                         vec = Vec3d.ZERO;

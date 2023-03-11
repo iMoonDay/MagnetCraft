@@ -79,7 +79,6 @@ public class ModConfig implements ConfigData {
         @ConfigEntry.BoundedDiscrete(max = 30)
         public int disEachClick = 5;
         @ConfigEntry.BoundedDiscrete(min = 1, max = 10)
-        @ConfigEntry.Gui.RequiresRestart
         public int maxEnchLvl = 5;
         @ConfigEntry.BoundedDiscrete(max = 30)
         public int requiredExperienceLevel = 5;

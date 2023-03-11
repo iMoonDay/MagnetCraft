@@ -16,8 +16,8 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -75,10 +75,10 @@ public class AttractMethods {
                 boolean hasNearerPlayer;
                 boolean hasNearerEntity = false;
                 if (entity instanceof PlayerEntity) {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, otherEntity -> (((EntityAttractNbt) otherEntity).isAttracting())) != entity;
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, EntityAttractNbt::isAttracting) != entity;
                 } else {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, otherEntity -> (((EntityAttractNbt) otherEntity).isAttracting())) != null;
-                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && (((EntityAttractNbt) otherEntity).isAttracting()))).isEmpty();
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, EntityAttractNbt::isAttracting) != null;
+                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && (otherEntity.isAttracting()))).isEmpty();
                 }
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = entity.getPos().subtract(targetEntity.getPos()).multiply(0.05);
@@ -110,8 +110,8 @@ public class AttractMethods {
                 pass = (!whitelistEnable || whitelist.contains(item)) && (!blacklistEnable || !blacklist.contains(item)) && noDegaussingEntity;
             }
             if (pass && !world.isClient) {
-                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && (((EntityAttractNbt) otherEntity).isAttracting()))).isEmpty();
-                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, otherEntity -> ((((EntityAttractNbt) otherEntity).isAttracting()))) != null;
+                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && (otherEntity.isAttracting()))).isEmpty();
+                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, EntityAttractNbt::isAttracting) != null;
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = pos.subtract(targetEntity.getPos()).multiply(0.05);
                     if (targetEntity.horizontalCollision) {
@@ -184,32 +184,36 @@ public class AttractMethods {
         double disPerLvl = config.value.disPerLvl;
         double magnetSetMultiplier = config.value.magnetSetMultiplier >= 1 ? config.value.magnetSetMultiplier : 1.5;
         double netheriteMagnetSetMultiplier = config.value.netheriteMagnetSetMultiplier >= 1 ? config.value.netheriteMagnetSetMultiplier : 2;
-        EntityAttractNbt entityWithNbt = (EntityAttractNbt) entity;
         ItemStack head = entity.getEquippedStack(EquipmentSlot.HEAD);
         ItemStack chest = entity.getEquippedStack(EquipmentSlot.CHEST);
         ItemStack legs = entity.getEquippedStack(EquipmentSlot.LEGS);
         ItemStack feet = entity.getEquippedStack(EquipmentSlot.FEET);
-        ItemStack mainhand = entity.getEquippedStack(EquipmentSlot.MAINHAND);
-        ItemStack offhand = entity.getEquippedStack(EquipmentSlot.OFFHAND);
-        boolean mainhandEnabled = mainhand.getNbt() != null && mainhand.getNbt().getBoolean("Enable");
-        boolean offhandEnabled = offhand.getNbt() != null && offhand.getNbt().getBoolean("Enable");
-        boolean mainhandElectromagnet = mainhand.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && mainhandEnabled;
-        boolean mainhandPermanent = mainhand.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && mainhandEnabled;
-        boolean mainhandPolar = mainhand.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && mainhandEnabled;
-        boolean mainhandCreature = mainhand.isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && mainhandEnabled;
+        ItemStack mainhandStack = entity.getEquippedStack(EquipmentSlot.MAINHAND);
+        ItemStack offhandStack = entity.getEquippedStack(EquipmentSlot.OFFHAND);
+        boolean mainhandEnabled = mainhandStack.getNbt() != null && mainhandStack.getNbt().getBoolean("Enable");
+        boolean offhandEnabled = offhandStack.getNbt() != null && offhandStack.getNbt().getBoolean("Enable");
+        boolean mainhandElectromagnet = mainhandStack.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && mainhandEnabled;
+        boolean mainhandPermanent = mainhandStack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && mainhandEnabled;
+        boolean mainhandPolar = mainhandStack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && mainhandEnabled;
+        boolean mainhandCreature = mainhandStack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && mainhandEnabled;
         boolean mainhandMagnet = mainhandElectromagnet || mainhandPermanent || mainhandPolar;
-        boolean offhandElectromagnet = offhand.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && offhandEnabled;
-        boolean offhandPermanent = offhand.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && offhandEnabled;
-        boolean offhandPolar = offhand.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && offhandEnabled;
-        boolean offhandCreature = offhand.isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && offhandEnabled;
+        boolean offhandElectromagnet = offhandStack.isOf(ItemRegistries.ELECTROMAGNET_ITEM) && offhandEnabled;
+        boolean offhandPermanent = offhandStack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) && offhandEnabled;
+        boolean offhandPolar = offhandStack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && offhandEnabled;
+        boolean offhandCreature = offhandStack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && offhandEnabled;
         boolean offhandMagnet = offhandElectromagnet || offhandPermanent || offhandPolar;
         boolean handElectromagnet = mainhandElectromagnet || offhandElectromagnet;
         boolean handPermanent = mainhandPermanent || offhandPermanent;
         boolean handPolar = mainhandPolar || offhandPolar;
         boolean handCreature = mainhandCreature || offhandCreature;
         boolean handMagnet = mainhandMagnet || offhandMagnet;
-        boolean hasEnch = (EnchantmentMethods.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT));
-        boolean enable = entityWithNbt.getEnable();
+        boolean hasEnch = EnchantmentMethods.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(mainhandStack, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(offhandStack, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean mainhandMagnetHasEnch = mainhandMagnet && mainhandHasEnch;
+        boolean offhandMagnetHasEnch = offhandMagnet && offhandHasEnch;
+        boolean handMagnetHasEnch = mainhandMagnetHasEnch || offhandMagnetHasEnch;
+        boolean enable = entity.getEnable();
         boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
         boolean horseArmorAttracting = entity instanceof HorseEntity horseEntity && horseEntity.getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
         boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && enable;
@@ -230,23 +234,25 @@ public class AttractMethods {
         boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
         boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
         int enchLvl = EnchantmentMethods.getEnchantmentLvl(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        int mainhandUsedTick = entity.getMainHandStack().getNbt() != null ? entity.getMainHandStack().getNbt().getInt("usedTick") : 0;
-        int offhandUsedTick = entity.getOffHandStack().getNbt() != null ? entity.getOffHandStack().getNbt().getInt("usedTick") : 0;
+        int mainhandUsedTick = entity.getMainHandStack().getNbt() != null ? entity.getMainHandStack().getNbt().getInt("UsedTick") : 0;
+        int offhandUsedTick = entity.getOffHandStack().getNbt() != null ? entity.getOffHandStack().getNbt().getInt("UsedTick") : 0;
         double enchMinDis = enchDefaultDis + disPerLvl;
         double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;
         double telDis;
         double finalTelDis = 0;
-        if (mainhandCreature && mainhandUsedTick >= 200) {
+        while (mainhandCreature && mainhandUsedTick >= 200) {
             NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
-            nbt.putInt("usedTick", 0);
+            nbt.putInt("UsedTick", mainhandUsedTick - 200);
             entity.getMainHandStack().setNbt(nbt);
-            DamageMethods.addDamage(entity, net.minecraft.util.Hand.MAIN_HAND, 1, true);
+            DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1, true);
+            mainhandUsedTick -= 200;
         }
-        if (offhandCreature && offhandUsedTick >= 200) {
+        while (mainhandCreature && offhandUsedTick >= 200) {
             NbtCompound nbt = entity.getOffHandStack().getOrCreateNbt();
-            nbt.putInt("usedTick", 0);
-            entity.getOffHandStack().setNbt(nbt);
-            DamageMethods.addDamage(entity, net.minecraft.util.Hand.OFF_HAND, 1, true);
+            nbt.putInt("UsedTick", offhandUsedTick - 200);
+            entity.getMainHandStack().setNbt(nbt);
+            DamageMethods.addDamage(entity, Hand.OFF_HAND, 1, true);
+            offhandUsedTick -= 200;
         }
         if (enable && ((mainhandCreature && !mainhandEmptyDamage) || (offhandCreature && !offhandEmptyDamage))) {
             CreatureMagnetItem.attractCreatures(entity);
@@ -264,6 +270,9 @@ public class AttractMethods {
                             if (offhandItems[i]) {
                                 dis += magnetHandSpacing;
                             }
+                        }
+                        if (handMagnetHasEnch) {
+                            dis += enchMinDis + (enchLvl - 1) * disPerLvl;
                         }
                         if (dis > finalDis) {
                             finalDis = dis;
@@ -286,15 +295,15 @@ public class AttractMethods {
             }
             if (hasMagneticIronSuit) finalDis *= magnetSetMultiplier;
             if (hasNetheriteMagneticIronSuit) finalDis *= netheriteMagnetSetMultiplier;
-            entityWithNbt.setAttracting(true, finalDis);
+            entity.setAttracting(true, finalDis);
         } else {
-            entityWithNbt.setAttracting(false);
+            entity.setAttracting(false);
         }
         //信息栏
-        if ((entityWithNbt.isAttracting() || handCreature) && display && entity.isPlayer()) {
+        if (((isAttracting && canAttract(entity)) || handCreature) && display && entity instanceof PlayerEntity player) {
             String message;
             Text text;
-            if (finalDis > 0) {
+            if (isAttracting) {
                 message = ": " + finalDis;
                 text = Text.translatable("text.magnetcraft.message.attract").append(message);
                 if (handElectromagnet || handPermanent) {
@@ -333,11 +342,9 @@ public class AttractMethods {
                 message = ": " + creatureDis;
                 text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
             }
-            if (entity instanceof ServerPlayerEntity serverPlayer) {
-                serverPlayer.sendMessage(text, true);
-            }
+            player.sendMessage(text, true);
         }
-        if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && EnchantmentMethods.hasEnchantment(entity.getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {
+        if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {
             entity.removeStatusEffect(EffectRegistries.UNATTRACT_EFFECT);
         }
     }

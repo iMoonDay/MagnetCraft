@@ -28,7 +28,7 @@ public class AttractSensorEntity extends BlockEntity {
             return;
         }
         HashMap<Double, Direction> disList = new HashMap<>();
-        world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(30), otherEntity -> ((EntityAttractNbt) otherEntity).isAttracting())
+        world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(30), EntityAttractNbt::isAttracting)
                 .forEach(otherEntity -> disList.put(Math.sqrt(pos.getSquaredDistance(otherEntity.getPos())), Direction.getFacing(pos.getX() - otherEntity.getX(), pos.getY() - otherEntity.getY(), pos.getZ() - otherEntity.getZ())));
         if (!disList.isEmpty()) {
             int minDis = Collections.min(disList.keySet()).intValue();

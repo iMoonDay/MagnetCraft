@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -88,7 +88,7 @@ public class CreatureMagnetItem extends SwitchableItem {
                 return super.use(world, user, hand);
             }
             enabledSwitch(world, user, hand);
-            user.getItemCooldownManager().set(this, 20);
+            CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
         }
         return super.use(world, user, hand);
     }
@@ -103,8 +103,6 @@ public class CreatureMagnetItem extends SwitchableItem {
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
-        int percent = ModConfig.getConfig().value.coolingPercentage;
-        int cooldown = 20 * percent / 100;
         boolean sneaking = user.isSneaking();
         boolean cooling = user.getItemCooldownManager().isCoolingDown(this);
         boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
@@ -115,7 +113,7 @@ public class CreatureMagnetItem extends SwitchableItem {
                 entity.removeScoreboardTag(user.getEntityName());
             }
             if (!creative) {
-                user.getItemCooldownManager().set(this, cooldown);
+                CooldownMethods.setCooldown(user, stack, 20);
             }
         }
         return ActionResult.PASS;
@@ -127,7 +125,7 @@ public class CreatureMagnetItem extends SwitchableItem {
         boolean handingMagnet = entity.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) || entity.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM);
         if (!entity.world.isClient && handingMagnet) {
             boolean entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && entity.getPos().isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator()).isEmpty();
-            if (((EntityAttractNbt) entity).getEnable() && entityCanAttract) {
+            if (entity.getEnable() && entityCanAttract) {
                 entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), otherEntity -> (otherEntity.getScoreboardTags().contains(entity.getEntityName()) && otherEntity instanceof LivingEntity && otherEntity.getPos().isInRange(entity.getPos(), dis))).forEach(targetEntity -> {
                     LivingEntity livingEntity = (LivingEntity) targetEntity;
                     Vec3d vec = entity.getPos().subtract(targetEntity.getPos()).multiply(0.05);
@@ -137,6 +135,14 @@ public class CreatureMagnetItem extends SwitchableItem {
                     livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
                     livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
                     targetEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
+                    if (targetEntity.getPos().isInRange(entity.getPos(), 1)) {
+                        vec = Vec3d.ZERO;
+                    }
+                    if (entity.getVelocity().y < 0 && targetEntity.getPos().y > entity.getY()) {
+                        vec = vec.multiply(1, 0, 1).add(0, entity.getVelocity().y, 0);
+                    } else if (entity.getVelocity().y == 0 && targetEntity.getPos().y > entity.getY()) {
+                        vec = vec.multiply(1, 0, 1).add(0, -0.75, 0);
+                    }
                     targetEntity.setVelocity(vec);
                     PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                     if (!entity.isSpectator() && !(entity instanceof PlayerEntity player && player.isCreative())) {
@@ -164,6 +170,11 @@ public class CreatureMagnetItem extends SwitchableItem {
 
     public static void usedTickSet(ItemStack stack) {
         stack.getOrCreateNbt().putInt("UsedTick", 0);
+    }
+
+    @Override
+    public int getEnchantability() {
+        return 16;
     }
 
 }

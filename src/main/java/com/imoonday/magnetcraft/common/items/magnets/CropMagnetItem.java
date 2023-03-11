@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.*;
@@ -72,18 +73,15 @@ public class CropMagnetItem extends FilterableItem {
             }
         } else {
             int levelEveryCount = ModConfig.getConfig().value.removeFoodLevelEveryCount;
-            int percent = ModConfig.getConfig().value.coolingPercentage;
             if (!DamageMethods.isEmptyDamage(user, hand)) {
                 int crops = searchCrops(user, hand);
                 int removeFoodLevel = levelEveryCount != 0 ? crops / levelEveryCount + (crops % levelEveryCount == 0 ? 0 : 1) : 0;
                 boolean success = crops > 0;
                 if (success && !user.isCreative()) {
-                    int cooldown = (1 + removeFoodLevel) * 5 * 20 * percent / 100;
                     user.getHungerManager().setFoodLevel(user.getHungerManager().getFoodLevel() - removeFoodLevel);
-                    user.getItemCooldownManager().set(this, cooldown);
+                    CooldownMethods.setCooldown(user, user.getStackInHand(hand), (1 + removeFoodLevel) * 5 * 20);
                 } else {
-                    int cooldown = 20 * percent / 100;
-                    user.getItemCooldownManager().set(this, cooldown);
+                    CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
                 }
             }
         }
@@ -202,4 +200,10 @@ public class CropMagnetItem extends FilterableItem {
     public boolean getSwitchable() {
         return false;
     }
+
+    @Override
+    public int getEnchantability() {
+        return 14;
+    }
+
 }

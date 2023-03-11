@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.api.SwitchableItem;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,7 +26,18 @@ public class PortableDemagnetizerItem extends SwitchableItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         enabledSwitch(world, user, hand);
-        user.getItemCooldownManager().set(this, 20);
+        CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
         return super.use(world, user, hand);
     }
+
+    @Override
+    public boolean isDamageable() {
+        return true;
+    }
+
+    @Override
+    public int getEnchantability() {
+        return 14;
+    }
+
 }

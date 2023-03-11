@@ -30,5 +30,12 @@
     "fabric": "*",
     "minecraft": "1.19.3"
   },
-  "accessWidener": "magnetcraft.accesswidener"
+  "accessWidener": "magnetcraft.accesswidener",
+  "custom": {
+    "loom:injected_interfaces": {
+      "net/minecraft/class_1297": [
+        "com/imoonday/magnetcraft/api/EntityAttractNbt"
+      ]
+    }
+  }
 }

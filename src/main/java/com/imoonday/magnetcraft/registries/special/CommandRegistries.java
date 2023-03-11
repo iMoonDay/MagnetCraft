@@ -30,6 +30,7 @@ import java.util.Objects;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
+@SuppressWarnings("RedundantCast")
 public class CommandRegistries {
 
     public static void register() {
@@ -41,7 +42,7 @@ public class CommandRegistries {
                                                             ServerPlayerEntity player = context.getSource().getPlayer();
                                                             if (player != null) {
                                                                 String text = "None";
-                                                                NbtCompound nbt = ((EntityAttractNbt) player).getAttractData();
+                                                                NbtCompound nbt = ((EntityAttractNbt)player).getAttractData();
                                                                 if (nbt != null) {
                                                                     text = nbt.toString();
                                                                 }
@@ -55,7 +56,7 @@ public class CommandRegistries {
                                                 .executes(context -> {
                                                             ServerPlayerEntity player = context.getSource().getPlayer();
                                                             if (player != null) {
-                                                                if(((EntityAttractNbt) player).clearAttractData()){
+                                                                if(((EntityAttractNbt)player).clearAttractData()){
                                                                     player.sendMessage(Text.literal("Success"));
                                                                 }
                                                             }

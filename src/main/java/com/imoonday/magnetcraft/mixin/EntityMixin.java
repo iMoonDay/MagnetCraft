@@ -4,7 +4,6 @@ import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -52,7 +51,7 @@ public abstract class EntityMixin implements EntityAttractNbt {
 
     @Override
     public double getAttractDis() {
-        return this.attractData.contains("AttractDis", NbtElement.DOUBLE_TYPE) ? this.attractData.getDouble("AttractDis") : 0;
+        return this.attractDis;
     }
 
     @Override
@@ -62,7 +61,7 @@ public abstract class EntityMixin implements EntityAttractNbt {
 
     @Override
     public boolean isAttracting() {
-        return this.attractData.getBoolean("isAttracting");
+        return this.isAttracting;
     }
 
     @Override
@@ -86,7 +85,7 @@ public abstract class EntityMixin implements EntityAttractNbt {
 
     @Override
     public void setEnable(boolean enable) {
-        this.enable = enable;
+        this.attractData.putBoolean("Enable", enable);
     }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))

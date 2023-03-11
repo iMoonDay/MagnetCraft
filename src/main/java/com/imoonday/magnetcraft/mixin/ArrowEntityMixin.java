@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.PotionRegistries;
@@ -14,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ArrowEntity.class)
-public class ArrowEntityMixin {
+public abstract class ArrowEntityMixin extends EntityMixin {
 
     @Shadow
     private Potion potion;
@@ -28,7 +27,7 @@ public class ArrowEntityMixin {
             boolean isAttracting = this.potion == PotionRegistries.ATTRACT_POTION;
             double dis = ModConfig.getConfig().value.arrowAttractDis;
             if (isAttracting && AttractMethods.canAttract(entity)) {
-                ((EntityAttractNbt) entity).setAttracting(true, dis);
+                this.setAttracting(true, dis);
             }
         }
     }

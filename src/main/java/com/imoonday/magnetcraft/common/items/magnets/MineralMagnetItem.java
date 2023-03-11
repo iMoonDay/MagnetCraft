@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.screen.handler.MineralMagnetScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
@@ -131,15 +132,14 @@ public class MineralMagnetItem extends Item {
             }
         } else {
             if (!DamageMethods.isEmptyDamage(user, hand)) {
-                int percent = ModConfig.getConfig().value.coolingPercentage;
                 int value = searchMineral(user, hand);
                 boolean success = value > 0;
                 if (success && !user.isCreative()) {
-                    int cooldown = value * 20 * percent / 100;
-                    user.getItemCooldownManager().set(this, cooldown);
+                    CooldownMethods.setCooldown(user, user.getStackInHand(hand), value * 20);
+
                 } else {
-                    int cooldown = 20 * percent / 100;
-                    user.getItemCooldownManager().set(this, cooldown);
+                    CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+
                 }
             }
         }
@@ -150,8 +150,8 @@ public class MineralMagnetItem extends Item {
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         super.inventoryTick(stack, world, user, slot, selected);
         coresCheck(stack);
-        if (user instanceof PlayerEntity && user.isSpectator() && ((PlayerEntity) user).getItemCooldownManager().isCoolingDown(this)) {
-            ((PlayerEntity) user).getItemCooldownManager().remove(this);
+        if (user instanceof PlayerEntity player && user.isSpectator() && player.getItemCooldownManager().isCoolingDown(this)) {
+            player.getItemCooldownManager().remove(this);
         }
     }
 
@@ -173,7 +173,7 @@ public class MineralMagnetItem extends Item {
             int others = 0;
             int value;
             boolean isEmptyDamage = false;
-            DamageMethods.addDamage(player, hand, 1,false);
+            DamageMethods.addDamage(player, hand, 1, false);
             if (player.experienceLevel < requiredExperienceLevel && !player.isCreative()) {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
@@ -242,7 +242,7 @@ public class MineralMagnetItem extends Item {
                             }
                             total++;
                             totalValue += value;
-                            DamageMethods.addDamage(player, hand, value,true);
+                            DamageMethods.addDamage(player, hand, value, true);
                         }
                     }
                 }
@@ -341,8 +341,13 @@ public class MineralMagnetItem extends Item {
         }
     }
 
-    public static void changeAllCoreEnable(ItemStack stack,boolean enable){
+    public static void changeAllCoreEnable(ItemStack stack, boolean enable) {
         stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean("enable", enable));
+    }
+
+    @Override
+    public int getEnchantability() {
+        return 16;
     }
 
 }

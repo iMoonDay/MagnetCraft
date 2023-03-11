@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
@@ -64,8 +65,6 @@ public class ElectromagnetItem extends FilterableItem {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
         double dis = ModConfig.getConfig().value.electromagnetTeleportMinDis;
-        int percent = ModConfig.getConfig().value.coolingPercentage;
-        int cooldown = 20 * percent / 100;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
@@ -83,11 +82,11 @@ public class ElectromagnetItem extends FilterableItem {
             }
         } else if (!DamageMethods.isEmptyDamage(user, hand)) {
             if (!world.isClient) {
-                DamageMethods.addDamage(user, hand, 1,false);
+                DamageMethods.addDamage(user, hand, 1, false);
             }
             teleportItems(world, user, dis, hand);
         }
-        user.getItemCooldownManager().set(this, cooldown);
+        CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
         return super.use(world, user, hand);
     }
 
@@ -97,16 +96,16 @@ public class ElectromagnetItem extends FilterableItem {
         if (DamageMethods.isEmptyDamage(player, hand)) return;
         if (hand == Hand.MAIN_HAND) dis += magnetHandSpacing;
         double finalDis = dis;
-        int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(),finalDis)).size();
-        player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(),finalDis)).forEach(targetEntity -> {
+        int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).size();
+        player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).forEach(targetEntity -> {
             DamageMethods.addDamage(player, hand, 1, true);
             if (targetEntity instanceof ExperienceOrbEntity entity) {
                 int amount = entity.getExperienceAmount();
                 player.addExperience(amount);
             } else if (targetEntity instanceof ItemEntity entity) {
                 player.getInventory().offerOrDrop(entity.getStack());
-                targetEntity.kill();
             }
+            targetEntity.kill();
             player.incrementStat(CustomStatRegistries.ITEMS_TELEPORTED_TO_PLAYER);
             player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
         });
@@ -114,6 +113,11 @@ public class ElectromagnetItem extends FilterableItem {
         if (!world.isClient && message) {
             player.sendMessage(Text.translatable(text, dis, count));
         }
+    }
+
+    @Override
+    public int getEnchantability() {
+        return 14;
     }
 
 }

@@ -33,11 +33,12 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         PlayerEntity player = this.handler.getPlayer();
-        boolean onEnable = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.enable")) && mouseY >= y + 6 && mouseY <= y + 6 + 8;
+        boolean crop = this.handler.isCropMagnet();
+        boolean onEnable = !crop && mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.enable")) && mouseY >= y + 6 && mouseY <= y + 6 + 8;
         boolean onWhitelist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")) && mouseY >= y + 22 && mouseY <= y + 22 + 8;
         boolean onBlacklist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")) && mouseY >= y + 38 && mouseY <= y + 38 + 8;
-        boolean onCompareDamage = mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.damage")) && mouseX <= x + 157 + 8 && mouseY >= y + 22 && mouseY <= y + 22 + 8;
-        boolean onCompareNbt = mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.nbt")) && mouseX <= x + 157 + 8 && mouseY >= y + 38 && mouseY <= y + 38 + 8;
+        boolean onCompareDamage = !crop && mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.damage")) && mouseX <= x + 157 + 8 && mouseY >= y + 22 && mouseY <= y + 22 + 8;
+        boolean onCompareNbt = !crop && mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.nbt")) && mouseX <= x + 157 + 8 && mouseY >= y + 38 && mouseY <= y + 38 + 8;
         boolean onButton = onEnable || onWhitelist || onBlacklist || onCompareDamage || onCompareNbt;
         int id;
         if (onButton) {
@@ -45,14 +46,12 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
                 id = 0;
             } else if (onBlacklist) {
                 id = 1;
-            } else if (onCompareDamage && !this.handler.isCropMagnet()) {
+            } else if (onCompareDamage) {
                 id = 2;
-            } else if (onCompareNbt && !this.handler.isCropMagnet()) {
+            } else if (onCompareNbt) {
                 id = 3;
-            } else if (onEnable && !this.handler.isCropMagnet()) {
-                id = 4;
             } else {
-                id = -1;
+                id = 4;
             }
             if (this.client != null) {
                 this.handler.onButtonClick(this.client.player, id);

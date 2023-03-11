@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
@@ -51,12 +52,7 @@ public class PolorMagnetItem extends FilterableItem {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
-        int percent = ModConfig.getConfig().value.coolingPercentage;
-        int cooldown = 30 * percent / 100;
         boolean sneaking = user.isSneaking();
-        if (sneaking && user.getAbilities().flying) {
-            sneaking = false;
-        }
         if ((sneaking && !reversal) || (!sneaking && reversal)) {
             if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
                 if (!user.world.isClient) {
@@ -68,7 +64,7 @@ public class PolorMagnetItem extends FilterableItem {
                 }
                 enabledSwitch(world, user, hand);
             }
-            user.getItemCooldownManager().set(this, cooldown);
+            CooldownMethods.setCooldown(user, user.getStackInHand(hand), 30);
         }
         return super.use(world, user, hand);
     }
@@ -80,4 +76,15 @@ public class PolorMagnetItem extends FilterableItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
     }
+
+    @Override
+    public boolean isDamageable() {
+        return true;
+    }
+
+    @Override
+    public int getEnchantability() {
+        return 12;
+    }
+
 }

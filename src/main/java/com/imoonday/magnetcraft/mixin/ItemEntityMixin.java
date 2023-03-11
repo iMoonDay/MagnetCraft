@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
@@ -13,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ItemEntity.class)
-public class ItemEntityMixin {
+public class ItemEntityMixin extends EntityMixin {
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
     public void checkAttract(CallbackInfo info) {
@@ -25,7 +24,7 @@ public class ItemEntityMixin {
             boolean isAttracting = stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
             int dis = ModConfig.getConfig().value.droppedMagnetAttractDis;
             if (isAttracting && AttractMethods.canAttract(entity)) {
-                ((EntityAttractNbt) entity).setAttracting(true, dis);
+                this.setAttracting(true, dis);
             }
         }
     }

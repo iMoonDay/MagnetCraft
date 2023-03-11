@@ -27,10 +27,11 @@ public class AutomaticLootingEnchantment extends Enchantment {
 
     @Override
     public boolean isAcceptableItem(ItemStack stack) {
-        return stack.getItem() instanceof SwordItem
-                || stack.getItem() instanceof AxeItem
-                || stack.getItem() instanceof TridentItem
-                || stack.getItem() instanceof BowItem
-                || stack.getItem() instanceof CrossbowItem;
+        Item item = stack.getItem();
+        return item instanceof SwordItem
+                || item instanceof AxeItem
+                || item instanceof TridentItem
+                || item instanceof BowItem
+                || item instanceof CrossbowItem;
     }
 }

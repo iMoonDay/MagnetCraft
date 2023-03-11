@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
@@ -15,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(TridentEntity.class)
-public class TridentEntityMixin {
+public class TridentEntityMixin extends EntityMixin {
 
     @Shadow
     private ItemStack tridentStack;
@@ -35,7 +34,7 @@ public class TridentEntityMixin {
             double enchMinDis = enchDefaultDis + disPerLvl;
             double dis = enchMinDis + (enchLvl - 1) * disPerLvl;
             if (isAttracting && AttractMethods.canAttract(entity)) {
-                ((EntityAttractNbt) entity).setAttracting(true, dis);
+                this.setAttracting(true, dis);
             }
         }
     }

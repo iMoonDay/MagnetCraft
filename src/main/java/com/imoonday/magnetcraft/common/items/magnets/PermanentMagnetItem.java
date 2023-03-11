@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
@@ -53,8 +54,6 @@ public class PermanentMagnetItem extends FilterableItem {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
         double dis = ModConfig.getConfig().value.permanentMagnetTeleportMinDis;
-        int percent = ModConfig.getConfig().value.coolingPercentage;
-        int cooldown = 10 * percent / 100;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
@@ -73,8 +72,18 @@ public class PermanentMagnetItem extends FilterableItem {
         } else {
             ElectromagnetItem.teleportItems(world, user, dis, hand);
         }
-        user.getItemCooldownManager().set(this, cooldown);
+        CooldownMethods.setCooldown(user, user.getStackInHand(hand), 10);
         return super.use(world, user, hand);
+    }
+
+    @Override
+    public boolean isDamageable() {
+        return true;
+    }
+
+    @Override
+    public int getEnchantability() {
+        return 16;
     }
 
 }

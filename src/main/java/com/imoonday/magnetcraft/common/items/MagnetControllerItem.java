@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.common.items;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.methods.CooldownMethods;
 import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -82,30 +82,29 @@ public class MagnetControllerItem extends FilterableItem {
             if (user.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) {
                 user.removeStatusEffect(EffectRegistries.DEGAUSSING_EFFECT);
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_MILK, 1, 1);
-                user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
+                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
             } else {
                 user.addStatusEffect(new StatusEffectInstance(EffectRegistries.DEGAUSSING_EFFECT, 60 * 20, 0, true, false, true));
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_POTION, 1, 1);
-                user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 6 * 20);
+                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 6*20);
             }
         } else {
             changeMagnetEnable(user);
-            user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20);
+            CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
             user.getInventory().markDirty();
         }
     }
 
     public static void changeMagnetEnable(PlayerEntity user) {
-        EntityAttractNbt nbt = (EntityAttractNbt) user;
         boolean display = ModConfig.getConfig().displayActionBar;
         Text message;
         SoundEvent sound;
-        if (nbt.getEnable()) {
-            nbt.setEnable(false);
+        if (user.getEnable()) {
+            user.setEnable(false);
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
             message = Text.translatable("text.magnetcraft.message.magnet_off");
         } else {
-            nbt.setEnable(true);
+            user.setEnable(true);
             sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
             message = Text.translatable("text.magnetcraft.message.magnet_on");
         }
@@ -117,7 +116,13 @@ public class MagnetControllerItem extends FilterableItem {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
-        stack.getOrCreateNbt().putBoolean("Enable", ((EntityAttractNbt) user).getEnable());
+        stack.getOrCreateNbt().putBoolean("Enable", user.getEnable());
     }
+
+    @Override
+    public int getEnchantability() {
+        return 14;
+    }
+
 }
 

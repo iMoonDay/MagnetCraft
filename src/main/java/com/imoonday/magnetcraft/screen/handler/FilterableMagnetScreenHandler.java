@@ -3,6 +3,8 @@ package com.imoonday.magnetcraft.screen.handler;
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
+import net.minecraft.block.Block;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -20,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 import static com.imoonday.magnetcraft.common.items.MagnetControllerItem.changeMagnetEnable;
-import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags.SHULKER_BOXES;
 import static net.minecraft.item.Items.*;
 
 @SuppressWarnings("ConstantValue")
@@ -51,8 +52,8 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
         return getStack().isOf(ItemRegistries.CROP_MAGNET_ITEM);
     }
 
-    public static boolean canTeleportItems(ItemStack stack) {
-        return !stack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) && !stack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM);
+    public boolean canTeleportItems() {
+        return !getStack().isOf(ItemRegistries.POLAR_MAGNET_ITEM) && !getStack().isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM);
     }
 
     public ItemStack getStack() {
@@ -84,7 +85,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                 this.addSlot(new LockedSlot(filterSlots, x, 8 + x * 18, 35 + 18));
             }
         }
-        if (canTeleportItems(getStack())) {
+        if (canTeleportItems()) {
             for (y = 0; y < 3; ++y) {
                 this.addSlot(new ShulkerBoxSlot(shulkerBoxSlots, y, 178, 17 + y * 18));
             }
@@ -119,15 +120,14 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
         ArrayList<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < this.filterSlots.size(); i++) {
-            stacks.add(this.filterSlots.getStack(i));
+        for (int i = 0; i < inventory.size(); i++) {
+            stacks.add(inventory.getStack(i));
         }
-        FilterableItem.setFilterItems(getStack(), stacks);
-        stacks = new ArrayList<>();
-        for (int i = 0; i < this.shulkerBoxSlots.size(); i++) {
-            stacks.add(this.shulkerBoxSlots.getStack(i));
+        if (inventory == this.filterSlots) {
+            FilterableItem.setFilterItems(getStack(), stacks);
+        } else if (inventory == this.shulkerBoxSlots) {
+            FilterableItem.setShulkerBoxItems(getStack(), stacks);
         }
-        FilterableItem.setShulkerBoxItems(getStack(), stacks);
         this.sendContentUpdates();
     }
 
@@ -319,7 +319,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
         }
     }
 
-    public class ShulkerBoxSlot extends Slot{
+    private class ShulkerBoxSlot extends Slot {
 
         public ShulkerBoxSlot(Inventory inventory, int index, int x, int y) {
             super(inventory, index, x, y);
@@ -327,7 +327,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
 
         @Override
         public boolean canInsert(ItemStack stack) {
-            return stack.isIn(SHULKER_BOXES);
+            return Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock;
         }
 
         @Override

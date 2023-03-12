@@ -136,4 +136,10 @@ public class MineralMagnetScreen extends HandledScreen<MineralMagnetScreenHandle
         }
         return false;
     }
+
+    @Override
+    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+        return mouseX < (double)left || mouseY < (double)top || mouseX >= (double)(left + this.backgroundWidth + 23) || mouseY >= (double)(top + this.backgroundHeight);
+    }
+
 }

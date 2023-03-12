@@ -56,10 +56,8 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
         checkSize(this.shulkerBoxSlots, 3);
         int y;
         int x;
-        if (FilterableMagnetScreenHandler.canTeleportItems(stack)) {
-            for (y = 0; y < 3; ++y) {
-                this.addSlot(new ShulkerBoxSlot(shulkerBoxSlots, y, 178, 17 + y * 18));
-            }
+        for (y = 0; y < 3; ++y) {
+            this.addSlot(new ShulkerBoxSlot(shulkerBoxSlots, y, 178, 17 + y * 18));
         }
         for (y = 0; y < 3; ++y) {
             for (x = 0; x < 9; ++x) {
@@ -81,8 +79,8 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
         ArrayList<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < this.shulkerBoxSlots.size(); i++) {
-            stacks.add(this.shulkerBoxSlots.getStack(i));
+        for (int i = 0; i < inventory.size(); i++) {
+            stacks.add(inventory.getStack(i));
         }
         ItemStack stack = getSlot() != -1 ? getInventory().getStack(getSlot()) : getInventory().player.getOffHandStack();
         FilterableItem.setShulkerBoxItems(stack, stacks);
@@ -146,7 +144,7 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
         return true;
     }
 
-    public class ShulkerBoxSlot extends Slot{
+    private class ShulkerBoxSlot extends Slot {
 
         public ShulkerBoxSlot(Inventory inventory, int index, int x, int y) {
             super(inventory, index, x, y);

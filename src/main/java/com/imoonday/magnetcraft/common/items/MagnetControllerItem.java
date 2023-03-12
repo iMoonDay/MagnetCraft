@@ -60,15 +60,15 @@ public class MagnetControllerItem extends FilterableItem {
                     openScreen(user, hand, this);
                 }
             } else {
-                useTask(user, hand, true);
+                useController(user, hand, true);
             }
         } else {
-            useTask(user, hand, true);
+            useController(user, hand, true);
         }
         return super.use(world, user, hand);
     }
 
-    public static void useTask(PlayerEntity user, @Nullable Hand hand, boolean selected) {
+    public static void useController(PlayerEntity user, @Nullable Hand hand, boolean selected) {
         boolean rightClickReversal = ModConfig.getConfig().rightClickReversal;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
@@ -86,11 +86,16 @@ public class MagnetControllerItem extends FilterableItem {
             } else {
                 user.addStatusEffect(new StatusEffectInstance(EffectRegistries.DEGAUSSING_EFFECT, 60 * 20, 0, true, false, true));
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_POTION, 1, 1);
-                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 6*20);
+                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 6 * 20);
             }
         } else {
-            changeMagnetEnable(user);
-            CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+                changeMagnetEnable(user);
+            if (hand != null) {
+                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+            } else {
+                int percent = ModConfig.getConfig().value.coolingPercentage;
+                user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20 * percent / 100);
+            }
             user.getInventory().markDirty();
         }
     }
@@ -116,7 +121,12 @@ public class MagnetControllerItem extends FilterableItem {
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
-        stack.getOrCreateNbt().putBoolean("Enable", user.getEnable());
+        if (!world.isClient) {
+            stack.getOrCreateNbt().putBoolean("Enable", user.getEnable());
+        }
+        if (user instanceof PlayerEntity player) {
+            player.getInventory().markDirty();
+        }
     }
 
     @Override

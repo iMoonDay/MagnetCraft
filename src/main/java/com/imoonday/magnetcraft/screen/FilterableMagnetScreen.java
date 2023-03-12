@@ -79,8 +79,11 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
-        int width = crop ? backgroundWidth : backgroundWidth + 23;
-        drawTexture(matrices, x, y, 0, 0, width, backgroundHeight);
+        if (this.handler.canTeleportItems()) {
+            drawTexture(matrices, x, y, 0, 0, backgroundWidth + 23, backgroundHeight);
+        } else {
+            drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        }
         boolean onEnable = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.enable")) && mouseY >= y + 6 && mouseY <= y + 6 + 8;
         boolean onWhitelist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")) && mouseY >= y + 22 && mouseY <= y + 22 + 8;
         boolean onBlacklist = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")) && mouseY >= y + 38 && mouseY <= y + 38 + 8;
@@ -171,6 +174,15 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
             titleX = (backgroundWidth - textRenderer.getWidth(title)) / 3 * 2;
         } else {
             titleX = (backgroundWidth - textRenderer.getWidth(title)) / 2;
+        }
+    }
+
+    @Override
+    protected boolean isClickOutsideBounds(double mouseX, double mouseY, int left, int top, int button) {
+        if (this.handler.canTeleportItems()) {
+            return mouseX < (double) left || mouseY < (double) top || mouseX >= (double) (left + this.backgroundWidth + 23) || mouseY >= (double) (top + this.backgroundHeight);
+        } else {
+            return mouseX < (double) left || mouseY < (double) top || mouseX >= (double) (left + this.backgroundWidth) || mouseY >= (double) (top + this.backgroundHeight);
         }
     }
 

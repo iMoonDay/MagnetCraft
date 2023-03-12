@@ -29,7 +29,7 @@ public class LodestoneScreenHandler extends ScreenHandler {
     private int lastDis = 0;
 
     public LodestoneScreenHandler(int syncId, PlayerInventory inventory, PacketByteBuf buf) {
-        this(syncId, inventory, new SimpleInventory(18), new ArrayPropertyDelegate(3), ScreenHandlerContext.EMPTY);
+        this(syncId, inventory, new SimpleInventory(18), new ArrayPropertyDelegate(4), ScreenHandlerContext.EMPTY);
         this.pos = buf.readBlockPos();
     }
 
@@ -43,6 +43,10 @@ public class LodestoneScreenHandler extends ScreenHandler {
 
     public int getDirection() {
         return propertyDelegate.get(2);
+    }
+
+    public boolean isFilter() {
+        return propertyDelegate.get(3) == 1;
     }
 
     public BlockPos getPos() {
@@ -66,7 +70,7 @@ public class LodestoneScreenHandler extends ScreenHandler {
         this.context = context;
         this.pos = BlockPos.ORIGIN;
         checkSize(inventory, 18);
-        checkDataCount(propertyDelegate, 3);
+        checkDataCount(propertyDelegate, 4);
         int y;
         int x;
         for (y = 0; y < 2; ++y) {
@@ -86,7 +90,7 @@ public class LodestoneScreenHandler extends ScreenHandler {
 
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
-        if (id < 0 || id > 2) {
+        if (id < 0 || id > 3) {
             return false;
         }
         this.context.run((world, pos) -> {
@@ -114,6 +118,7 @@ public class LodestoneScreenHandler extends ScreenHandler {
                             nbt.putDouble("dis", entity.createNbt().getDouble("dis") + disEachClick <= maxDis ? entity.createNbt().getDouble("dis") + disEachClick : 0);
                         }
                     }
+                    case 3 -> nbt.putBoolean("filter", !isFilter());
                 }
                 entity.readNbt(nbt);
                 entity.markDirty();

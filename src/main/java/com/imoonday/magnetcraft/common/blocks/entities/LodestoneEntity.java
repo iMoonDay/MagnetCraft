@@ -14,6 +14,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.Packet;
@@ -29,12 +30,15 @@ import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
+import java.util.ArrayList;
+
 public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
 
     private boolean redstone;
     private double dis;
     private int direction;
     private boolean enable;
+    private boolean filter;
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(18, ItemStack.EMPTY);
 
     protected final PropertyDelegate propertyDelegate = new PropertyDelegate() {
@@ -42,12 +46,12 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         public int get(int index) {
             if (index == 0) {
                 return redstone ? 1 : 0;
-            }
-            if (index == 1) {
+            } else if (index == 1) {
                 return (int) dis;
-            }
-            if (index == 2) {
+            } else if (index == 2) {
                 return direction;
+            } else if (index == 3) {
+                return filter ? 1 : 0;
             }
             return 0;
         }
@@ -58,7 +62,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
 
         @Override
         public int size() {
-            return 3;
+            return 4;
         }
     };
 
@@ -92,7 +96,9 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                     case 6 -> Direction.DOWN;
                     default -> null;
                 };
-                AttractMethods.attractItems(world, centerPos, dis);
+                ArrayList<Item> allowedItems = new ArrayList<>();
+                entity.inventory.forEach(stack -> allowedItems.add(stack.getItem()));
+                AttractMethods.attractItems(world, centerPos, dis, entity.filter, allowedItems);
                 if (direction != null) {
                     putItemEntityIn(world, pos, entity, direction);
                 } else {
@@ -113,6 +119,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         enable = redstone ? world != null && world.isReceivingRedstonePower(pos) : dis > 1;
         nbt.putBoolean("enable", enable);
         nbt.putInt("direction", direction);
+        nbt.putBoolean("filter", filter);
         Inventories.writeNbt(nbt, inventory);
     }
 
@@ -127,6 +134,9 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         }
         if (nbt.contains("direction")) {
             direction = nbt.getInt("direction");
+        }
+        if (nbt.contains("filter")) {
+            filter = nbt.getBoolean("filter");
         }
     }
 
@@ -167,35 +177,39 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).forEach(entity -> {
             DefaultedList<ItemStack> inventory = blockEntity.inventory;
             ItemStack stack = ((ItemEntity) entity).getStack();
-            boolean hasEmptySlot = false;
-            boolean hasSameStack = false;
-            boolean overflow = false;
-            int overflowCount = 0;
-            int slot = -1;
-            for (int i = 0; i < inventory.size(); i++) {
-                ItemStack inventoryStack = inventory.get(i);
-                hasEmptySlot = inventoryStack.isEmpty();
-                hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
-                overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
-                if (hasEmptySlot || hasSameStack) {
-                    slot = i;
-                    if (overflow) {
-                        overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
+            ArrayList<Item> allowedItems = new ArrayList<>();
+            blockEntity.inventory.forEach(itemStack -> allowedItems.add(itemStack.getItem()));
+            if (!blockEntity.filter || allowedItems.contains(stack.getItem())) {
+                boolean hasEmptySlot = false;
+                boolean hasSameStack = false;
+                boolean overflow = false;
+                int overflowCount = 0;
+                int slot = -1;
+                for (int i = 0; i < inventory.size(); i++) {
+                    ItemStack inventoryStack = inventory.get(i);
+                    hasEmptySlot = inventoryStack.isEmpty();
+                    hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
+                    overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
+                    if (hasEmptySlot || hasSameStack) {
+                        slot = i;
+                        if (overflow) {
+                            overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
+                        }
+                        break;
                     }
-                    break;
                 }
-            }
-            if (hasEmptySlot) {
-                inventory.set(slot, stack);
-                entity.kill();
-            } else if (hasSameStack) {
-                if (overflow) {
-                    inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
-                    stack.setCount(overflowCount);
-                } else {
-                    stack.increment(inventory.get(slot).getCount());
+                if (hasEmptySlot) {
                     inventory.set(slot, stack);
                     entity.kill();
+                } else if (hasSameStack) {
+                    if (overflow) {
+                        inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
+                        stack.setCount(overflowCount);
+                    } else {
+                        stack.increment(inventory.get(slot).getCount());
+                        inventory.set(slot, stack);
+                        entity.kill();
+                    }
                 }
             }
         });

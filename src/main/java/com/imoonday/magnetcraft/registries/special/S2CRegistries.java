@@ -19,12 +19,7 @@ public class S2CRegistries {
                 ClientPlayerEntity player = client.player;
                 if (player != null) {
                     ((EntityAttractNbt) player).setEnable(enable);
-                    SoundEvent sound;
-                    if (!enable) {
-                        sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
-                    } else {
-                        sound = SoundEvents.BLOCK_BEACON_ACTIVATE;
-                    }
+                    SoundEvent sound = enable ? SoundEvents.BLOCK_BEACON_ACTIVATE : SoundEvents.BLOCK_BEACON_DEACTIVATE;
                     player.getInventory().markDirty();
                     player.playSound(sound, 1, 1);
                 }

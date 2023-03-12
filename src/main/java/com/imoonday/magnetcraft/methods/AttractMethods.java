@@ -10,6 +10,7 @@ import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.HorseEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -28,12 +29,12 @@ import java.util.Objects;
 
 public class AttractMethods {
 
-    public static void attractItems(World world, Vec3d pos, double dis) {
+    public static void attractItems(World world, Vec3d pos, double dis, boolean filter, ArrayList<Item> allowedItems) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         if (!world.isClient) {
             boolean blockCanAttract = world.getOtherEntities(null, Box.from(pos).expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && pos.isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator())).isEmpty();
             if (blockCanAttract) {
-                attracting(world, pos, dis);
+                attracting(world, pos, dis, filter, allowedItems);
             }
         }
     }
@@ -92,7 +93,7 @@ public class AttractMethods {
         });
     }
 
-    public static void attracting(World world, Vec3d pos, double dis) {
+    public static void attracting(World world, Vec3d pos, double dis, boolean filter, ArrayList<Item> allowedItems) {
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
@@ -107,7 +108,7 @@ public class AttractMethods {
             if (targetEntity instanceof ItemEntity itemEntity) {
                 String item = Registries.ITEM.getId(itemEntity.getStack().getItem()).toString();
                 boolean noDegaussingEntity = targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity && ((LivingEntity) otherEntity).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
-                pass = (!whitelistEnable || whitelist.contains(item)) && (!blacklistEnable || !blacklist.contains(item)) && noDegaussingEntity;
+                pass = (!whitelistEnable || whitelist.contains(item)) && (!blacklistEnable || !blacklist.contains(item)) && noDegaussingEntity && (!filter || allowedItems.contains(itemEntity.getStack().getItem()));
             }
             if (pass && !world.isClient) {
                 boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && (otherEntity.isAttracting()))).isEmpty();

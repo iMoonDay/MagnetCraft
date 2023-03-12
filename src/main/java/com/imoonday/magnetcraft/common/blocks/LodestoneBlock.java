@@ -24,8 +24,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
-
 public class LodestoneBlock extends BlockWithEntity {
     public LodestoneBlock(Settings settings) {
         super(settings);
@@ -50,56 +48,31 @@ public class LodestoneBlock extends BlockWithEntity {
 
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-        assert world != null;
         NbtCompound nbt = new NbtCompound();
         nbt.putBoolean("redstone", true);
         nbt.putInt("direction", 0);
-        Objects.requireNonNull(world.getBlockEntity(pos)).readNbt(nbt);
+        nbt.putBoolean("filter", false);
+        BlockEntity blockEntity = world.getBlockEntity(pos);
+        if (blockEntity != null) {
+            blockEntity.readNbt(nbt);
+        }
     }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        int direction = Objects.requireNonNull(blockEntity).createNbt().getInt("direction");
+        if (blockEntity == null) return ActionResult.FAIL;
+        int direction = blockEntity.createNbt().getInt("direction");
         NbtCompound nbt = new NbtCompound();
         Direction side = hit.getSide();
         if (player.isSneaky()) {
-            if (side == Direction.SOUTH) {
-                if (direction == 1) {
-                    nbt.putInt("direction", 0);
-                } else {
-                    nbt.putInt("direction", 1);
-                }
-            } else if (side == Direction.WEST) {
-                if (direction == 2) {
-                    nbt.putInt("direction", 0);
-                } else {
-                    nbt.putInt("direction", 2);
-                }
-            } else if (side == Direction.NORTH) {
-                if (direction == 3) {
-                    nbt.putInt("direction", 0);
-                } else {
-                    nbt.putInt("direction", 3);
-                }
-            } else if (side == Direction.EAST) {
-                if (direction == 4) {
-                    nbt.putInt("direction", 0);
-                } else {
-                    nbt.putInt("direction", 4);
-                }
-            } else if (side == Direction.UP) {
-                if (direction == 5) {
-                    nbt.putInt("direction", 0);
-                } else {
-                    nbt.putInt("direction", 5);
-                }
-            } else if (side == Direction.DOWN) {
-                if (direction == 6) {
-                    nbt.putInt("direction", 0);
-                } else {
-                    nbt.putInt("direction", 6);
-                }
+            switch (side) {
+                case SOUTH -> nbt.putInt("direction", direction == 1 ? 0 : 1);
+                case WEST -> nbt.putInt("direction", direction == 2 ? 0 : 2);
+                case NORTH -> nbt.putInt("direction", direction == 3 ? 0 : 3);
+                case EAST -> nbt.putInt("direction", direction == 4 ? 0 : 4);
+                case UP -> nbt.putInt("direction", direction == 5 ? 0 : 5);
+                case DOWN -> nbt.putInt("direction", direction == 6 ? 0 : 6);
             }
         } else {
             if (!world.isClient) {
@@ -108,7 +81,6 @@ public class LodestoneBlock extends BlockWithEntity {
                     player.openHandledScreen(screenHandlerFactory);
                 }
             }
-//            }
         }
         if (!world.isClient) {
             blockEntity.readNbt(nbt);
@@ -124,8 +96,8 @@ public class LodestoneBlock extends BlockWithEntity {
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         if (state.getBlock() != newState.getBlock()) {
             BlockEntity blockEntity = world.getBlockEntity(pos);
-            if (blockEntity instanceof LodestoneEntity) {
-                ItemScatterer.spawn(world, pos, (LodestoneEntity) blockEntity);
+            if (blockEntity instanceof LodestoneEntity lodestoneEntity) {
+                ItemScatterer.spawn(world, pos, lodestoneEntity);
                 world.updateComparators(pos, this);
             }
             super.onStateReplaced(state, world, pos, newState, moved);
@@ -144,19 +116,12 @@ public class LodestoneBlock extends BlockWithEntity {
 
     public static void showState(World world, BlockPos pos, @Nullable PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        boolean redstone = Objects.requireNonNull(blockEntity).createNbt().getBoolean("redstone");
-        double dis = Objects.requireNonNull(blockEntity).createNbt().getDouble("dis");
-        int direction = Objects.requireNonNull(blockEntity).createNbt().getInt("direction");
+        if (blockEntity == null) return;
+        boolean redstone = blockEntity.createNbt().getBoolean("redstone");
+        double dis = blockEntity.createNbt().getDouble("dis");
+        int direction = blockEntity.createNbt().getInt("direction");
         String directionText = "text.magnetcraft.message.direction." + direction;
-        Text text;
-        if (!redstone) {
-            text = Text.translatable("block.magnetcraft.lodestone.tooltip.3", dis)
-                    .append(Text.translatable(directionText));
-        } else {
-            text = Text.translatable("text.magnetcraft.message.redstone_mode")
-                    .append(Text.translatable("block.magnetcraft.lodestone.tooltip.3", dis))
-                    .append(Text.translatable(directionText));
-        }
+        Text text = redstone ? Text.translatable("text.magnetcraft.message.redstone_mode").append(Text.translatable("block.magnetcraft.lodestone.tooltip.3", dis)).append(Text.translatable(directionText)) : Text.translatable("block.magnetcraft.lodestone.tooltip.3", dis).append(Text.translatable(directionText));
         if (!world.isClient && player != null) player.sendMessage(text, true);
     }
 }

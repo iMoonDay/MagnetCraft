@@ -29,15 +29,18 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.message.redstone_mode")) && mouseY >= y + 20 && mouseY <= y + 20 + 8;
         boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
-        if (onRedstone || onLeftClick || onRightClick) {
+        boolean onFilter = mouseX >= x + 110 && mouseX <= x + 110 + 8 && mouseY >= y + 20 && mouseY <= y + 20 + 8;
+        if (onRedstone || onLeftClick || onRightClick || onFilter) {
             this.handler.getPlayer().playSound(SoundEvents.UI_BUTTON_CLICK.value(), 1, 1);
             int id;
             if (onRedstone) {
                 id = 0;
             } else if (onLeftClick) {
                 id = 1;
-            } else {
+            } else if (onRightClick) {
                 id = 2;
+            } else {
+                id = 3;
             }
             if (this.client != null) {
                 this.handler.onButtonClick(this.client.player, id);
@@ -60,23 +63,17 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         int x = (width - backgroundWidth) / 2;
         int y = (height - backgroundHeight) / 2;
         drawTexture(matrices, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        int dis = this.handler.getDis();
         boolean redstone = this.handler.getRedstone() == 1;
+        boolean filter = this.handler.isFilter();
         boolean onRedstone = mouseX >= x + 11 && mouseX <= x + 11 + 8 + textRenderer.getWidth(Text.translatable("text.magnetcraft.message.redstone_mode")) && mouseY >= y + 20 && mouseY <= y + 20 + 8;
         boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
-        int dis = this.handler.getDis();
+        boolean onFilter = mouseX >= x + 110 && mouseX <= x + 110 + 8 && mouseY >= y + 20 && mouseY <= y + 20 + 8;
         if (onRedstone) {
-            if (redstone) {
-                drawTexture(matrices, x + 11, y + 20, 8, 166 + 8, 8, 8);
-            } else {
-                drawTexture(matrices, x + 11, y + 20, 8, 166, 8, 8);
-            }
+            drawTexture(matrices, x + 11, y + 20, 8, redstone ? 166 + 8 : 166, 8, 8);
         } else {
-            if (redstone) {
-                drawTexture(matrices, x + 11, y + 20, 0, 166 + 8, 8, 8);
-            } else {
-                drawTexture(matrices, x + 11, y + 20, 0, 166, 8, 8);
-            }
+            drawTexture(matrices, x + 11, y + 20, 0, redstone ? 166 + 8 : 166, 8, 8);
         }
         if (onLeftClick) {
             drawTexture(matrices, x + 132, y + 17, 48, 166, 16, 16);
@@ -88,8 +85,15 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
             drawTexture(matrices, x + 132, y + 17, 16, 166, 16, 16);
             drawTexture(matrices, x + 133 + 16, y + 17, 16 + 16, 166, 16, 16);
         }
+        if (onFilter) {
+            drawTexture(matrices, x + 110, y + 20, 8, filter ? 166 + 8 : 166, 8, 8);
+        } else {
+            drawTexture(matrices, x + 110, y + 20, 0, filter ? 166 + 8 : 166, 8, 8);
+        }
         textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.redstone_mode"), x + 11 + 10, y + 20, Color.black.getRGB());
         textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.direction." + this.handler.getDirection()), x + 11, y + 10, Color.black.getRGB());
+        int filterX = x + 110 + 4 - textRenderer.getWidth(Text.translatable("text.magnetcraft.message.filter")) / 2;
+        textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.filter"), filterX, y + 10, Color.black.getRGB());
         int x1 = ((x + 133 + 16) * 2 - textRenderer.getWidth(String.valueOf(dis))) / 2;
         int textWidth = textRenderer.getWidth(Text.translatable("text.magnetcraft.message.attract"));
         int half = textWidth / 2;

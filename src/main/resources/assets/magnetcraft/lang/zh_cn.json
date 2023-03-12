@@ -163,6 +163,7 @@
   "text.magnetcraft.message.direction.4": "方向: 东",
   "text.magnetcraft.message.direction.5": "方向: 上",
   "text.magnetcraft.message.direction.6": "方向: 下",
+  "text.magnetcraft.message.filter": "过滤",
   "text.magnetcraft.screen.compare.nbt": "对比NBT",
   "text.magnetcraft.screen.compare.damage": "对比耐久",
   "text.magnetcraft.screen.enable": "启用",

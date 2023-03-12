@@ -163,6 +163,7 @@
   "text.magnetcraft.message.direction.4": "Direction: East",
   "text.magnetcraft.message.direction.5": "Direction: Up",
   "text.magnetcraft.message.direction.6": "Direction: Down",
+  "text.magnetcraft.message.filter": "Filter",
   "text.magnetcraft.screen.compare.nbt": "Compare NBT",
   "text.magnetcraft.screen.compare.damage": "Compare Damage",
   "text.magnetcraft.screen.enable": "Enable",

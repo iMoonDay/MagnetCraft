@@ -14,6 +14,7 @@ import static com.imoonday.magnetcraft.registries.common.FluidRegistries.MAGNETI
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+@SuppressWarnings("CodeBlock2Expr")
 public class ItemGroupRegistries {
 
     public static void register() {

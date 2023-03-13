@@ -120,11 +120,21 @@ public class EntityMixin implements EntityAttractNbt {
 
     @Inject(method = "readNbt", at = @At("TAIL"))
     public void readPocketsDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
-        this.attractData = nbt.getCompound("AttractData");
-        this.attractDis = this.attractData.getDouble("AttractDis");
-        this.isAttracting = this.attractData.getBoolean("isAttracting");
-        this.enable = this.attractData.getBoolean("Enable");
-        this.attractOwner = this.attractData.getUuid("AttractOwner");
+        if (nbt.contains("AttractData")) {
+            this.attractData = nbt.getCompound("AttractData");
+            if (nbt.getCompound("AttractData").contains("AttractDis")) {
+                this.attractDis = nbt.getCompound("AttractData").getDouble("AttractDis");
+            }
+            if (nbt.getCompound("AttractData").contains("isAttracting")) {
+                this.isAttracting = nbt.getCompound("AttractData").getBoolean("isAttracting");
+            }
+            if (nbt.getCompound("AttractData").contains("Enable")) {
+                this.enable = nbt.getCompound("AttractData").getBoolean("Enable");
+            }
+            if (nbt.getCompound("AttractData").contains("AttractOwner")) {
+                this.attractOwner = nbt.getCompound("AttractData").getUuid("AttractOwner");
+            }
+        }
     }
 
 }

@@ -3,7 +3,6 @@ package com.imoonday.magnetcraft.common.items.magnets;
 import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.CooldownMethods;
-import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -25,8 +24,11 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.UUID;
 
 public class CreatureMagnetItem extends SwitchableItem {
+
+    public static UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public CreatureMagnetItem(Settings settings) {
         super(settings);
@@ -108,9 +110,12 @@ public class CreatureMagnetItem extends SwitchableItem {
         boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
         boolean creative = user.isCreative();
         boolean enable = stack.getOrCreateNbt().getBoolean("Enable");
+        boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
         if ((((!sneaking && !reversal) || (sneaking && reversal)) || !sneakToSwitch) && enable && !cooling && entityCanAttract) {
-            if (!entity.addScoreboardTag(user.getEntityName())) {
-                entity.removeScoreboardTag(user.getEntityName());
+            if (hasAttractOwner) {
+                entity.setAttractOwner(CreatureMagnetItem.EMPTY_UUID);
+            } else {
+                entity.setAttractOwner(user.getUuid());
             }
             if (!creative) {
                 CooldownMethods.setCooldown(user, stack, 20);
@@ -119,50 +124,43 @@ public class CreatureMagnetItem extends SwitchableItem {
         return ActionResult.PASS;
     }
 
-    public static void attractCreatures(LivingEntity entity) {
-        int degaussingDis = ModConfig.getConfig().value.degaussingDis;
-        int dis = ModConfig.getConfig().value.creatureMagnetAttractDis;
-        boolean handingMagnet = entity.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) || entity.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM);
-        if (!entity.world.isClient && handingMagnet) {
-            boolean entityCanAttract = entity.world.getOtherEntities(null, entity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) && entity.getPos().isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator()).isEmpty();
-            if (entity.getEnable() && entityCanAttract) {
-                entity.world.getOtherEntities(entity, entity.getBoundingBox().expand(dis), otherEntity -> (otherEntity.getScoreboardTags().contains(entity.getEntityName()) && otherEntity instanceof LivingEntity && otherEntity.getPos().isInRange(entity.getPos(), dis))).forEach(targetEntity -> {
-                    LivingEntity livingEntity = (LivingEntity) targetEntity;
-                    Vec3d vec = entity.getPos().subtract(targetEntity.getPos()).multiply(0.05);
-                    if (targetEntity.horizontalCollision) {
-                        vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
-                    }
-                    livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
-                    if (!livingEntity.isOnGround()) {
-                        livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
-                    }
-                    targetEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, entity.getEyePos());
-                    if (targetEntity.getPos().isInRange(entity.getPos(), 1)) {
-                        vec = Vec3d.ZERO;
-                    }
-                    if (entity.getVelocity().y < 0 && targetEntity.getPos().y > entity.getY()) {
-                        vec = vec.multiply(1, 0, 1).add(0, entity.getVelocity().y, 0);
-                    } else if (entity.getVelocity().y == 0 && targetEntity.getPos().y > entity.getY()) {
-                        vec = vec.multiply(1, 0, 1).add(0, -0.75, 0);
-                    }
-                    targetEntity.setVelocity(vec);
-                    PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
-                    if (!entity.isSpectator() && !(entity instanceof PlayerEntity player && player.isCreative())) {
-                        ItemStack stack;
-                        if (entity.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
-                            stack = entity.getMainHandStack();
-                            int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
-                            stack.getOrCreateNbt().putInt("UsedTick", tick);
-                        } else {
-                            stack = entity.getOffHandStack();
-                            int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
-                            stack.getOrCreateNbt().putInt("UsedTick", tick);
-                        }
-                    }
-                });
+    public static void followAttractOwner(LivingEntity followingEntity, PlayerEntity attractingPlayer) {
+        if (attractingPlayer.world.isClient || followingEntity.world.isClient) {
+            return;
+        }
+        Vec3d vec = attractingPlayer.getPos().subtract(followingEntity.getPos()).multiply(0.05);
+        if (followingEntity.horizontalCollision) {
+            vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
+        }
+        followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
+        if (!followingEntity.isOnGround()) {
+            followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
+        }
+        followingEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, attractingPlayer.getEyePos());
+        if (followingEntity.getPos().isInRange(attractingPlayer.getPos(), 1)) {
+            vec = Vec3d.ZERO;
+        }
+        if (attractingPlayer.getVelocity().y < 0 && followingEntity.getPos().y > attractingPlayer.getY()) {
+            vec = vec.multiply(1, 0, 1).add(0, attractingPlayer.getVelocity().y, 0);
+        } else if (attractingPlayer.getVelocity().y == 0 && followingEntity.getPos().y > attractingPlayer.getY()) {
+            vec = vec.multiply(1, 0, 1).add(0, -0.75, 0);
+        }
+        followingEntity.setVelocity(vec);
+        PlayerLookup.tracking(followingEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(followingEntity)));
+        if (!attractingPlayer.isSpectator() && !(attractingPlayer.isCreative())) {
+            ItemStack stack;
+            if (attractingPlayer.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
+                stack = attractingPlayer.getMainHandStack();
+                int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
+                stack.getOrCreateNbt().putInt("UsedTick", tick);
+            } else {
+                stack = attractingPlayer.getOffHandStack();
+                int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
+                stack.getOrCreateNbt().putInt("UsedTick", tick);
             }
         }
     }
+
 
     public static void usedTickCheck(ItemStack stack) {
         if (stack.getNbt() == null || !stack.getNbt().contains("UsedTick")) {

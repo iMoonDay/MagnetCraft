@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.api;
 
+import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import me.shedaniel.autoconfig.AutoConfig;
@@ -70,7 +71,7 @@ public abstract class SwitchableItem extends Item {
             message = isMainhand ? Text.translatable("text.magnetcraft.message.mainhand_off") : Text.translatable("text.magnetcraft.message.offhand_off");
             sound = SoundEvents.BLOCK_BEACON_DEACTIVATE;
             if (stack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
-                player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), entity -> (entity.getScoreboardTags().contains(player.getEntityName()) && entity instanceof LivingEntity && entity.getPos().isInRange(player.getPos(),dis))).forEach(entity -> entity.removeScoreboardTag(player.getEntityName()));
+                player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), entity -> (!entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID) && entity instanceof LivingEntity && entity.getPos().isInRange(player.getPos(), dis))).forEach(entity -> entity.setAttractOwner(CreatureMagnetItem.EMPTY_UUID));
             }
         }
         if (client) {

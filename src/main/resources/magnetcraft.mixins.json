@@ -8,10 +8,12 @@
     "ArrowEntityMixin",
     "BlockMixin",
     "BrewingMixin",
+    "CarvedPumpkinBlockMixin",
     "EntityMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
-    "TridentEntityMixin"
+    "TridentEntityMixin",
+    "VillagerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1

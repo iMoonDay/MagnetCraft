@@ -46,7 +46,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
     }
 
     public AdvancedGrindstoneScreenHandler(int syncId, PlayerInventory playerInventory, final ScreenHandlerContext context) {
-        super(ScreenRegistries.ADVANCED_GRINDSTONE_SCREEN_HANDLER_SCREEN_HANDLER, syncId);
+        super(ScreenRegistries.ADVANCED_GRINDSTONE_SCREEN_HANDLER, syncId);
         this.context = context;
         this.index = 0;
         this.maxIndex = 0;

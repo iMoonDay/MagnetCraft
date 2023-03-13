@@ -188,7 +188,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                 for (int i = 0; i < inventory.size(); i++) {
                     ItemStack inventoryStack = inventory.get(i);
                     hasEmptySlot = inventoryStack.isEmpty();
-                    hasSameStack = inventoryStack.isItemEqual(stack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
+                    hasSameStack = ItemStack.canCombine(stack,inventoryStack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
                     overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
                     if (hasEmptySlot || hasSameStack) {
                         slot = i;

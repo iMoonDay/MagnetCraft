@@ -5,6 +5,7 @@ import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
 import com.imoonday.magnetcraft.common.items.magnets.*;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
+import com.imoonday.magnetcraft.registries.common.EntityRegistries;
 import com.imoonday.magnetcraft.registries.special.S2CRegistries;
 import com.imoonday.magnetcraft.registries.special.KeyBindingRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
@@ -30,5 +31,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         S2CRegistries.registerClient();
         PortableDemagnetizerItem.registerClient();
         MagneticFluid.registerClient();
+        EntityRegistries.registerClient();
     }
 }

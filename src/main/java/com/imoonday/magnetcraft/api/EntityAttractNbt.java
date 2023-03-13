@@ -2,6 +2,8 @@ package com.imoonday.magnetcraft.api;
 
 import net.minecraft.nbt.NbtCompound;
 
+import java.util.UUID;
+
 @SuppressWarnings("unused")
 public interface EntityAttractNbt {
 
@@ -22,5 +24,9 @@ public interface EntityAttractNbt {
     boolean getEnable();
 
     void setEnable(boolean enable);
+
+    UUID getAttractOwner();
+
+    void setAttractOwner(UUID uuid);
 
 }

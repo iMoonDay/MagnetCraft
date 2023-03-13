@@ -12,7 +12,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
@@ -40,7 +39,7 @@ public class MagnetControllerItem extends FilterableItem {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(Items.FLINT) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(ItemRegistries.DEMAGNETIZED_POWDER_ITEM) || super.canRepair(stack, ingredient);
     }
 
     @Override

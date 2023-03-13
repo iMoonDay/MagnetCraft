@@ -9,6 +9,7 @@ import net.minecraft.item.Items;
 import net.minecraft.text.Text;
 
 import static com.imoonday.magnetcraft.registries.common.BlockRegistries.*;
+import static com.imoonday.magnetcraft.registries.common.EntityRegistries.MAGNETIC_IRON_GOLEM_SPAWN_EGG;
 import static com.imoonday.magnetcraft.registries.common.FluidRegistries.MAGNETIC_FLUID_BUCKET;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
@@ -90,6 +91,7 @@ public class ItemGroupRegistries {
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                     content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
                     content.add(MAGNETIC_FLUID_BUCKET);
+                    content.add(MAGNETIC_IRON_GOLEM_SPAWN_EGG);
                 }).build();
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL).register(content -> {
@@ -191,6 +193,10 @@ public class ItemGroupRegistries {
             content.addAfter(Items.IRON_DOOR, MAGLEV_IRON_DOOR_BLOCK);
             content.addAfter(Items.REPEATER, MAGLEV_REPEATER_BLOCK);
             content.addAfter(Items.COMPARATOR, MAGLEV_COMPARATOR_BLOCK);
+        });
+
+        ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(content -> {
+            content.add(MAGNETIC_IRON_GOLEM_SPAWN_EGG);
         });
     }
 }

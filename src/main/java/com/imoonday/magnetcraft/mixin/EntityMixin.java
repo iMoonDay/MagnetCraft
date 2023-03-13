@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.methods.AttractMethods;
 import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NbtCompound;
@@ -10,36 +11,34 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.UUID;
+
 @Mixin(Entity.class)
-public abstract class EntityMixin implements EntityAttractNbt {
+public class EntityMixin implements EntityAttractNbt {
 
     protected NbtCompound attractData = new NbtCompound();
     protected double attractDis = 0;
     protected boolean isAttracting = false;
     protected boolean enable = true;
+    protected UUID attractOwner = CreatureMagnetItem.EMPTY_UUID;
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     public void tick(CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
-        if (!this.attractData.contains("AttractDis")) {
-            this.attractData.putDouble("AttractDis", 0);
-        }
-        if (!this.attractData.contains("isAttracting")) {
-            this.attractData.putBoolean("isAttracting", false);
-        }
-        if (!this.attractData.contains("Enable")) {
-            this.attractData.putBoolean("Enable", true);
-        }
-        this.attractDis = this.attractData.getDouble("AttractDis");
-        this.isAttracting = this.attractData.getBoolean("isAttracting");
-        this.enable = this.attractData.getBoolean("Enable");
-        if (this.isAttracting && this.enable) {
-            AttractMethods.attracting(entity, this.attractDis);
+        this.attractDis = this.getAttractDis();
+        this.isAttracting = this.isAttracting();
+        this.enable = this.getEnable();
+        this.attractOwner = this.getAttractOwner();
+        if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
+            AttractMethods.attracting(entity, entity.getAttractDis());
         }
     }
 
     @Override
     public NbtCompound getAttractData() {
+        if (attractData == null) {
+            attractData = new NbtCompound();
+        }
         return this.attractData;
     }
 
@@ -51,7 +50,10 @@ public abstract class EntityMixin implements EntityAttractNbt {
 
     @Override
     public double getAttractDis() {
-        return this.attractDis;
+        if (!this.attractData.contains("AttractDis")) {
+            this.attractData.putDouble("AttractDis", 0);
+        }
+        return this.attractData.getDouble("AttractDis");
     }
 
     @Override
@@ -61,7 +63,10 @@ public abstract class EntityMixin implements EntityAttractNbt {
 
     @Override
     public boolean isAttracting() {
-        return this.isAttracting;
+        if (!this.attractData.contains("isAttracting")) {
+            this.attractData.putBoolean("isAttracting", false);
+        }
+        return this.attractData.getBoolean("isAttracting");
     }
 
     @Override
@@ -80,7 +85,10 @@ public abstract class EntityMixin implements EntityAttractNbt {
 
     @Override
     public boolean getEnable() {
-        return this.enable;
+        if (!this.attractData.contains("Enable")) {
+            this.attractData.putBoolean("Enable", true);
+        }
+        return this.attractData.getBoolean("Enable");
     }
 
     @Override
@@ -88,14 +96,35 @@ public abstract class EntityMixin implements EntityAttractNbt {
         this.attractData.putBoolean("Enable", enable);
     }
 
+    @Override
+    public UUID getAttractOwner() {
+        if (!this.attractData.contains("AttractOwner")) {
+            this.attractData.putUuid("AttractOwner", CreatureMagnetItem.EMPTY_UUID);
+        }
+        return this.attractData.getUuid("AttractOwner");
+    }
+
+    @Override
+    public void setAttractOwner(UUID uuid) {
+        this.attractData.putUuid("AttractOwner", uuid);
+    }
+
     @Inject(method = "writeNbt", at = @At("TAIL"))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
+        this.attractData.putDouble("AttractDis", this.getAttractDis());
+        this.attractData.putBoolean("isAttracting", this.isAttracting());
+        this.attractData.putBoolean("Enable", this.getEnable());
+        this.attractData.putUuid("AttractOwner", this.getAttractOwner());
         nbt.put("AttractData", this.attractData);
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
     public void readPocketsDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         this.attractData = nbt.getCompound("AttractData");
+        this.attractDis = this.attractData.getDouble("AttractDis");
+        this.isAttracting = this.attractData.getBoolean("isAttracting");
+        this.enable = this.attractData.getBoolean("Enable");
+        this.attractOwner = this.attractData.getUuid("AttractOwner");
     }
 
 }

@@ -2,9 +2,7 @@ package com.imoonday.magnetcraft.common.blocks;
 
 import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.BlockEntityTicker;
 import net.minecraft.block.entity.BlockEntityType;
@@ -75,6 +73,10 @@ public class LodestoneBlock extends BlockWithEntity {
                 case DOWN -> nbt.putInt("direction", direction == 6 ? 0 : 6);
             }
         } else {
+            Block block = Block.getBlockFromItem(player.getStackInHand(hand).getItem());
+            if (block instanceof CarvedPumpkinBlock || block.getDefaultState().isOf(BlockRegistries.MAGNET_BLOCK)) {
+                return ActionResult.PASS;
+            }
             if (!world.isClient) {
                 NamedScreenHandlerFactory screenHandlerFactory = state.createScreenHandlerFactory(world, pos);
                 if (screenHandlerFactory != null) {

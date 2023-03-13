@@ -157,6 +157,9 @@ public class AttractMethods {
     }
 
     public static boolean canAttract(Entity entity) {
+        if (!entity.getEnable()) {
+            return false;
+        }
         int degaussingDis = ModConfig.getConfig().value.degaussingDis;
         if (!entity.world.getEntitiesByClass(LivingEntity.class, entity.getBoundingBox().expand(degaussingDis), otherEntity -> otherEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && entity.getPos().isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator()).isEmpty()) {
             return false;
@@ -214,10 +217,9 @@ public class AttractMethods {
         boolean mainhandMagnetHasEnch = mainhandMagnet && mainhandHasEnch;
         boolean offhandMagnetHasEnch = offhandMagnet && offhandHasEnch;
         boolean handMagnetHasEnch = mainhandMagnetHasEnch || offhandMagnetHasEnch;
-        boolean enable = entity.getEnable();
         boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
         boolean horseArmorAttracting = entity instanceof HorseEntity horseEntity && horseEntity.getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
-        boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && enable;
+        boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && canAttract(entity);
         boolean hasMagneticIronHelmet = head.isOf(ItemRegistries.MAGNETIC_IRON_HELMET);
         boolean hasMagneticIronChestcplate = chest.isOf(ItemRegistries.MAGNETIC_IRON_CHESTPLATE);
         boolean hasMagneticIronLeggings = legs.isOf(ItemRegistries.MAGNETIC_IRON_LEGGINGS);
@@ -228,8 +230,6 @@ public class AttractMethods {
         boolean hasNetheriteMagneticIronBoots = feet.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
         boolean hasMagneticIronSuit = hasMagneticIronHelmet && hasMagneticIronChestcplate && hasMagneticIronLeggings && hasMagneticIronBoots;
         boolean hasNetheriteMagneticIronSuit = hasNetheriteMagneticIronHelmet && hasNetheriteMagneticIronChestcplate && hasNetheriteMagneticIronLeggings && hasNetheriteMagneticIronBoots;
-        boolean mainhandEmptyDamage = DamageMethods.isEmptyDamage(entity, net.minecraft.util.Hand.MAIN_HAND);
-        boolean offhandEmptyDamage = DamageMethods.isEmptyDamage(entity, net.minecraft.util.Hand.OFF_HAND);
         boolean display = config.displayActionBar;
         boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
         boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
@@ -241,6 +241,8 @@ public class AttractMethods {
         double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;
         double telDis;
         double finalTelDis = 0;
+        PlayerEntity playerByUuid = entity.world.getPlayerByUuid(entity.getAttractOwner());
+        boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
         while (mainhandCreature && mainhandUsedTick >= 200) {
             NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
             nbt.putInt("UsedTick", mainhandUsedTick - 200);
@@ -255,11 +257,16 @@ public class AttractMethods {
             DamageMethods.addDamage(entity, Hand.OFF_HAND, 1, true);
             offhandUsedTick -= 200;
         }
-        if (enable && ((mainhandCreature && !mainhandEmptyDamage) || (offhandCreature && !offhandEmptyDamage))) {
-            CreatureMagnetItem.attractCreatures(entity);
+        if (!(entity instanceof PlayerEntity) && hasAttractOwner && playerByUuid != null && entity.getPos().isInRange(playerByUuid.getPos(), creatureDis) && canAttract(playerByUuid)) {
+            boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
+            boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
+            boolean attractOwnerHandCreature = attractOwnerMainhandCreature || attractOwnerOffhandCreature;
+            if (attractOwnerHandCreature) {
+                CreatureMagnetItem.followAttractOwner(entity, playerByUuid);
+            }
         }
         //检测吸引
-        if (isAttracting && canAttract(entity)) {
+        if (isAttracting) {
             int amplifier;
             double dis;
             if (handMagnet || hasEnch) {
@@ -301,7 +308,7 @@ public class AttractMethods {
             entity.setAttracting(false);
         }
         //信息栏
-        if (((isAttracting && canAttract(entity)) || handCreature) && display && entity instanceof PlayerEntity player) {
+        if ((isAttracting || handCreature) && display && entity instanceof PlayerEntity player) {
             String message;
             Text text;
             if (isAttracting) {

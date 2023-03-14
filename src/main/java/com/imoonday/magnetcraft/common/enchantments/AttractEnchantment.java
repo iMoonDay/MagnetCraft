@@ -23,7 +23,7 @@ public class AttractEnchantment extends Enchantment {
 
     @Override
     public int getMaxLevel() {
-        return ModConfig.getConfig().value.maxEnchLvl;
+        return ModConfig.getValue().maxEnchLvl;
     }
 
 }

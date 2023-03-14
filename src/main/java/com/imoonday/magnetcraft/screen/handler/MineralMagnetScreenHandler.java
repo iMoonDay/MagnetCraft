@@ -78,12 +78,14 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
     @Override
     public void onContentChanged(Inventory inventory) {
         super.onContentChanged(inventory);
-        ArrayList<ItemStack> stacks = new ArrayList<>();
-        for (int i = 0; i < inventory.size(); i++) {
-            stacks.add(inventory.getStack(i));
+        if (inventory == this.shulkerBoxSlots) {
+            ArrayList<ItemStack> stacks = new ArrayList<>();
+            for (int i = 0; i < inventory.size(); i++) {
+                stacks.add(inventory.getStack(i));
+            }
+            ItemStack stack = getSlot() != -1 ? getInventory().getStack(getSlot()) : getInventory().player.getOffHandStack();
+            FilterableItem.setShulkerBoxItems(stack, stacks);
         }
-        ItemStack stack = getSlot() != -1 ? getInventory().getStack(getSlot()) : getInventory().player.getOffHandStack();
-        FilterableItem.setShulkerBoxItems(stack, stacks);
         this.sendContentUpdates();
     }
 

@@ -72,7 +72,7 @@ public class ElectromagnetItem extends FilterableItem {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
-        double dis = ModConfig.getConfig().value.electromagnetTeleportMinDis;
+        double dis = ModConfig.getValue().electromagnetTeleportMinDis;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
@@ -100,7 +100,7 @@ public class ElectromagnetItem extends FilterableItem {
 
     public static void teleportItems(World world, PlayerEntity player, double dis, Hand hand) {
         boolean message = ModConfig.getConfig().displayMessageFeedback;
-        int magnetHandSpacing = ModConfig.getConfig().value.magnetHandSpacing;
+        int magnetHandSpacing = ModConfig.getValue().magnetHandSpacing;
         if (DamageMethods.isEmptyDamage(player, hand)) return;
         if (hand == Hand.MAIN_HAND) dis += magnetHandSpacing;
         double finalDis = dis;

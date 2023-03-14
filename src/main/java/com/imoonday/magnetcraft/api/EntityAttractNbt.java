@@ -19,7 +19,7 @@ public interface EntityAttractNbt {
 
     void setAttracting(boolean attracting);
 
-    void setAttracting(boolean attracting,double dis);
+    void setAttracting(boolean attracting, double dis);
 
     boolean getEnable();
 
@@ -28,5 +28,15 @@ public interface EntityAttractNbt {
     UUID getAttractOwner();
 
     void setAttractOwner(UUID uuid);
+
+    boolean canAttract();
+
+    boolean isFollowing();
+
+    void setFollowing(boolean following);
+
+    boolean ignoreFallDamage();
+
+    void setIgnoreFallDamage(boolean ignore);
 
 }

@@ -73,7 +73,7 @@ public class CropMagnetItem extends FilterableItem {
                 openScreen(user, hand, this);
             }
         } else {
-            int levelEveryCount = ModConfig.getConfig().value.removeFoodLevelEveryCount;
+            int levelEveryCount = ModConfig.getValue().removeFoodLevelEveryCount;
             if (!DamageMethods.isEmptyDamage(user, hand)) {
                 int crops = searchCrops(user, hand);
                 int removeFoodLevel = levelEveryCount != 0 ? crops / levelEveryCount + (crops % levelEveryCount == 0 ? 0 : 1) : 0;

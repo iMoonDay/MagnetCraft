@@ -115,6 +115,7 @@
   "block.magnetcraft.maglev_comparator": "Maglev Comparator",
   "block.magnetcraft.magnetic_fluid_cauldron": "Magnetic Fluid Cauldron",
   "entity.magnetcraft.magnetic_iron_golem": "Magnetic Iron Golem",
+  "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "Magnetic Iron Golem with Lodestone",
   "container.magnetcraft.advanced_grindstone_title": "Enchantment Extraction",
   "effect.magnetcraft.attract": "Attract",
   "effect.magnetcraft.degaussing": "Degaussing",
@@ -218,10 +219,16 @@
   "text.autoconfig.magnetcraft.option.value.disPerLvl": "Increased distance per enchantment level",
   "text.autoconfig.magnetcraft.option.value.disPerPower": "Increased lodestone attract distance per redstone power",
   "text.autoconfig.magnetcraft.option.value.disEachClick": "Increased lodestone attract distance each right-click",
+  "text.autoconfig.magnetcraft.option.value.secPerDamage": "Creature Magnet consumes the seconds required for durability each time",
   "text.autoconfig.magnetcraft.option.value.maxEnchLvl": "Max enchant level(Need Restart)",
   "text.autoconfig.magnetcraft.option.value.requiredExperienceLevel": "The experience level required for each use of mineral magnet",
   "text.autoconfig.magnetcraft.option.value.removeFoodLevelEveryCount": "Crop magnet consume a minimum of food level once per use (0 is not consumed)",
   "text.autoconfig.magnetcraft.option.value.coolingPercentage": "Percentage adjusts item usage cooldown",
   "text.autoconfig.magnetcraft.option.value.magnetSetMultiplier": "Magnet set lifting range multiplier",
-  "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "Netherite Magnet set lifting range multiplier"
+  "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "Netherite Magnet set lifting range multiplier",
+  "text.autoconfig.magnetcraft.option.golem": "Golem Value Setting",
+  "text.autoconfig.magnetcraft.option.golem.spawnByVillager": "Spawn by Villager",
+  "text.autoconfig.magnetcraft.option.golem.spawnProbability": "Spawn Probability",
+  "text.autoconfig.magnetcraft.option.golem.lodestoneDropProbability": "Drop Probability of Lodestone",
+  "text.autoconfig.magnetcraft.option.golem.attractDis": "Attract distance of Golem"
 }

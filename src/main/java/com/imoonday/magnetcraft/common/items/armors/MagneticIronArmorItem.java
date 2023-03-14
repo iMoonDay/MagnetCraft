@@ -21,7 +21,7 @@ public class MagneticIronArmorItem extends ArmorItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        tooltip.add(Text.translatable("item.magnetcraft.magnetic_armor.tooltip", ModConfig.getConfig().value.magnetSetMultiplier)
+        tooltip.add(Text.translatable("item.magnetcraft.magnetic_armor.tooltip", ModConfig.getValue().magnetSetMultiplier)
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
     }
 }

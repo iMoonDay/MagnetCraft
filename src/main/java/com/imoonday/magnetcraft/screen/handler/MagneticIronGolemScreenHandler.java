@@ -79,4 +79,9 @@ public class MagneticIronGolemScreenHandler extends ScreenHandler {
         return this.inventory.canPlayerUse(player);
     }
 
+    @Override
+    public void close(PlayerEntity player) {
+        super.close(player);
+        this.inventory.markDirty();
+    }
 }

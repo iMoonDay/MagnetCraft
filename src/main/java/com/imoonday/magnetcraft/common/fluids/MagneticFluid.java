@@ -4,6 +4,8 @@ import com.imoonday.magnetcraft.api.AbstractMagneticFluid;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.client.render.fluid.v1.FluidRenderHandlerRegistry;
 import net.fabricmc.fabric.api.client.render.fluid.v1.SimpleFluidRenderHandler;
@@ -87,6 +89,7 @@ public class MagneticFluid extends AbstractMagneticFluid {
 
     }
 
+    @Environment(EnvType.CLIENT)
     public static void registerClient() {
         FluidRenderHandlerRegistry.INSTANCE.register(STILL_MAGNETIC_FLUID, FLOWING_MAGNETIC_FLUID, new SimpleFluidRenderHandler(
                 new Identifier("minecraft:block/water_still"),

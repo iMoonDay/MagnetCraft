@@ -10,6 +10,7 @@
     "BrewingMixin",
     "CarvedPumpkinBlockMixin",
     "EntityMixin",
+    "EntityTypeMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
     "TridentEntityMixin",

@@ -56,11 +56,7 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
     @Override
     public void appendTooltip(ItemStack itemStack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         if (itemStack.getNbt() != null && itemStack.getNbt().getBoolean("Filterable")) {
-            if (itemStack.getOrCreateNbt().getBoolean("Whitelist")) {
-                tooltip.add(Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-            } else {
-                tooltip.add(Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-            }
+            tooltip.add(itemStack.getOrCreateNbt().getBoolean("Whitelist") ? Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD) : Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
             for (int i = 0; i < itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).size(); i++) {
                 NbtCompound filter = itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).getCompound(i);
                 ItemStack stack = ItemStack.fromNbt(filter);
@@ -182,10 +178,7 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
         shulkerBoxCheck(stack);
         NbtList list = stack.getOrCreateNbt().getList("ShulkerBox", NbtElement.COMPOUND_TYPE);
         list.clear();
-        for (ItemStack otherStack : stacks) {
-            NbtCompound otherStackNbt = otherStack.writeNbt(new NbtCompound());
-            list.add(otherStackNbt);
-        }
+        stacks.stream().map(otherStack -> otherStack.writeNbt(new NbtCompound())).forEach(list::add);
         stack.getOrCreateNbt().put("ShulkerBox", list);
     }
 

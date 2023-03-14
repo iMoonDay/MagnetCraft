@@ -52,7 +52,7 @@ public abstract class SwitchableItem extends Item {
     public static void enabledSwitch(World world, PlayerEntity player, Hand hand) {
         boolean display = AutoConfig.getConfigHolder(ModConfig.class).getConfig().displayActionBar;
         boolean enableSneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
-        double dis = ModConfig.getConfig().value.creatureMagnetAttractDis;
+        double dis = ModConfig.getValue().creatureMagnetAttractDis;
         boolean isMainhand = hand == Hand.MAIN_HAND;
         boolean client = world.isClient;
         ItemStack stack = player.getStackInHand(hand);

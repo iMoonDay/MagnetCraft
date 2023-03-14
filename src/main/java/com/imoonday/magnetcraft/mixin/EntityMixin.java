@@ -2,8 +2,13 @@ package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.api.EntityAttractNbt;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
+import com.imoonday.magnetcraft.registries.common.EffectRegistries;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,14 +26,18 @@ public class EntityMixin implements EntityAttractNbt {
     protected boolean isAttracting = false;
     protected boolean enable = true;
     protected UUID attractOwner = CreatureMagnetItem.EMPTY_UUID;
+    protected boolean isFollowing = false;
+    protected boolean ignoreFallDamage = false;
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     public void tick(CallbackInfo ci) {
         Entity entity = (Entity) (Object) this;
         this.attractDis = this.getAttractDis();
-        this.isAttracting = this.isAttracting();
+        this.isAttracting = this.isAttracting() && this.canAttract();
         this.enable = this.getEnable();
         this.attractOwner = this.getAttractOwner();
+        this.isFollowing = this.isFollowing();
+        this.ignoreFallDamage = this.ignoreFallDamage();
         if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
             AttractMethods.attracting(entity, entity.getAttractDis());
         }
@@ -109,30 +118,88 @@ public class EntityMixin implements EntityAttractNbt {
         this.attractData.putUuid("AttractOwner", uuid);
     }
 
+    @Override
+    public boolean canAttract() {
+        Entity entity = (Entity) (Object) this;
+        if (!entity.getEnable()) {
+            return false;
+        }
+        int degaussingDis = ModConfig.getValue().degaussingDis;
+        if (!entity.world.getEntitiesByClass(LivingEntity.class, entity.getBoundingBox().expand(degaussingDis), otherEntity -> otherEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && entity.getPos().isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator()).isEmpty()) {
+            return false;
+        }
+        if (entity instanceof LivingEntity livingEntity) {
+            if (livingEntity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT)) {
+                return false;
+            }
+            if (!(livingEntity instanceof PlayerEntity)) {
+                return livingEntity.world.getEntitiesByClass(PlayerEntity.class, entity.getBoundingBox().expand(degaussingDis), player -> player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM) && stack.getNbt() != null && stack.getNbt().getBoolean("Enable"))).isEmpty();
+            }
+            return true;
+        }
+        return true;
+    }
+
+    @Override
+    public boolean isFollowing() {
+        if (!this.attractData.contains("isFollowing")) {
+            this.attractData.putBoolean("isFollowing", false);
+        }
+        return this.attractData.getBoolean("isFollowing");
+    }
+
+    @Override
+    public void setFollowing(boolean following) {
+        this.attractData.putBoolean("isFollowing", following);
+    }
+
+    @Override
+    public boolean ignoreFallDamage() {
+        if (!this.attractData.contains("IgnoreFallDamage")) {
+            this.attractData.putBoolean("IgnoreFallDamage", false);
+        }
+        return this.attractData.getBoolean("IgnoreFallDamage");
+    }
+
+    @Override
+    public void setIgnoreFallDamage(boolean ignore) {
+        this.attractData.putBoolean("IgnoreFallDamage", ignore);
+    }
+
+
     @Inject(method = "writeNbt", at = @At("TAIL"))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
         this.attractData.putDouble("AttractDis", this.getAttractDis());
-        this.attractData.putBoolean("isAttracting", this.isAttracting());
+        this.attractData.putBoolean("isAttracting", this.isAttracting() && this.canAttract());
         this.attractData.putBoolean("Enable", this.getEnable());
         this.attractData.putUuid("AttractOwner", this.getAttractOwner());
+        this.attractData.putBoolean("isFollowing", this.isFollowing());
+        this.attractData.putBoolean("IgnoreFallDamage", this.ignoreFallDamage());
         nbt.put("AttractData", this.attractData);
     }
 
     @Inject(method = "readNbt", at = @At("TAIL"))
     public void readPocketsDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains("AttractData")) {
-            this.attractData = nbt.getCompound("AttractData");
-            if (nbt.getCompound("AttractData").contains("AttractDis")) {
-                this.attractDis = nbt.getCompound("AttractData").getDouble("AttractDis");
+            NbtCompound data = nbt.getCompound("AttractData");
+            this.attractData = data;
+            if (data.contains("AttractDis")) {
+                this.attractDis = data.getDouble("AttractDis");
             }
-            if (nbt.getCompound("AttractData").contains("isAttracting")) {
-                this.isAttracting = nbt.getCompound("AttractData").getBoolean("isAttracting");
+            if (data.contains("isAttracting")) {
+                this.isAttracting = data.getBoolean("isAttracting");
             }
-            if (nbt.getCompound("AttractData").contains("Enable")) {
-                this.enable = nbt.getCompound("AttractData").getBoolean("Enable");
+            if (data.contains("Enable")) {
+                this.enable = data.getBoolean("Enable");
             }
-            if (nbt.getCompound("AttractData").contains("AttractOwner")) {
-                this.attractOwner = nbt.getCompound("AttractData").getUuid("AttractOwner");
+            if (data.contains("AttractOwner")) {
+                this.attractOwner = data.getUuid("AttractOwner");
+            }
+            if (data.contains("isFollowing")) {
+                this.isFollowing = data.getBoolean("isFollowing");
+            }
+            if (data.contains("IgnoreFallDamage")) {
+                this.ignoreFallDamage = data.getBoolean("IgnoreFallDamage");
             }
         }
     }

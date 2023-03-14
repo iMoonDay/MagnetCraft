@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.projectile.TridentEntity;
@@ -33,7 +32,7 @@ public class TridentEntityMixin extends EntityMixin {
             double disPerLvl = config.value.disPerLvl;
             double enchMinDis = enchDefaultDis + disPerLvl;
             double dis = enchMinDis + (enchLvl - 1) * disPerLvl;
-            if (isAttracting && AttractMethods.canAttract(entity)) {
+            if (isAttracting && this.canAttract()) {
                 this.setAttracting(true, dis);
             }
         }

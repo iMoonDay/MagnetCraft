@@ -14,6 +14,7 @@ public class MagneticIronGolemEntityRenderer extends IronGolemEntityRenderer {
 
     @Override
     public Identifier getTexture(IronGolemEntity ironGolemEntity) {
-        return id("textures/entity/magnetic_iron_golem/magnetic_iron_golem.png");
+        String id = ironGolemEntity instanceof MagneticIronGolemEntity entity && entity.isHasLodestone() ? "magnetic_iron_golem_with_lodestone" : "magnetic_iron_golem";
+        return id("textures/entity/magnetic_iron_golem/" + id + ".png");
     }
 }

@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.PotionRegistries;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.potion.Potion;
@@ -25,8 +24,8 @@ public abstract class ArrowEntityMixin extends EntityMixin {
             World world = ((ArrowEntity) (Object) this).world;
             if (world == null) return;
             boolean isAttracting = this.potion == PotionRegistries.ATTRACT_POTION;
-            double dis = ModConfig.getConfig().value.arrowAttractDis;
-            if (isAttracting && AttractMethods.canAttract(entity)) {
+            double dis = ModConfig.getValue().arrowAttractDis;
+            if (isAttracting && this.canAttract()) {
                 this.setAttracting(true, dis);
             }
         }

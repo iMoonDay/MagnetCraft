@@ -72,7 +72,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
 
     public static void tick(World world, BlockPos pos, BlockState state, LodestoneEntity entity) {
         if (world != null) {
-            int maxDis = ModConfig.getConfig().value.lodestoneMaxDis;
+            int maxDis = ModConfig.getValue().lodestoneMaxDis;
             world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
             double dis = entity.dis <= maxDis ? entity.dis + 1 : maxDis + 1;
             int getDirection = entity.direction;
@@ -112,7 +112,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
 
     @Override
     public void writeNbt(NbtCompound nbt) {
-        int disPerPower = ModConfig.getConfig().value.disPerPower;
+        int disPerPower = ModConfig.getValue().disPerPower;
         nbt.putBoolean("redstone", redstone);
         nbt.putDouble("dis", redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : dis);
         dis = nbt.getDouble("dis");

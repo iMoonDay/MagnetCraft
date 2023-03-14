@@ -78,6 +78,8 @@ public class ModConfig implements ConfigData {
         public int disPerPower = 2;
         @ConfigEntry.BoundedDiscrete(max = 30)
         public int disEachClick = 5;
+        @ConfigEntry.BoundedDiscrete(min = 1, max = 300)
+        public int secPerDamage = 30;
         @ConfigEntry.BoundedDiscrete(min = 1, max = 10)
         public int maxEnchLvl = 5;
         @ConfigEntry.BoundedDiscrete(max = 30)
@@ -93,6 +95,19 @@ public class ModConfig implements ConfigData {
 
     }
 
+    @ConfigEntry.Gui.CollapsibleObject
+    public GolemValue golem = new GolemValue();
+
+    public static class GolemValue {
+        public boolean spawnByVillager = true;
+        @ConfigEntry.BoundedDiscrete(max = 100)
+        public int spawnProbability = 25;
+        @ConfigEntry.BoundedDiscrete(max = 100)
+        public int lodestoneDropProbability = 50;
+        @ConfigEntry.BoundedDiscrete(max = 150)
+        public int attractDis = 15;
+    }
+
     public static void register() {
         AutoConfig.register(ModConfig.class, GsonConfigSerializer::new);
     }
@@ -103,6 +118,10 @@ public class ModConfig implements ConfigData {
 
     public static DefaultValue getValue() {
         return AutoConfig.getConfigHolder(ModConfig.class).getConfig().value;
+    }
+
+    public static GolemValue getGolemValue() {
+        return AutoConfig.getConfigHolder(ModConfig.class).getConfig().golem;
     }
 
 }

@@ -2,7 +2,6 @@ package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethods;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
@@ -22,8 +21,8 @@ public class ItemEntityMixin extends EntityMixin {
             if (world == null) return;
             ItemStack stack = entity.getStack();
             boolean isAttracting = stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
-            int dis = ModConfig.getConfig().value.droppedMagnetAttractDis;
-            if (isAttracting && AttractMethods.canAttract(entity)) {
+            int dis = ModConfig.getValue().droppedMagnetAttractDis;
+            if (isAttracting && this.canAttract()) {
                 this.setAttracting(true, dis);
             }
         }

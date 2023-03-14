@@ -3,6 +3,9 @@ package com.imoonday.magnetcraft.mixin;
 import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntity;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
+import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CarvedPumpkinBlock;
@@ -11,6 +14,7 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
+import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
@@ -25,13 +29,15 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
 
+import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.GOLEM_PACKET_ID;
+
 @Mixin(CarvedPumpkinBlock.class)
 public class CarvedPumpkinBlockMixin {
 
+    private BlockPattern magneticIronGolemWithLodestoneDispenserPattern;
     private BlockPattern magneticIronGolemDispenserPattern;
-    private BlockPattern magneticIronGolemWithoutLodestoneDispenserPattern;
+    private BlockPattern magneticIronGolemWithLodestonePattern;
     private BlockPattern magneticIronGolemPattern;
-    private BlockPattern magneticIronGolemWithoutLodestonePattern;
     private static final Predicate<BlockState> IS_GOLEM_HEAD_PREDICATE = state -> state != null && (state.isOf(Blocks.CARVED_PUMPKIN) || state.isOf(Blocks.JACK_O_LANTERN));
 
     @Shadow
@@ -40,7 +46,7 @@ public class CarvedPumpkinBlockMixin {
 
     @Inject(method = "canDispense", at = @At(value = "HEAD"), cancellable = true)
     public void canDispense(WorldView world, BlockPos pos, CallbackInfoReturnable<Boolean> cir) {
-        if (this.getMagneticIronGolemDispenserPattern().searchAround(world, pos) != null || this.getMagneticIronGolemWithoutLodestoneDispenserPattern().searchAround(world, pos) != null) {
+        if (this.getMagneticIronGolemWithLodestoneDispenserPattern().searchAround(world, pos) != null || this.getMagneticIronGolemDispenserPattern().searchAround(world, pos) != null) {
             cir.setReturnValue(true);
         }
     }
@@ -48,46 +54,50 @@ public class CarvedPumpkinBlockMixin {
     @Inject(method = "trySpawnEntity", at = @At(value = "TAIL"))
     private void trySpawnEntity(World world, BlockPos pos, CallbackInfo ci) {
         MagneticIronGolemEntity magneticIronGolemEntity;
-        BlockPattern.Result result1 = this.getMagneticIronGolemPattern().searchAround(world, pos);
-        BlockPattern.Result result2 = this.getMagneticIronGolemWithoutLodestonePattern().searchAround(world, pos);
+        BlockPattern.Result result1 = this.getMagneticIronGolemWithLodestonePattern().searchAround(world, pos);
+        BlockPattern.Result result2 = this.getMagneticIronGolemPattern().searchAround(world, pos);
         if (result1 != null && (magneticIronGolemEntity = EntityRegistries.MAGNETIC_IRON_GOLEM.create(world)) != null) {
             magneticIronGolemEntity.setPlayerCreated(true);
-            spawnEntity(world, result1, magneticIronGolemEntity, result1.translate(1, 2, 0).getBlockPos());
+            spawnEntity(world, result1, magneticIronGolemEntity.withLodestone(), result1.translate(1, 2, 0).getBlockPos());
+            if (!world.isClient) {
+                PacketByteBuf buf = PacketByteBufs.create();
+                buf.writeInt(magneticIronGolemEntity.getId());
+                PlayerLookup.tracking(magneticIronGolemEntity).forEach(player -> ServerPlayNetworking.send(player, GOLEM_PACKET_ID, buf));
+            }
         } else {
             if (result2 != null && (magneticIronGolemEntity = EntityRegistries.MAGNETIC_IRON_GOLEM.create(world)) != null) {
                 magneticIronGolemEntity.setPlayerCreated(true);
-                magneticIronGolemEntity.setHasLodestone(false);
                 spawnEntity(world, result2, magneticIronGolemEntity, result2.translate(1, 2, 0).getBlockPos());
             }
         }
     }
 
+    private BlockPattern getMagneticIronGolemWithLodestoneDispenserPattern() {
+        if (this.magneticIronGolemWithLodestoneDispenserPattern == null) {
+            this.magneticIronGolemWithLodestoneDispenserPattern = BlockPatternBuilder.start().aisle("~ ~", "#$#", "~#~").where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).where('$', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.LODESTONE_BLOCK))).build();
+        }
+        return this.magneticIronGolemWithLodestoneDispenserPattern;
+    }
+
+    private BlockPattern getMagneticIronGolemWithLodestonePattern() {
+        if (this.magneticIronGolemWithLodestonePattern == null) {
+            this.magneticIronGolemWithLodestonePattern = BlockPatternBuilder.start().aisle("~^~", "#$#", "~#~").where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE)).where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).where('$', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.LODESTONE_BLOCK))).build();
+        }
+        return this.magneticIronGolemWithLodestonePattern;
+    }
+
     private BlockPattern getMagneticIronGolemDispenserPattern() {
         if (this.magneticIronGolemDispenserPattern == null) {
-            this.magneticIronGolemDispenserPattern = BlockPatternBuilder.start().aisle("~ ~", "#$#", "~#~").where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).where('$', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.LODESTONE_BLOCK))).build();
+            this.magneticIronGolemDispenserPattern = BlockPatternBuilder.start().aisle("~ ~", "###", "~#~").where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).build();
         }
         return this.magneticIronGolemDispenserPattern;
     }
 
     private BlockPattern getMagneticIronGolemPattern() {
         if (this.magneticIronGolemPattern == null) {
-            this.magneticIronGolemPattern = BlockPatternBuilder.start().aisle("~^~", "#$#", "~#~").where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE)).where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).where('$', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.LODESTONE_BLOCK))).build();
+            this.magneticIronGolemPattern = BlockPatternBuilder.start().aisle("~^~", "###", "~#~").where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE)).where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).build();
         }
         return this.magneticIronGolemPattern;
-    }
-
-    private BlockPattern getMagneticIronGolemWithoutLodestoneDispenserPattern() {
-        if (this.magneticIronGolemWithoutLodestoneDispenserPattern == null) {
-            this.magneticIronGolemWithoutLodestoneDispenserPattern = BlockPatternBuilder.start().aisle("~ ~", "###", "~#~").where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).build();
-        }
-        return this.magneticIronGolemWithoutLodestoneDispenserPattern;
-    }
-
-    private BlockPattern getMagneticIronGolemWithoutLodestonePattern() {
-        if (this.magneticIronGolemWithoutLodestonePattern == null) {
-            this.magneticIronGolemWithoutLodestonePattern = BlockPatternBuilder.start().aisle("~^~", "###", "~#~").where('^', CachedBlockPosition.matchesBlockState(IS_GOLEM_HEAD_PREDICATE)).where('#', CachedBlockPosition.matchesBlockState(BlockStatePredicate.forBlock(BlockRegistries.MAGNET_BLOCK))).where('~', CachedBlockPosition.matchesBlockState(MaterialPredicate.create(Material.AIR))).build();
-        }
-        return this.magneticIronGolemWithoutLodestonePattern;
     }
 
 }

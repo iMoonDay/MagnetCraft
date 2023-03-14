@@ -53,7 +53,7 @@ public class PermanentMagnetItem extends FilterableItem {
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
-        double dis = ModConfig.getConfig().value.permanentMagnetTeleportMinDis;
+        double dis = ModConfig.getValue().permanentMagnetTeleportMinDis;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;

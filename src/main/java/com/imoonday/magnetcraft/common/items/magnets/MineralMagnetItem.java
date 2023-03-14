@@ -143,7 +143,6 @@ public class MineralMagnetItem extends Item {
                     CooldownMethods.setCooldown(user, user.getStackInHand(hand), value * 20);
                 } else {
                     CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
-
                 }
             }
         }
@@ -161,7 +160,7 @@ public class MineralMagnetItem extends Item {
     }
 
     public static int searchMineral(PlayerEntity player, Hand hand) {
-        int requiredExperienceLevel = ModConfig.getConfig().value.requiredExperienceLevel;
+        int requiredExperienceLevel = ModConfig.getValue().requiredExperienceLevel;
         int total = 0;
         int totalValue = 0;
         if (!player.world.isClient) {

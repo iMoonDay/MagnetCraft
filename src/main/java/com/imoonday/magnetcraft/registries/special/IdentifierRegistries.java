@@ -9,6 +9,7 @@ public class IdentifierRegistries {
     public static final Identifier USE_CONTROLLER_PACKET_ID = id("use_controller");
     public static final Identifier BLACKLIST_PACKET_ID = id("blacklist");
     public static final Identifier WHITELIST_PACKET_ID = id("whitelist");
+    public static final Identifier GOLEM_PACKET_ID = id("golem");
 
     public static Identifier id(String id) {
         return new Identifier(MOD_ID, id);

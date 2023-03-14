@@ -115,6 +115,7 @@
   "block.magnetcraft.maglev_comparator": "磁悬浮红石比较器",
   "block.magnetcraft.magnetic_fluid_cauldron": "装有磁流体的炼药锅",
   "entity.magnetcraft.magnetic_iron_golem": "磁傀儡",
+  "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "装备磁石的磁傀儡",
   "container.magnetcraft.advanced_grindstone_title": "附魔提取",
   "effect.magnetcraft.attract": "吸引",
   "effect.magnetcraft.degaussing": "消磁",
@@ -218,10 +219,16 @@
   "text.autoconfig.magnetcraft.option.value.disPerLvl": "每级附魔增加的距离",
   "text.autoconfig.magnetcraft.option.value.disPerPower": "每级红石信号增加的磁石吸引距离",
   "text.autoconfig.magnetcraft.option.value.disEachClick": "每次右击磁石增加的吸引距离",
+  "text.autoconfig.magnetcraft.option.value.secPerDamage": "生物磁铁每次消耗耐久需要的秒时间",
   "text.autoconfig.magnetcraft.option.value.maxEnchLvl": "最大附魔等级(修改后需重启游戏)",
   "text.autoconfig.magnetcraft.option.value.requiredExperienceLevel": "矿物磁铁每次使用所需要的等级",
   "text.autoconfig.magnetcraft.option.value.removeFoodLevelEveryCount": "作物磁铁每次使用消耗一点饱食度的最低限度(0则不消耗)",
   "text.autoconfig.magnetcraft.option.value.coolingPercentage": "百分比调整物品使用冷却时间",
   "text.autoconfig.magnetcraft.option.value.magnetSetMultiplier": "磁铁套装提升范围的倍率",
-  "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "下界磁铁套装提升范围的倍率"
+  "text.autoconfig.magnetcraft.option.value.netheriteMagnetSetMultiplier": "下界磁铁套装提升范围的倍率",
+  "text.autoconfig.magnetcraft.option.golem": "磁傀儡设置",
+  "text.autoconfig.magnetcraft.option.golem.spawnByVillager": "由村民生成",
+  "text.autoconfig.magnetcraft.option.golem.spawnProbability": "生成概率",
+  "text.autoconfig.magnetcraft.option.golem.lodestoneDropProbability": "磁石的掉落概率",
+  "text.autoconfig.magnetcraft.option.golem.attractDis": "吸引距离"
 }

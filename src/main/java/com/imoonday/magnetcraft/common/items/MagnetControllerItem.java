@@ -92,7 +92,7 @@ public class MagnetControllerItem extends FilterableItem {
             if (hand != null) {
                 CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
             } else {
-                int percent = ModConfig.getConfig().value.coolingPercentage;
+                int percent = ModConfig.getValue().coolingPercentage;
                 user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20 * percent / 100);
             }
             user.getInventory().markDirty();

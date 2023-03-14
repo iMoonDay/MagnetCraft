@@ -8,7 +8,7 @@ import net.minecraft.item.ItemStack;
 public class CooldownMethods {
 
     public static void setCooldown(PlayerEntity player, ItemStack stack, int cooldown) {
-        int percent = ModConfig.getConfig().value.coolingPercentage;
+        int percent = ModConfig.getValue().coolingPercentage;
         if (EnchantmentMethods.hasEnchantment(stack, EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT)) {
             int level = EnchantmentMethods.getEnchantmentLvl(stack, EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT);
             cooldown -= cooldown * level / 10;

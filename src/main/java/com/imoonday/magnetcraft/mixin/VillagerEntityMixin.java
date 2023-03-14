@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.LargeEntitySpawnHelper;
@@ -38,7 +39,9 @@ public class VillagerEntityMixin {
         Box box = entity.getBoundingBox().expand(10.0, 10.0, 10.0);
         List<VillagerEntity> list = world.getNonSpectatingEntities(VillagerEntity.class, box);
         Random random = entity.getRandom();
-        if (random.nextBetween(1, 4) == 1) {
+        int percent = ModConfig.getGolemValue().spawnProbability;
+        boolean canSpawn = ModConfig.getGolemValue().spawnByVillager;
+        if (random.nextBetween(1, 100) <= percent && canSpawn) {
             if (LargeEntitySpawnHelper.trySpawnAt(EntityRegistries.MAGNETIC_IRON_GOLEM, SpawnReason.MOB_SUMMONED, world, entity.getBlockPos(), 10, 8, 6, LargeEntitySpawnHelper.Requirements.IRON_GOLEM).isPresent()) {
                 list.forEach(GolemLastSeenSensor::rememberIronGolem);
                 ci.cancel();

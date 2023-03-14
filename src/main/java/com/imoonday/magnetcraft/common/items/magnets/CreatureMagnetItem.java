@@ -3,6 +3,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.CooldownMethods;
+import com.imoonday.magnetcraft.methods.DamageMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -132,10 +133,7 @@ public class CreatureMagnetItem extends SwitchableItem {
         if (followingEntity.horizontalCollision) {
             vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
         }
-        followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 3 * 20, 0, false, false));
-        if (!followingEntity.isOnGround()) {
-            followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOW_FALLING, 10 * 20, 0, false, false));
-        }
+        followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
         followingEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, attractingPlayer.getEyePos());
         if (followingEntity.getPos().isInRange(attractingPlayer.getPos(), 1)) {
             vec = Vec3d.ZERO;
@@ -146,17 +144,20 @@ public class CreatureMagnetItem extends SwitchableItem {
             vec = vec.multiply(1, 0, 1).add(0, -0.75, 0);
         }
         followingEntity.setVelocity(vec);
+        if (!followingEntity.isOnGround()) {
+            followingEntity.setIgnoreFallDamage(true);
+        }
         PlayerLookup.tracking(followingEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(followingEntity)));
         if (!attractingPlayer.isSpectator() && !(attractingPlayer.isCreative())) {
             ItemStack stack;
             if (attractingPlayer.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
                 stack = attractingPlayer.getMainHandStack();
-                int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
-                stack.getOrCreateNbt().putInt("UsedTick", tick);
+                int tick = stack.getOrCreateNbt().getInt("UsedTick");
+                stack.getOrCreateNbt().putInt("UsedTick", ++tick);
             } else {
                 stack = attractingPlayer.getOffHandStack();
-                int tick = stack.getOrCreateNbt().getInt("UsedTick") + 1;
-                stack.getOrCreateNbt().putInt("UsedTick", tick);
+                int tick = stack.getOrCreateNbt().getInt("UsedTick");
+                stack.getOrCreateNbt().putInt("UsedTick", ++tick);
             }
         }
     }
@@ -175,6 +176,22 @@ public class CreatureMagnetItem extends SwitchableItem {
     @Override
     public int getEnchantability() {
         return 16;
+    }
+
+    public static void followingCheck(LivingEntity entity) {
+        double creatureDis = ModConfig.getValue().creatureMagnetAttractDis;
+        PlayerEntity playerByUuid = entity.world.getPlayerByUuid(entity.getAttractOwner());
+        boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
+        if (!(entity instanceof PlayerEntity) && hasAttractOwner && playerByUuid != null && entity.getPos().isInRange(playerByUuid.getPos(), creatureDis) && playerByUuid.canAttract()) {
+            boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
+            boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
+            if (attractOwnerMainhandCreature || attractOwnerOffhandCreature) {
+                CreatureMagnetItem.followAttractOwner(entity, playerByUuid);
+                entity.setFollowing(true);
+                return;
+            }
+        }
+        entity.setFollowing(false);
     }
 
 }

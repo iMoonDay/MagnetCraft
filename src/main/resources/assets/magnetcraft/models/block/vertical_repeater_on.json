@@ -1,0 +1,6 @@
+{
+    "parent": "magnetcraft:block/vertical_repeater",
+    "textures": {
+        "bottom": "magnetcraft:block/vertical_repeater_back_on"
+    }
+}

@@ -113,6 +113,7 @@
   "block.magnetcraft.maglev_oak_door": "磁悬浮橡木门",
   "block.magnetcraft.maglev_repeater": "磁悬浮红石中继器",
   "block.magnetcraft.maglev_comparator": "磁悬浮红石比较器",
+  "block.magnetcraft.vertical_repeater": "垂直红石复制器",
   "block.magnetcraft.magnetic_fluid_cauldron": "装有磁流体的炼药锅",
   "entity.magnetcraft.magnetic_iron_golem": "磁傀儡",
   "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "装备磁石的磁傀儡",

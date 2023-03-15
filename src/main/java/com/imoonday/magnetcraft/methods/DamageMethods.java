@@ -5,25 +5,35 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.random.Random;
 
 public class DamageMethods {
     public static void addDamage(LivingEntity user, Hand hand, int damage, boolean unbreaking) {
         ItemStack stack = user.getStackInHand(hand);
+        if ((user instanceof PlayerEntity player && player.getAbilities().creativeMode && damage > 0) || !stack.isDamageable()) {
+            return;
+        }
         if (unbreaking) {
             stack.damage(damage, user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
         } else {
-            boolean stackDamageable = stack.isDamageable();
-            boolean creative = user.isPlayer() && ((PlayerEntity) user).isCreative();
             int stackDamage = stack.getDamage();
             int stackMaxDamage = stack.getMaxDamage();
-            int setDamage = stackDamage + damage;
-            if (!creative && stackDamageable) {
-                stack.setDamage(setDamage);
-                stackDamage = stack.getDamage();
-                if (stackDamage > stackMaxDamage) {
-                    stack.setDamage(stackMaxDamage);
-                }
-            }
+            int finalDamage = stackDamage + damage;
+            stack.setDamage(finalDamage > stackMaxDamage ? stackMaxDamage : Math.max(finalDamage, 0));
+        }
+    }
+
+    public static void addDamage(ItemStack stack,Random random, int damage, boolean unbreaking) {
+        if (!stack.isDamageable()) {
+            return;
+        }
+        if (unbreaking) {
+            stack.damage(damage, random,null);
+        } else {
+            int stackDamage = stack.getDamage();
+            int stackMaxDamage = stack.getMaxDamage();
+            int finalDamage = stackDamage + damage;
+            stack.setDamage(finalDamage > stackMaxDamage ? stackMaxDamage : Math.max(finalDamage, 0));
         }
     }
 

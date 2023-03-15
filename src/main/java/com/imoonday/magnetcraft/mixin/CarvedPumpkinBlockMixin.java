@@ -3,9 +3,6 @@ package com.imoonday.magnetcraft.mixin;
 import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntity;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
-import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.CarvedPumpkinBlock;
@@ -14,7 +11,6 @@ import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.block.pattern.BlockPatternBuilder;
 import net.minecraft.block.pattern.CachedBlockPosition;
 import net.minecraft.entity.Entity;
-import net.minecraft.network.PacketByteBuf;
 import net.minecraft.predicate.block.BlockStatePredicate;
 import net.minecraft.util.function.MaterialPredicate;
 import net.minecraft.util.math.BlockPos;
@@ -28,8 +24,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
-
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.GOLEM_PACKET_ID;
 
 @Mixin(CarvedPumpkinBlock.class)
 public class CarvedPumpkinBlockMixin {
@@ -59,11 +53,11 @@ public class CarvedPumpkinBlockMixin {
         if (result1 != null && (magneticIronGolemEntity = EntityRegistries.MAGNETIC_IRON_GOLEM.create(world)) != null) {
             magneticIronGolemEntity.setPlayerCreated(true);
             spawnEntity(world, result1, magneticIronGolemEntity.withLodestone(), result1.translate(1, 2, 0).getBlockPos());
-            if (!world.isClient) {
-                PacketByteBuf buf = PacketByteBufs.create();
-                buf.writeInt(magneticIronGolemEntity.getId());
-                PlayerLookup.tracking(magneticIronGolemEntity).forEach(player -> ServerPlayNetworking.send(player, GOLEM_PACKET_ID, buf));
-            }
+//            if (!world.isClient) {
+//                PacketByteBuf buf = PacketByteBufs.create();
+//                buf.writeInt(magneticIronGolemEntity.getId());
+//                PlayerLookup.tracking(magneticIronGolemEntity).forEach(player -> ServerPlayNetworking.send(player, GOLEM_PACKET_ID, buf));
+//            }
         } else {
             if (result2 != null && (magneticIronGolemEntity = EntityRegistries.MAGNETIC_IRON_GOLEM.create(world)) != null) {
                 magneticIronGolemEntity.setPlayerCreated(true);

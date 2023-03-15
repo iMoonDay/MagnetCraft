@@ -26,7 +26,7 @@ public class MagnetCraft implements ModInitializer {
         CustomStatRegistries.register();
         CommandRegistries.register();
         ScreenRegistries.register();
-        EventRegistries.register();
+//        EventRegistries.register();
         RecipeRegistries.register();
         EntityRegistries.register();
     }

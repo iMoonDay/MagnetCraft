@@ -1,12 +1,17 @@
 package com.imoonday.magnetcraft.methods;
 
 import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.common.tags.FluidTags;
+import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
+import com.imoonday.magnetcraft.registries.common.FluidRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.*;
 import net.minecraft.entity.passive.HorseEntity;
@@ -20,9 +25,11 @@ import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -236,6 +243,38 @@ public class AttractMethods {
             entity.getMainHandStack().setNbt(nbt);
             DamageMethods.addDamage(entity, Hand.OFF_HAND, 1, true);
             offhandUsedTick -= tickPerDamage;
+        }
+        if (entity instanceof PlayerEntity player && player.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
+            boolean success = false;
+            int mainhandRepair = 0;
+            int offhandRepair = 0;
+            BlockPos pos = new BlockPos(player.getEyePos());
+            BlockState state = player.world.getBlockState(pos);
+            if (!player.world.isClient && state.isOf(FluidRegistries.MAGNETIC_FLUID)) {
+                Random random = entity.getRandom();
+                if (mainhandStack.isIn(ItemTags.MAGNETS) && mainhandStack.isDamageable() && mainhandStack.isDamaged()) {
+                    int damage = mainhandStack.getDamage();
+                    int maxDamage = mainhandStack.getMaxDamage();
+                    if (random.nextBetween(1, maxDamage * 200) <= damage) {
+                        DamageMethods.addDamage(entity, Hand.MAIN_HAND, -maxDamage / 10, false);
+                        mainhandRepair = damage - mainhandStack.getDamage();
+                        success = true;
+                    }
+                }
+                if (offhandStack.isIn(ItemTags.MAGNETS) && offhandStack.isDamageable() && offhandStack.isDamaged()) {
+                    int damage = offhandStack.getDamage();
+                    int maxDamage = offhandStack.getMaxDamage();
+                    if (random.nextBetween(1, maxDamage * 200) <= damage) {
+                        DamageMethods.addDamage(entity, Hand.OFF_HAND, -maxDamage / 10, false);
+                        offhandRepair = damage - offhandStack.getDamage();
+                        success = true;
+                    }
+                }
+                if (success && random.nextBetween(1, 100) <= mainhandRepair + offhandRepair && state.isOf(FluidRegistries.MAGNETIC_FLUID)) {
+                    player.world.setBlockState(pos, Blocks.WATER.getDefaultState());
+                }
+            }
+            player.getInventory().markDirty();
         }
         //检测吸引
         if (isAttracting) {

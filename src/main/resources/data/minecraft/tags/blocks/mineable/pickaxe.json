@@ -10,6 +10,7 @@
     "magnetcraft:magnetic_pressure_plate",
     "magnetcraft:demagnetizer",
     "magnetcraft:attract_sensor",
-    "magnetcraft:advanced_grindstone"
+    "magnetcraft:advanced_grindstone",
+    "magnetcraft:vertical_repeater"
   ]
 }

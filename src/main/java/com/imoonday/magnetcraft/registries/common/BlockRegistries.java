@@ -58,6 +58,7 @@ public class BlockRegistries {
     public static final AttractSensorBlock ATTRACT_SENSOR_BLOCK = register("attract_sensor", new AttractSensorBlock(FabricBlockSettings.copy(MAGNET_BLOCK)));
     public static final BlockEntityType<AttractSensorEntity> ATTRACT_SENSOR_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("attract_sensor"), FabricBlockEntityTypeBuilder.create(AttractSensorEntity::new, ATTRACT_SENSOR_BLOCK).build());
     public static final AdvancedGrindstoneBlock ADVANCED_GRINDSTONE_BLOCK = register("advanced_grindstone", new AdvancedGrindstoneBlock(FabricBlockSettings.copy(Blocks.GRINDSTONE)));
+    public static final VerticalRepeaterBlock VERTICAL_REPEATER_BLOCK = register("vertical_repeater", new VerticalRepeaterBlock(FabricBlockSettings.copy(Blocks.OBSERVER)));
 
     public static final Map<Item, CauldronBehavior> MAGNETIC_FLUID_CAULDRON_BEHAVIOR = CauldronBehavior.createMap();
     public static final Block MAGNETIC_FLUID_CAULDRON = registerBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(AbstractBlock.Settings.copy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));

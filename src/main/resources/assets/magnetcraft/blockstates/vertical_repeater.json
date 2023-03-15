@@ -1,0 +1,20 @@
+{
+  "variants": {
+    "facing=down,powered=false": {
+      "model": "magnetcraft:block/vertical_repeater",
+      "x": 90
+    },
+    "facing=down,powered=true": {
+      "model": "magnetcraft:block/vertical_repeater_on",
+      "x": 90
+    },
+    "facing=up,powered=false": {
+      "model": "magnetcraft:block/vertical_repeater",
+      "x": 270
+    },
+    "facing=up,powered=true": {
+      "model": "magnetcraft:block/vertical_repeater_on",
+      "x": 270
+    }
+  }
+}

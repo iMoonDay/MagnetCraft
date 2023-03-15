@@ -32,6 +32,7 @@ public class ItemGroupRegistries {
                     content.add(DEMAGNETIZER_BLOCK);
                     content.add(ATTRACT_SENSOR_BLOCK);
                     content.add(ADVANCED_GRINDSTONE_BLOCK);
+                    content.add(VERTICAL_REPEATER_BLOCK);
                     content.add(MAGLEV_LEVER_BLOCK);
                     content.add(MAGLEV_OAK_BUTTON_BLOCK);
                     content.add(MAGLEV_STONE_BUTTON_BLOCK);
@@ -194,6 +195,7 @@ public class ItemGroupRegistries {
             content.addAfter(Items.IRON_DOOR, MAGLEV_IRON_DOOR_BLOCK);
             content.addAfter(Items.REPEATER, MAGLEV_REPEATER_BLOCK);
             content.addAfter(Items.COMPARATOR, MAGLEV_COMPARATOR_BLOCK);
+            content.addAfter(MAGLEV_COMPARATOR_BLOCK, VERTICAL_REPEATER_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(content -> {

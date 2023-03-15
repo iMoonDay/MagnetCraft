@@ -36,6 +36,7 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.IntStream;
 
@@ -43,8 +44,8 @@ import java.util.stream.IntStream;
 public class MagneticIronGolemEntity extends IronGolemEntity {
 
     protected static final TrackedData<Byte> MAGNETIC_IRON_GOLEM_FLAGS = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
+    private static final TrackedData<Boolean> HAS_LODESTONE = DataTracker.registerData(MagneticIronGolemEntity.class,TrackedDataHandlerRegistry.BOOLEAN);
     private final Inventory inventory = new SimpleInventory(27);
-    private boolean hasLodestone = false;
 
     public MagneticIronGolemEntity(EntityType<? extends IronGolemEntity> entityType, World world) {
         super(entityType, world);
@@ -56,24 +57,24 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
 
     @Override
     public boolean isAttracting() {
-        return this.hasLodestone && ((EntityAttractNbt) this).canAttract();
+        return this.isHasLodestone() && ((EntityAttractNbt) this).canAttract();
     }
 
     @Override
     public double getAttractDis() {
-        return this.hasLodestone && ((EntityAttractNbt) this).canAttract() ? ModConfig.getGolemValue().attractDis : 0;
+        return this.isHasLodestone() && ((EntityAttractNbt) this).canAttract() ? ModConfig.getGolemValue().attractDis : 0;
     }
 
     public void setHasLodestone(boolean hasLodestone) {
-        this.hasLodestone = hasLodestone;
+        this.dataTracker.set(HAS_LODESTONE,hasLodestone);
     }
 
     public boolean isHasLodestone() {
-        return this.hasLodestone;
+        return this.dataTracker.get(HAS_LODESTONE);
     }
 
     public MagneticIronGolemEntity withLodestone() {
-        this.hasLodestone = true;
+        this.setHasLodestone(true);
         return this;
     }
 
@@ -85,7 +86,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
     protected void dropInventory() {
         super.dropInventory();
         IntStream.range(0, this.inventory.size()).mapToObj(this.inventory::getStack).forEach(this::dropStack);
-        if (this.hasLodestone) {
+        if (this.isHasLodestone()) {
             Random random = this.random;
             int percent = ModConfig.getGolemValue().lodestoneDropProbability;
             if (random.nextBetween(1, 100) <= percent) {
@@ -96,7 +97,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
 
     @Override
     public Text getName() {
-        return this.hasLodestone ? Text.translatable("entity.magnetcraft.magnetic_iron_golem.with_lodestone") : super.getName();
+        return this.isHasLodestone() ? Text.translatable("entity.magnetcraft.magnetic_iron_golem.with_lodestone") : super.getName();
     }
 
     @Override
@@ -105,7 +106,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         NbtList inventory = new NbtList();
         IntStream.range(0, this.inventory.size()).mapToObj(i -> this.inventory.getStack(i).writeNbt(new NbtCompound())).forEach(inventory::add);
         nbt.put("Inventory", inventory);
-        nbt.putBoolean("HasLodestone", this.hasLodestone);
+        nbt.putBoolean("HasLodestone", this.isHasLodestone());
     }
 
     @Override
@@ -115,7 +116,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
             IntStream.range(0, nbt.getList("Inventory", NbtElement.COMPOUND_TYPE).size()).forEach(i -> this.inventory.setStack(i, ItemStack.fromNbt((NbtCompound) nbt.getList("Inventory", NbtElement.COMPOUND_TYPE).get(i))));
         }
         if (nbt.contains("HasLodestone")) {
-            this.hasLodestone = nbt.getBoolean("HasLodestone");
+            this.setHasLodestone(nbt.getBoolean("HasLodestone"));
         }
     }
 
@@ -127,7 +128,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         }
     }
 
-    private void insertItem(ItemEntity entity) {
+    private void insertItem(@NotNull ItemEntity entity) {
         ItemStack stack = entity.getStack();
         if (stack.isOf(ItemRegistries.MAGNETIC_IRON_INGOT)) {
             while (this.getHealth() < this.getMaxHealth()) {
@@ -192,22 +193,22 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
             } else {
                 return ActionResult.PASS;
             }
-        } else if (block instanceof LodestoneBlock && !this.hasLodestone) {
+        } else if (block instanceof LodestoneBlock && !this.dataTracker.get(HAS_LODESTONE)) {
             this.setHasLodestone(true);
             this.playSound(SoundEvents.ENTITY_IRON_GOLEM_REPAIR, 1.0f, g);
             if (!player.getAbilities().creativeMode) {
                 player.getStackInHand(hand).decrement(1);
             }
             return ActionResult.success(this.world.isClient);
-        } else if (player.world != null && !player.world.isClient && this.hasLodestone) {
+        } else if (player.world != null && !player.world.isClient && this.dataTracker.get(HAS_LODESTONE)) {
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, player1) -> new MagneticIronGolemScreenHandler(syncId, inv, this.inventory), MagneticIronGolemEntity.this.getDisplayName()));
         }
         this.inventory.markDirty();
-        return ActionResult.success(this.world.isClient && this.hasLodestone);
+        return ActionResult.success(this.world.isClient && this.dataTracker.get(HAS_LODESTONE));
     }
 
     @Override
-    public boolean canSpawn(WorldView world) {
+    public boolean canSpawn(@NotNull WorldView world) {
         BlockPos blockPos = this.getBlockPos();
         BlockPos blockPos2 = blockPos.down();
         BlockState blockState = world.getBlockState(blockPos2);
@@ -228,6 +229,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(MAGNETIC_IRON_GOLEM_FLAGS, (byte) 0);
+        this.dataTracker.startTracking(HAS_LODESTONE,false);
     }
 
     @Override
@@ -246,8 +248,3 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
     }
 
 }
-///summon magnetcraft:magnetic_iron_golem 28.16 -60.00 -48.16 {Brain: {memories: {}}, HurtByTimestamp: 0, Attributes: [{Base: 16.0d, Modifiers: [{Amount: -0.09630816611952596d, Operation: 1, UUID: [I; -30930734, -1459927240, -1906151979, -933374918], Name: "Random spawn bonus"}], Name: "minecraft:generic.follow_range"}, {Base: 0.25d, Name: "minecraft:generic.movement_speed"}], Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, HandDropChances: [0.085f, 0.085f], PersistenceRequired: 0b, AngerTime: 0, Motion: [0.0d, -0.0784000015258789d, 0.0d], HasLodestone: 0b, Health: 100.0f, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [45.0f, 0.0f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, AttractData: {isAttracting: 0b, AttractOwner: [I; 0, 0, 0, 0], AttractDis: 0.0d, Enable: 1b}, HurtTime: 0s, Inventory: [{id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}]}
-///summon magnetcraft:magnetic_iron_golem 28.16 -60.00 -48.16 {Brain: {memories: {}}, HurtByTimestamp: 0, Attributes: [{Base: 16.0d, Modifiers: [{Amount: -0.09630816611952596d, Operation: 1, UUID: [I; -30930734, -1459927240, -1906151979, -933374918], Name: "Random spawn bonus"}], Name: "minecraft:generic.follow_range"}, {Base: 0.25d, Name: "minecraft:generic.movement_speed"}], Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, HandDropChances: [0.085f, 0.085f], PersistenceRequired: 0b, AngerTime: 0, Motion: [0.0d, -0.0784000015258789d, 0.0d], HasLodestone: 0b, Health: 100.0f, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [45.0f, 0.0f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, AttractData: {isAttracting: 0b, AttractOwner: [I; 0, 0, 0, 0], AttractDis: 0.0d, Enable: 1b}, HurtTime: 0s, Inventory: [{id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}]}
-
-///summon magnetcraft:magnetic_iron_golem 25.16 -60.00 -47.84 {Brain: {memories: {}}, HurtByTimestamp: 0, Attributes: [{Base: 16.0d, Modifiers: [{Amount: 0.009176273725878611d, Operation: 1, UUID: [I; -2074426243, -960937013, -1277063034, -1422711650], Name: "Random spawn bonus"}], Name: "minecraft:generic.follow_range"}, {Base: 0.25d, Name: "minecraft:generic.movement_speed"}], Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, HandDropChances: [0.085f, 0.085f], PersistenceRequired: 0b, AngerTime: 0, Motion: [0.0d, -0.0784000015258789d, 0.0d], HasLodestone: 1b, Health: 100.0f, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [135.0f, 0.31677803f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, AttractData: {isAttracting: 1b, AttractOwner: [I; 0, 0, 0, 0], AttractDis: 15.0d, Enable: 1b}, HurtTime: 0s, Inventory: [{id: "magnetcraft:magnet_fragment", Count: 17b}, {id: "magnetcraft:magnetic_iron_ingot", Count: 15b}, {id: "magnetcraft:magnetic_iron_golem_spawn_egg", Count: 1b}, {id: "minecraft:oak_fence", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}]}
-///summon magnetcraft:magnetic_iron_golem 25.16 -60.00 -47.84 {Brain: {memories: {}}, HurtByTimestamp: 0, Attributes: [{Base: 16.0d, Modifiers: [{Amount: 0.009176273725878611d, Operation: 1, UUID: [I; -2074426243, -960937013, -1277063034, -1422711650], Name: "Random spawn bonus"}], Name: "minecraft:generic.follow_range"}, {Base: 0.25d, Name: "minecraft:generic.movement_speed"}], Invulnerable: 0b, FallFlying: 0b, PortalCooldown: 0, AbsorptionAmount: 0.0f, FallDistance: 0.0f, DeathTime: 0s, HandDropChances: [0.085f, 0.085f], PersistenceRequired: 0b, AngerTime: 0, Motion: [0.0d, -0.0784000015258789d, 0.0d], HasLodestone: 1b, Health: 100.0f, PlayerCreated: 0b, LeftHanded: 0b, Air: 300s, OnGround: 1b, Rotation: [135.0f, 17.163456f], HandItems: [{}, {}], ArmorDropChances: [0.085f, 0.085f, 0.085f, 0.085f], Fire: -1s, ArmorItems: [{}, {}, {}, {}], CanPickUpLoot: 0b, AttractData: {isAttracting: 1b, AttractOwner: [I; 0, 0, 0, 0], AttractDis: 15.0d, Enable: 1b}, HurtTime: 0s, Inventory: [{id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}, {id: "minecraft:air", Count: 1b}]}

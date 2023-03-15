@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "434",
+    "121"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:cobblestone"
+    },
+    "2": {
+      "item": "minecraft:redstone"
+    },
+    "3": {
+      "item": "magnetcraft:maglev_repeater"
+    },
+    "4": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:vertical_repeater",
+    "count": 1
+  }
+}

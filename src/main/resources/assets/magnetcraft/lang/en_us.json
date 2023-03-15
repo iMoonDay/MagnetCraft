@@ -113,6 +113,7 @@
   "block.magnetcraft.maglev_oak_door": "Maglev Oak Door",
   "block.magnetcraft.maglev_repeater": "Maglev Repeater",
   "block.magnetcraft.maglev_comparator": "Maglev Comparator",
+  "block.magnetcraft.vertical_repeater": "Vertical Redstone Replicators",
   "block.magnetcraft.magnetic_fluid_cauldron": "Magnetic Fluid Cauldron",
   "entity.magnetcraft.magnetic_iron_golem": "Magnetic Iron Golem",
   "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "Magnetic Iron Golem with Lodestone",

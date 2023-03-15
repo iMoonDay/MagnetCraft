@@ -1,0 +1,24 @@
+{
+    "parent": "block/block",
+    "textures": {
+        "bottom": "magnetcraft:block/vertical_repeater_back",
+        "side_east": "magnetcraft:block/vertical_repeater_side_east",
+        "side_west": "magnetcraft:block/vertical_repeater_side_west",
+        "top": "magnetcraft:block/vertical_repeater_top",
+        "front": "magnetcraft:block/vertical_repeater_front",
+        "particle": "magnetcraft:block/vertical_repeater_front"
+    },
+    "elements": [
+        {   "from": [ 0, 0, 0 ],
+            "to": [ 16, 16, 16 ],
+            "faces": {
+                "down":  { "uv": [ 0, 0, 16, 16 ], "texture": "#top", "cullface": "down" },
+                "up":    { "uv": [ 0, 16, 16, 0 ], "texture": "#top", "cullface": "up" },
+                "north": { "uv": [ 0, 0, 16, 16 ], "texture": "#front", "cullface": "north" },
+                "south": { "uv": [ 0, 0, 16, 16 ], "texture": "#bottom", "cullface": "south" },
+                "west":  { "uv": [ 0, 0, 16, 16 ], "texture": "#side_west", "cullface": "west" },
+                "east":  { "uv": [ 0, 0, 16, 16 ], "texture": "#side_east", "cullface": "east" }
+            }
+        }
+    ]
+}

@@ -36,7 +36,8 @@
       "magnetcraft:magnet_fragment_from_magnetic_iron_ingot",
       "magnetcraft:demagnetizer",
       "magnetcraft:portable_demagnetizer",
-      "magnetcraft:advanced_grindstone"
+      "magnetcraft:advanced_grindstone",
+      "magnetcraft:vertical_repeater"
     ]
   }
 }

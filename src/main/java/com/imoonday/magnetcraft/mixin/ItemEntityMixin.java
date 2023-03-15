@@ -47,7 +47,7 @@ public class ItemEntityMixin extends EntityMixin {
                             success = true;
                         }
                     }
-                    if (success && random.nextBetween(1, 100) <= mainhandRepair + offhandRepair) {
+                    if (success && random.nextBetween(1, 200) <= mainhandRepair + offhandRepair) {
                         entity.world.setBlockState(entity.getBlockPos(), Blocks.WATER.getDefaultState());
                     }
                 }

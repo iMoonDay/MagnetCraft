@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntity;
+import com.imoonday.magnetcraft.common.entities.golem.MagneticIronGolemEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnReason;

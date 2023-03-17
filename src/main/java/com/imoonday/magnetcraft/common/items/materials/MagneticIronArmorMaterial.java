@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.common.items.materials;
 
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
@@ -12,13 +12,13 @@ public class MagneticIronArmorMaterial implements ArmorMaterial {
     private static final int[] PROTECTION_VALUES = new int[] {2,5,6,2};
 
     @Override
-    public int getDurability(EquipmentSlot slot) {
-        return BASE_DURABILITY[slot.getEntitySlotId()] * 17;
+    public int getDurability(ArmorItem.Type type) {
+        return BASE_DURABILITY[type.getEquipmentSlot().getEntitySlotId()] * 17;
     }
 
     @Override
-    public int getProtectionAmount(EquipmentSlot slot) {
-        return PROTECTION_VALUES[slot.getEntitySlotId()];
+    public int getProtection(ArmorItem.Type type) {
+        return PROTECTION_VALUES[type.getEquipmentSlot().getEntitySlotId()];
     }
 
     @Override

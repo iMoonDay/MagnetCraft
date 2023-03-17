@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.registries.common;
 
-import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntity;
+import com.imoonday.magnetcraft.common.entities.golem.MagneticIronGolemEntity;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;

@@ -7,6 +7,8 @@ import com.imoonday.magnetcraft.common.blocks.entities.DemagnetizerEntity;
 import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
 import com.imoonday.magnetcraft.common.blocks.maglev.*;
 import com.imoonday.magnetcraft.common.items.LodestoneBlockItem;
+import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
+import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
@@ -19,12 +21,16 @@ import net.minecraft.item.*;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.sound.BlockSoundGroup;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
 import net.minecraft.util.ActionResult;
 import net.minecraft.world.event.GameEvent;
+import net.minecraft.world.gen.GenerationStep;
+import net.minecraft.world.gen.feature.PlacedFeature;
 
 import java.util.Map;
 
@@ -34,6 +40,9 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 public class BlockRegistries {
 
     public static final Block MAGNETITE_BLOCK = register("magnetite", new Block(FabricBlockSettings.copy(Blocks.IRON_ORE)));
+    public static final RegistryKey<PlacedFeature> ORE_MAGNETITE_MIDDLE_PLACED_KEY = RegistryKey.of(RegistryKeys.PLACED_FEATURE, id("ore_magnetite_middle"));
+    public static final RegistryKey<PlacedFeature> ORE_MAGNETITE_SMALL_PLACED_KEY = RegistryKey.of(RegistryKeys.PLACED_FEATURE, id("ore_magnetite_small"));
+    public static final RegistryKey<PlacedFeature> ORE_MAGNETITE_UPPER_PLACED_KEY = RegistryKey.of(RegistryKeys.PLACED_FEATURE, id("ore_magnetite_upper"));
     public static final Block DEEPSLATE_MAGNETITE_BLOCK = register("deepslate_magnetite", new Block(FabricBlockSettings.copy(Blocks.DEEPSLATE_IRON_ORE)));
     public static final Block MAGNET_BLOCK = register("magnet_block", new Block(FabricBlockSettings.copy(Blocks.IRON_BLOCK)));
     public static final Block NETHERITE_MAGNET_BLOCK = register("netherite_magnet_block", new Block(FabricBlockSettings.copy(Blocks.NETHERITE_BLOCK)));
@@ -46,13 +55,13 @@ public class BlockRegistries {
     public static final MaglevDetectorRailBlock MAGLEV_DETECTOR_RAIL_BLOCK = register("maglev_detector_rail", new MaglevDetectorRailBlock(FabricBlockSettings.copy(Blocks.DETECTOR_RAIL).noCollision()));
     public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = register("maglev_activator_rail", new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.ACTIVATOR_RAIL).noCollision()));
     public static final MaglevLeverBlock MAGLEV_LEVER_BLOCK = register("maglev_lever", new MaglevLeverBlock(FabricBlockSettings.copy(Blocks.LEVER).noCollision()));
-    public static final MaglevButtonBlock MAGLEV_STONE_BUTTON_BLOCK = register("maglev_stone_button", new MaglevButtonBlock(FabricBlockSettings.copy(Blocks.STONE_BUTTON).noCollision(), 20, false, SoundEvents.BLOCK_STONE_BUTTON_CLICK_OFF, SoundEvents.BLOCK_STONE_BUTTON_CLICK_ON));
-    public static final MaglevButtonBlock MAGLEV_OAK_BUTTON_BLOCK = register("maglev_oak_button", new MaglevButtonBlock(FabricBlockSettings.copy(Blocks.STONE_BUTTON).noCollision(), 30, true, SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_OFF, SoundEvents.BLOCK_WOODEN_BUTTON_CLICK_ON));
-    public static final MaglevDoorBlock MAGLEV_IRON_DOOR_BLOCK = register("maglev_iron_door", new MaglevDoorBlock(FabricBlockSettings.copy(Blocks.IRON_DOOR).nonOpaque(), SoundEvents.BLOCK_IRON_DOOR_CLOSE, SoundEvents.BLOCK_IRON_DOOR_OPEN));
-    public static final MaglevDoorBlock MAGLEV_OAK_DOOR_BLOCK = register("maglev_oak_door", new MaglevDoorBlock(FabricBlockSettings.copy(Blocks.OAK_DOOR).nonOpaque(), SoundEvents.BLOCK_WOODEN_DOOR_CLOSE, SoundEvents.BLOCK_WOODEN_DOOR_OPEN));
+    public static final MaglevButtonBlock MAGLEV_STONE_BUTTON_BLOCK = register("maglev_stone_button", new MaglevButtonBlock(FabricBlockSettings.copy(Blocks.STONE_BUTTON).noCollision(), BlockSetType.STONE, 20, false));
+    public static final MaglevButtonBlock MAGLEV_OAK_BUTTON_BLOCK = register("maglev_oak_button", new MaglevButtonBlock(FabricBlockSettings.copy(Blocks.STONE_BUTTON).noCollision(), BlockSetType.OAK, 30, true));
+    public static final MaglevDoorBlock MAGLEV_IRON_DOOR_BLOCK = register("maglev_iron_door", new MaglevDoorBlock(FabricBlockSettings.copy(Blocks.IRON_DOOR).nonOpaque(), BlockSetType.IRON));
+    public static final MaglevDoorBlock MAGLEV_OAK_DOOR_BLOCK = register("maglev_oak_door", new MaglevDoorBlock(FabricBlockSettings.copy(Blocks.OAK_DOOR).nonOpaque(), BlockSetType.OAK));
     public static final MaglevRepeaterBlock MAGLEV_REPEATER_BLOCK = register("maglev_repeater", new MaglevRepeaterBlock(FabricBlockSettings.copy(Blocks.REPEATER).nonOpaque()));
     public static final MaglevComparatorBlock MAGLEV_COMPARATOR_BLOCK = register("maglev_comparator", new MaglevComparatorBlock(FabricBlockSettings.copy(Blocks.COMPARATOR).nonOpaque()));
-    public static final MagneticPressurePlateBlock MAGNETIC_PRESSURE_PLATE = register("magnetic_pressure_plate", new MagneticPressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.METAL).requiresTool().noCollision().strength(0.5f).sounds(BlockSoundGroup.METAL), SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_OFF, SoundEvents.BLOCK_METAL_PRESSURE_PLATE_CLICK_ON));
+    public static final MagneticPressurePlateBlock MAGNETIC_PRESSURE_PLATE = register("magnetic_pressure_plate", new MagneticPressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.METAL).requiresTool().noCollision().strength(0.5f).sounds(BlockSoundGroup.METAL), BlockSetType.IRON));
     public static final DemagnetizerBlock DEMAGNETIZER_BLOCK = register("demagnetizer", new DemagnetizerBlock(FabricBlockSettings.copy(MAGNET_BLOCK)));
     public static final BlockEntityType<DemagnetizerEntity> DEMAGNETIZER_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("demagnetizer"), FabricBlockEntityTypeBuilder.create(DemagnetizerEntity::new, DEMAGNETIZER_BLOCK).build());
     public static final AttractSensorBlock ATTRACT_SENSOR_BLOCK = register("attract_sensor", new AttractSensorBlock(FabricBlockSettings.copy(MAGNET_BLOCK)));
@@ -108,6 +117,9 @@ public class BlockRegistries {
             }
             return ActionResult.success(world.isClient);
         });
+        BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, ORE_MAGNETITE_SMALL_PLACED_KEY);
+        BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, ORE_MAGNETITE_MIDDLE_PLACED_KEY);
+        BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, ORE_MAGNETITE_UPPER_PLACED_KEY);
         MagnetCraft.LOGGER.info("BlockRegistries.class Loaded");
     }
 

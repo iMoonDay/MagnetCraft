@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialCraftingRecipe;
 import net.minecraft.recipe.book.CraftingRecipeCategory;
+import net.minecraft.registry.DynamicRegistryManager;
 import net.minecraft.registry.tag.TagKey;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.collection.DefaultedList;
@@ -40,7 +41,7 @@ public class FilterAddRecipe extends SpecialCraftingRecipe {
     }
 
     @Override
-    public ItemStack craft(CraftingInventory inventory) {
+    public ItemStack craft(CraftingInventory inventory, DynamicRegistryManager registryManager) {
         boolean hasMagnet = false;
         boolean hasFilterModule = false;
         ItemStack magnetStack = ItemStack.EMPTY;

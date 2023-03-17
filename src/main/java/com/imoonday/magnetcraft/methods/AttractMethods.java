@@ -237,7 +237,7 @@ public class AttractMethods {
             boolean success = false;
             int mainhandRepair = 0;
             int offhandRepair = 0;
-            BlockPos pos = new BlockPos(player.getEyePos());
+            BlockPos pos = new BlockPos((int) player.getEyePos().x, (int) player.getEyePos().y, (int) player.getEyePos().z);
             BlockState state = player.world.getBlockState(pos);
             if (!player.world.isClient && state.isOf(FluidRegistries.MAGNETIC_FLUID)) {
                 Random random = entity.getRandom();
@@ -302,7 +302,8 @@ public class AttractMethods {
                 }
             }
             if (MagneticIronArmorItem.isInMagneticIronSuit(entity)) finalDis *= magnetSetMultiplier;
-            if (NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(entity)) finalDis *= netheriteMagnetSetMultiplier;
+            if (NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(entity))
+                finalDis *= netheriteMagnetSetMultiplier;
             entity.setAttracting(true, finalDis);
         } else {
             entity.setAttracting(false);

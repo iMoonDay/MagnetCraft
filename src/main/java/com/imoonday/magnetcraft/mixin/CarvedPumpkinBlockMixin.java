@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntity;
+import com.imoonday.magnetcraft.common.entities.golem.MagneticIronGolemEntity;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
 import net.minecraft.block.BlockState;

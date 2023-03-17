@@ -22,7 +22,7 @@ public class ItemGroupRegistries {
         FabricItemGroup.builder(id("magnet"))
                 .displayName(Text.translatable("group.magnetcraft.magnet"))
                 .icon(() -> new ItemStack(ELECTROMAGNET_ITEM))
-                .entries((enabledFeatures, content, operatorEnabled) -> {
+                .entries((context,content) -> {
                     content.add(MAGNETITE_BLOCK);
                     content.add(DEEPSLATE_MAGNETITE_BLOCK);
                     content.add(RAW_MAGNET_BLOCK);

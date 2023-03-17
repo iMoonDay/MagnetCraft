@@ -51,21 +51,23 @@ public class MagneticLevitationEnchantment extends Enchantment {
         int maxSec = (int) ((10 + lvl * 10) * multiplier);
         String displayTime = ((tick / 20) + (tick % 20 == 0 ? 0 : 1)) + " / " + maxSec;
         boolean auto = player.getAutomaticLevitation();
+        boolean isClient = player.world.isClient;
+        boolean survival = !player.isSpectator() && !player.getAbilities().creativeMode;
         if (!player.isOnGround() && (player.jumping || auto)) {
             double heightMultiplier = MagneticIronArmorItem.isInMagneticIronSuit(player) ? 1.5 : NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(player) ? 2.0 : 1.0;
             double height = (1.5 + (double) lvl / 2.0) * heightMultiplier + 0.1;
             player.setNoGravity(true);
             boolean collide = DoubleStream.iterate(0, d -> d <= height, d -> d + 0.1).anyMatch(d -> (!player.doesNotCollide(0, -d, 0)));
             player.setVelocity(player.getVelocity().x, tick >= maxSec * 20 ? -0.1 : collide ? player.isSneaking() ? auto ? -speed : 0 : speed : !player.doesNotCollide(0, -height - 0.1, 0) ? player.isSneaking() && auto ? -speed : 0 : -0.1, player.getVelocity().z);
-            if (player.world.isClient) {
+            if (isClient) {
                 player.world.addParticle(ParticleTypes.FIREWORK, player.getX(), player.getY(), player.getZ(), player.getRandom().nextGaussian() * 0.05, -player.getVelocity().y * 0.5, player.getRandom().nextGaussian() * 0.05);
             }
             player.velocityDirty = true;
             player.setIgnoreFallDamage(true);
-            if (!player.isSpectator() && !player.getAbilities().creativeMode) {
-                player.setLevitationTick(tick + 1);
+            if (survival) {
+                player.setLevitationTick(++tick);
                 player.addExhaustion(player.isSprinting() ? 0.2f / 20 : 0.05f / 20);
-                if (!player.world.isClient) {
+                if (!isClient) {
                     int usedTick = stack.getNbt() != null && stack.getNbt().contains("UsedTick") ? stack.getOrCreateNbt().getInt("UsedTick") : 0;
                     stack.getOrCreateNbt().putInt("UsedTick", ++usedTick);
                     player.sendMessage(Text.literal(displayTime), true);
@@ -74,8 +76,11 @@ public class MagneticLevitationEnchantment extends Enchantment {
             player.getInventory().markDirty();
         } else {
             player.setNoGravity(false);
-            if (!player.world.isClient && !player.isSpectator() && !player.getAbilities().creativeMode && tick > 0) {
-                player.sendMessage(Text.literal(displayTime), true);
+            if (survival && tick > 0) {
+                player.setLevitationTick(++tick);
+                if (!isClient) {
+                    player.sendMessage(Text.literal(displayTime), true);
+                }
             }
         }
     }

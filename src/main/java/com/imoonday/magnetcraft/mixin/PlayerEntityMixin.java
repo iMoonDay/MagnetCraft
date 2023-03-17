@@ -45,11 +45,12 @@ public abstract class PlayerEntityMixin {
                     player.setNoGravity(false);
                 }
                 ItemStack stack = player.getEquippedStack(EquipmentSlot.FEET);
-                int tick = stack.getNbt() != null && stack.getNbt().contains("UsedTick") ? stack.getOrCreateNbt().getInt("UsedTick") : 0;
+                boolean hasTick = stack.getNbt() != null && stack.getNbt().contains("UsedTick");
+                int tick = hasTick ? stack.getNbt().getInt("UsedTick") : 0;
                 if (EnchantmentMethods.hasEnchantment(stack, MAGNETIC_LEVITATION_ENCHANTMENT) && player.getMagneticLevitationMode() && !player.getAbilities().creativeMode) {
                     stack.getOrCreateNbt().putInt("UsedTick", ++tick);
                 }
-                while (stack.getOrCreateNbt().getInt("UsedTick") >= 60 * 20) {
+                while (stack.getNbt().getInt("UsedTick") >= 60 * 20) {
                     stack.getOrCreateNbt().putInt("UsedTick", stack.getOrCreateNbt().getInt("UsedTick") - 60 * 20);
                     DamageMethods.addDamage(stack, player.getRandom(), 1, true);
                 }

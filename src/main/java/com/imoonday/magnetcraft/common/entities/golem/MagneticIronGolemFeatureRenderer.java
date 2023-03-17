@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.entities;
+package com.imoonday.magnetcraft.common.entities.golem;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.client.render.VertexConsumerProvider;

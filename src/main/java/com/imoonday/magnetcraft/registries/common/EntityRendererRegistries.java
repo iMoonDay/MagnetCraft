@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.registries.common;
 
-import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntityModel;
-import com.imoonday.magnetcraft.common.entities.MagneticIronGolemEntityRenderer;
+import com.imoonday.magnetcraft.common.entities.golem.MagneticIronGolemEntityModel;
+import com.imoonday.magnetcraft.common.entities.golem.MagneticIronGolemEntityRenderer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityModelLayerRegistry;

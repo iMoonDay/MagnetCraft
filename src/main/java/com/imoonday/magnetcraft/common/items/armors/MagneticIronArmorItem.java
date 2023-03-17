@@ -17,8 +17,9 @@ import java.util.List;
 
 public class MagneticIronArmorItem extends ArmorItem {
 
-    public MagneticIronArmorItem(ArmorMaterial material, EquipmentSlot slot, Settings settings) {
-        super(material, slot, settings);
+
+    public MagneticIronArmorItem(ArmorMaterial material, Type type, Settings settings) {
+        super(material, type, settings);
     }
 
     @Override

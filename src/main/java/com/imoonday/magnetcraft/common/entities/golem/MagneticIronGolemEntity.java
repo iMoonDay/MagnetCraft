@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.entities;
+package com.imoonday.magnetcraft.common.entities.golem;
 
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;

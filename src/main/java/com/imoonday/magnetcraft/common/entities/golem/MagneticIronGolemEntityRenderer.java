@@ -1,4 +1,4 @@
-package com.imoonday.magnetcraft.common.entities;
+package com.imoonday.magnetcraft.common.entities.golem;
 
 import com.imoonday.magnetcraft.registries.common.EntityRendererRegistries;
 import net.fabricmc.api.EnvType;
@@ -27,13 +27,14 @@ public class MagneticIronGolemEntityRenderer extends MobEntityRenderer<MagneticI
     @Override
     protected void setupTransforms(MagneticIronGolemEntity entity, MatrixStack matrixStack, float f, float g, float h) {
         super.setupTransforms(entity, matrixStack, f, g, h);
-        if ((double)entity.limbDistance < 0.01) {
+        if ((double)entity.limbAnimator.getSpeed() < 0.01) {
             return;
         }
         float i = 13.0f;
-        float j = entity.limbAngle - entity.limbDistance * (1.0f - h) + 6.0f;
+        float j = entity.limbAnimator.getPos(h) + 6.0f;
         float k = (Math.abs(j % i - 6.5f) - 3.25f) / 3.25f;
         matrixStack.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(6.5f * k));
     }
+
 
 }

@@ -17,7 +17,7 @@ import com.imoonday.magnetcraft.common.items.tools.CustomHoeItem;
 import com.imoonday.magnetcraft.common.items.tools.CustomPickaxeItem;
 import com.imoonday.magnetcraft.common.items.tools.CustomShovelItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.HorseArmorItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.SwordItem;
@@ -74,16 +74,16 @@ public class ItemRegistries {
     public static final CustomHoeItem NETHERITE_MAGNETIC_IRON_HOE = register("netherite_magnetic_iron_hoe", new CustomHoeItem(NetheriteMagneticIronToolMaterial.INSTANCE, -3, 0.0f, new Item.Settings().fireproof()));
 
     public static final MagneticIronArmorMaterial MAGNETIC_IRON_MATERIAL = new MagneticIronArmorMaterial();
-    public static final MagneticIronArmorItem MAGNETIC_IRON_HELMET = register("magnetic_iron_helmet", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, EquipmentSlot.HEAD, new Item.Settings()));
-    public static final MagneticIronArmorItem MAGNETIC_IRON_CHESTPLATE = register("magnetic_iron_chestplate", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, EquipmentSlot.CHEST, new Item.Settings()));
-    public static final MagneticIronArmorItem MAGNETIC_IRON_LEGGINGS = register("magnetic_iron_leggings", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, EquipmentSlot.LEGS, new Item.Settings()));
-    public static final MagneticIronArmorItem MAGNETIC_IRON_BOOTS = register("magnetic_iron_boots", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, EquipmentSlot.FEET, new Item.Settings()));
+    public static final MagneticIronArmorItem MAGNETIC_IRON_HELMET = register("magnetic_iron_helmet", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings()));
+    public static final MagneticIronArmorItem MAGNETIC_IRON_CHESTPLATE = register("magnetic_iron_chestplate", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings()));
+    public static final MagneticIronArmorItem MAGNETIC_IRON_LEGGINGS = register("magnetic_iron_leggings", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, ArmorItem.Type.LEGGINGS, new Item.Settings()));
+    public static final MagneticIronArmorItem MAGNETIC_IRON_BOOTS = register("magnetic_iron_boots", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings()));
 
     public static final NetheriteMagneticIronArmorMaterial NETHERITE_MAGNETIC_IRON_MATERIAL = new NetheriteMagneticIronArmorMaterial();
-    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_HELMET = register("netherite_magnetic_iron_helmet", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.HEAD, new Item.Settings().fireproof()));
-    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_CHESTPLATE = register("netherite_magnetic_iron_chestplate", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.CHEST, new Item.Settings().fireproof()));
-    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_LEGGINGS = register("netherite_magnetic_iron_leggings", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.LEGS, new Item.Settings().fireproof()));
-    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_BOOTS = register("netherite_magnetic_iron_boots", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, EquipmentSlot.FEET, new Item.Settings().fireproof()));
+    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_HELMET = register("netherite_magnetic_iron_helmet", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, ArmorItem.Type.HELMET, new Item.Settings().fireproof()));
+    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_CHESTPLATE = register("netherite_magnetic_iron_chestplate", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, ArmorItem.Type.CHESTPLATE, new Item.Settings().fireproof()));
+    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_LEGGINGS = register("netherite_magnetic_iron_leggings", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, ArmorItem.Type.LEGGINGS, new Item.Settings().fireproof()));
+    public static final NetheriteMagneticIronArmorItem NETHERITE_MAGNETIC_IRON_BOOTS = register("netherite_magnetic_iron_boots", new NetheriteMagneticIronArmorItem(NETHERITE_MAGNETIC_IRON_MATERIAL, ArmorItem.Type.BOOTS, new Item.Settings().fireproof()));
 
     public static final HorseArmorItem MAGNETIC_IRON_HORSE_ARMOR = register("magnetic_iron_horse_armor", new HorseArmorItem(9, "magnetic_iron", new Item.Settings().maxCount(1)));
 

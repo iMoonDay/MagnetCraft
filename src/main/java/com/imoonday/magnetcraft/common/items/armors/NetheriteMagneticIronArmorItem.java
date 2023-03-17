@@ -16,8 +16,9 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class NetheriteMagneticIronArmorItem extends ArmorItem {
-    public NetheriteMagneticIronArmorItem(ArmorMaterial material, EquipmentSlot slot, Settings settings) {
-        super(material, slot, settings);
+
+    public NetheriteMagneticIronArmorItem(ArmorMaterial material, Type type, Settings settings) {
+        super(material, type, settings);
     }
 
     @Override

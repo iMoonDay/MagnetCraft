@@ -1,6 +1,8 @@
 package com.imoonday.magnetcraft.methods;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.api.MagnetCraftEntity;
+import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
+import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
@@ -84,13 +86,13 @@ public class AttractMethods {
                 boolean hasNearerPlayer;
                 boolean hasNearerEntity = false;
                 if (entity instanceof PlayerEntity) {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, EntityAttractNbt::isAttracting) != entity;
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, MagnetCraftEntity::isAttracting) != entity;
                 } else {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, EntityAttractNbt::isAttracting) != null;
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, MagnetCraftEntity::isAttracting) != null;
                     hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && otherEntity.isAttracting() && otherEntity.getEnable() && otherEntity.isAlive())).isEmpty();
                 }
                 if (!hasNearerPlayer && !hasNearerEntity) {
-                    Vec3d vec = entity.getPos().subtract(targetEntity.getPos()).multiply(0.05);
+                    Vec3d vec = entity.getPos().add(0, 0.5, 0).subtract(targetEntity.getPos()).multiply(0.05);
                     if (targetEntity.horizontalCollision) {
                         vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
                     }
@@ -120,7 +122,7 @@ public class AttractMethods {
             }
             if (pass && !world.isClient) {
                 boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && (otherEntity.isAttracting()))).isEmpty();
-                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, EntityAttractNbt::isAttracting) != null;
+                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, MagnetCraftEntity::isAttracting) != null;
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = pos.subtract(targetEntity.getPos()).multiply(0.05);
                     if (targetEntity.horizontalCollision) {
@@ -176,9 +178,6 @@ public class AttractMethods {
         double disPerLvl = value.disPerLvl;
         double magnetSetMultiplier = value.magnetSetMultiplier >= 1 ? value.magnetSetMultiplier : 1.5;
         double netheriteMagnetSetMultiplier = value.netheriteMagnetSetMultiplier >= 1 ? value.netheriteMagnetSetMultiplier : 2;
-        ItemStack head = entity.getEquippedStack(EquipmentSlot.HEAD);
-        ItemStack chest = entity.getEquippedStack(EquipmentSlot.CHEST);
-        ItemStack legs = entity.getEquippedStack(EquipmentSlot.LEGS);
         ItemStack feet = entity.getEquippedStack(EquipmentSlot.FEET);
         ItemStack mainhandStack = entity.getEquippedStack(EquipmentSlot.MAINHAND);
         ItemStack offhandStack = entity.getEquippedStack(EquipmentSlot.OFFHAND);
@@ -208,16 +207,6 @@ public class AttractMethods {
         boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
         boolean horseArmorAttracting = entity instanceof HorseEntity horseEntity && horseEntity.getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
         boolean isAttracting = (hasEnch || handMagnet || hasEffect || horseArmorAttracting) && entity.canAttract() && entity.isAlive();
-        boolean hasMagneticIronHelmet = head.isOf(ItemRegistries.MAGNETIC_IRON_HELMET);
-        boolean hasMagneticIronChestcplate = chest.isOf(ItemRegistries.MAGNETIC_IRON_CHESTPLATE);
-        boolean hasMagneticIronLeggings = legs.isOf(ItemRegistries.MAGNETIC_IRON_LEGGINGS);
-        boolean hasMagneticIronBoots = feet.isOf(ItemRegistries.MAGNETIC_IRON_BOOTS);
-        boolean hasNetheriteMagneticIronHelmet = head.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_HELMET);
-        boolean hasNetheriteMagneticIronChestcplate = chest.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_CHESTPLATE);
-        boolean hasNetheriteMagneticIronLeggings = legs.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_LEGGINGS);
-        boolean hasNetheriteMagneticIronBoots = feet.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
-        boolean hasMagneticIronSuit = hasMagneticIronHelmet && hasMagneticIronChestcplate && hasMagneticIronLeggings && hasMagneticIronBoots;
-        boolean hasNetheriteMagneticIronSuit = hasNetheriteMagneticIronHelmet && hasNetheriteMagneticIronChestcplate && hasNetheriteMagneticIronLeggings && hasNetheriteMagneticIronBoots;
         boolean display = ModConfig.getConfig().displayActionBar;
         boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
         boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
@@ -312,8 +301,8 @@ public class AttractMethods {
                     finalDis = dis;
                 }
             }
-            if (hasMagneticIronSuit) finalDis *= magnetSetMultiplier;
-            if (hasNetheriteMagneticIronSuit) finalDis *= netheriteMagnetSetMultiplier;
+            if (MagneticIronArmorItem.isInMagneticIronSuit(entity)) finalDis *= magnetSetMultiplier;
+            if (NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(entity)) finalDis *= netheriteMagnetSetMultiplier;
             entity.setAttracting(true, finalDis);
         } else {
             entity.setAttracting(false);
@@ -361,7 +350,9 @@ public class AttractMethods {
                 message = ": " + creatureDis;
                 text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
             }
-            player.sendMessage(text, true);
+            if (!player.world.isClient && (!EnchantmentMethods.hasEnchantment(feet, EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT) || !player.getMagneticLevitationMode() && player.getLevitationTick() <= 0)) {
+                player.sendMessage(text, true);
+            }
         }
         if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {
             entity.removeStatusEffect(EffectRegistries.UNATTRACT_EFFECT);

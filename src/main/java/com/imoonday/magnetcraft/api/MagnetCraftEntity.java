@@ -5,7 +5,7 @@ import net.minecraft.nbt.NbtCompound;
 import java.util.UUID;
 
 @SuppressWarnings("unused")
-public interface EntityAttractNbt {
+public interface MagnetCraftEntity {
 
     NbtCompound getAttractData();
 
@@ -38,5 +38,13 @@ public interface EntityAttractNbt {
     boolean ignoreFallDamage();
 
     void setIgnoreFallDamage(boolean ignore);
+
+    boolean getMagneticLevitationMode();
+
+    void setMagneticLevitationMode(boolean mode);
+
+    int getLevitationTick();
+
+    void setLevitationTick(int tick);
 
 }

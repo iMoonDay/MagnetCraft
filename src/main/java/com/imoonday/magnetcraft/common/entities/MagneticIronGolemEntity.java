@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.entities;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
@@ -44,7 +44,7 @@ import java.util.stream.IntStream;
 public class MagneticIronGolemEntity extends IronGolemEntity {
 
     protected static final TrackedData<Byte> MAGNETIC_IRON_GOLEM_FLAGS = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
-    private static final TrackedData<Boolean> HAS_LODESTONE = DataTracker.registerData(MagneticIronGolemEntity.class,TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> HAS_LODESTONE = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private final Inventory inventory = new SimpleInventory(27);
 
     public MagneticIronGolemEntity(EntityType<? extends IronGolemEntity> entityType, World world) {
@@ -57,16 +57,16 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
 
     @Override
     public boolean isAttracting() {
-        return this.isHasLodestone() && ((EntityAttractNbt) this).canAttract();
+        return this.isHasLodestone() && ((MagnetCraftEntity) this).canAttract();
     }
 
     @Override
     public double getAttractDis() {
-        return this.isHasLodestone() && ((EntityAttractNbt) this).canAttract() ? ModConfig.getGolemValue().attractDis : 0;
+        return this.isHasLodestone() && ((MagnetCraftEntity) this).canAttract() ? ModConfig.getGolemValue().attractDis : 0;
     }
 
     public void setHasLodestone(boolean hasLodestone) {
-        this.dataTracker.set(HAS_LODESTONE,hasLodestone);
+        this.dataTracker.set(HAS_LODESTONE, hasLodestone);
     }
 
     public boolean isHasLodestone() {
@@ -229,7 +229,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(MAGNETIC_IRON_GOLEM_FLAGS, (byte) 0);
-        this.dataTracker.startTracking(HAS_LODESTONE,false);
+        this.dataTracker.startTracking(HAS_LODESTONE, false);
     }
 
     @Override

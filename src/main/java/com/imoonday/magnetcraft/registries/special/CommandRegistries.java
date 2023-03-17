@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.registries.special;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.config.ModConfig;
 import me.shedaniel.autoconfig.AutoConfig;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
@@ -42,7 +42,7 @@ public class CommandRegistries {
                                                             ServerPlayerEntity player = context.getSource().getPlayer();
                                                             if (player != null) {
                                                                 String text = "None";
-                                                                NbtCompound nbt = ((EntityAttractNbt)player).getAttractData();
+                                                                NbtCompound nbt = ((MagnetCraftEntity)player).getAttractData();
                                                                 if (nbt != null) {
                                                                     text = nbt.toString();
                                                                 }
@@ -56,7 +56,7 @@ public class CommandRegistries {
                                                 .executes(context -> {
                                                             ServerPlayerEntity player = context.getSource().getPlayer();
                                                             if (player != null) {
-                                                                if(((EntityAttractNbt)player).clearAttractData()){
+                                                                if(((MagnetCraftEntity)player).clearAttractData()){
                                                                     player.sendMessage(Text.literal("Success"));
                                                                 }
                                                             }

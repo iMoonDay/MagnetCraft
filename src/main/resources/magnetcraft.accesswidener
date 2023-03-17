@@ -1,3 +1,5 @@
 accessWidener   v1    named
 
 accessible  method  net/minecraft/entity/projectile/TridentEntity   asItemStack ()Lnet/minecraft/item/ItemStack;
+
+accessible field net/minecraft/entity/LivingEntity jumping Z

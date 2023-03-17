@@ -33,6 +33,9 @@ public class LivingEntityMixin {
             MagneticFluid.tick(entity);
             AttractMethods.tickCheck(entity);
             CreatureMagnetItem.followingCheck(entity);
+            if (entity.isOnGround()) {
+                entity.setIgnoreFallDamage(false);
+            }
         }
     }
 
@@ -48,8 +51,8 @@ public class LivingEntityMixin {
                 boolean hasEnchantment = EnchantmentMethods.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
                 if (hasEnchantment) {
                     world.getOtherEntities(null, entity.getBoundingBox(), targetEntity -> ((targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.age == 0)).forEach(targetEntity -> {
-                        if (targetEntity instanceof ExperienceOrbEntity) {
-                            int amount = ((ExperienceOrbEntity) targetEntity).getExperienceAmount();
+                        if (targetEntity instanceof ExperienceOrbEntity orb) {
+                            int amount = orb.getExperienceAmount();
                             player.addExperience(amount);
                         } else {
                             player.getInventory().offerOrDrop(((ItemEntity) targetEntity).getStack());
@@ -70,12 +73,12 @@ public class LivingEntityMixin {
         }
     }
 
-    @Inject(method = "computeFallDamage", at = @At(value = "RETURN"), cancellable = true)
-    protected void computeFallDamage(float fallDistance, float damageMultiplier, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "damage", at = @At(value = "HEAD"), cancellable = true)
+    protected void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity.ignoreFallDamage() && entity.isOnGround()) {
+        if (entity.ignoreFallDamage() && source.isFromFalling() && !entity.world.isClient) {
             entity.setIgnoreFallDamage(false);
-            cir.setReturnValue(0);
+            cir.setReturnValue(false);
         }
     }
 

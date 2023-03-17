@@ -9,14 +9,19 @@
     "BlockMixin",
     "BrewingMixin",
     "CarvedPumpkinBlockMixin",
+    "EnchantmentHelperMixin",
     "EntityMixin",
     "EntityTypeMixin",
     "ItemEntityMixin",
     "LivingEntityMixin",
+    "PlayerEntityMixin",
     "TridentEntityMixin",
     "VillagerEntityMixin"
   ],
   "injectors": {
     "defaultRequire": 1
-  }
+  },
+  "client": [
+    "ClientPlayerEntityMixin"
+  ]
 }

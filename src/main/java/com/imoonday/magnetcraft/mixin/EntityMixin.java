@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.methods.AttractMethods;
@@ -19,7 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.UUID;
 
 @Mixin(Entity.class)
-public class EntityMixin implements EntityAttractNbt {
+public class EntityMixin implements MagnetCraftEntity {
 
     protected NbtCompound attractData = new NbtCompound();
     protected double attractDis = 0;
@@ -28,6 +28,8 @@ public class EntityMixin implements EntityAttractNbt {
     protected UUID attractOwner = CreatureMagnetItem.EMPTY_UUID;
     protected boolean isFollowing = false;
     protected boolean ignoreFallDamage = false;
+    protected boolean magneticLevitationMode = true;
+    protected int levitationTick = 0;
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     public void tick(CallbackInfo ci) {
@@ -38,6 +40,7 @@ public class EntityMixin implements EntityAttractNbt {
         this.attractOwner = this.getAttractOwner();
         this.isFollowing = this.isFollowing();
         this.ignoreFallDamage = this.ignoreFallDamage();
+        this.magneticLevitationMode = this.getMagneticLevitationMode();
         if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
             AttractMethods.attracting(entity, entity.getAttractDis());
         }
@@ -162,10 +165,35 @@ public class EntityMixin implements EntityAttractNbt {
     }
 
     @Override
-    public void setIgnoreFallDamage(boolean ignore) {
-        this.attractData.putBoolean("IgnoreFallDamage", ignore);
+    public void setIgnoreFallDamage(boolean ignoreFallDamage) {
+        this.attractData.putBoolean("IgnoreFallDamage", ignoreFallDamage);
     }
 
+    @Override
+    public boolean getMagneticLevitationMode() {
+        if (!this.attractData.contains("MagneticLevitationMode")) {
+            this.attractData.putBoolean("MagneticLevitationMode", true);
+        }
+        return this.attractData.getBoolean("MagneticLevitationMode");
+    }
+
+    @Override
+    public void setMagneticLevitationMode(boolean mode) {
+        this.attractData.putBoolean("MagneticLevitationMode", mode);
+    }
+
+    @Override
+    public int getLevitationTick() {
+        if (!this.attractData.contains("LevitationTick") && this.attractData.getInt("LevitationTick") < 0) {
+            this.attractData.putInt("LevitationTick", 0);
+        }
+        return this.attractData.getInt("LevitationTick");
+    }
+
+    @Override
+    public void setLevitationTick(int tick) {
+        this.attractData.putInt("LevitationTick", Math.max(tick, 0));
+    }
 
     @Inject(method = "writeNbt", at = @At("TAIL"))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
@@ -175,6 +203,8 @@ public class EntityMixin implements EntityAttractNbt {
         this.attractData.putUuid("AttractOwner", this.getAttractOwner());
         this.attractData.putBoolean("isFollowing", this.isFollowing());
         this.attractData.putBoolean("IgnoreFallDamage", this.ignoreFallDamage());
+        this.attractData.putBoolean("MagneticLevitationMode", this.getMagneticLevitationMode());
+        this.attractData.putInt("LevitationTick", this.getLevitationTick());
         nbt.put("AttractData", this.attractData);
     }
 
@@ -200,6 +230,12 @@ public class EntityMixin implements EntityAttractNbt {
             }
             if (data.contains("IgnoreFallDamage")) {
                 this.ignoreFallDamage = data.getBoolean("IgnoreFallDamage");
+            }
+            if (data.contains("MagneticLevitationMode")) {
+                this.magneticLevitationMode = data.getBoolean("MagneticLevitationMode");
+            }
+            if (data.contains("LevitationTick")) {
+                this.levitationTick = data.getInt("LevitationTick");
             }
         }
     }

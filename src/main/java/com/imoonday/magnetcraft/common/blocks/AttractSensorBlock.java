@@ -70,11 +70,7 @@ public class AttractSensorBlock extends BlockWithEntity {
             if (entity instanceof AttractSensorEntity sensorEntity) {
                 boolean hasDirection = sensorEntity.isHasDirection();
                 sensorEntity.setHasDirection(!hasDirection);
-                if (!hasDirection) {
-                    player.sendMessage(Text.translatable("block.magnetcraft.attract_sensor.message.1"), true);
-                } else {
-                    player.sendMessage(Text.translatable("block.magnetcraft.attract_sensor.message.2"), true);
-                }
+                player.sendMessage(Text.translatable(hasDirection ? "block.magnetcraft.attract_sensor.message.2" : "block.magnetcraft.attract_sensor.message.1"), true);
             }
         }
         return super.onUse(state, world, pos, player, hand, hit);

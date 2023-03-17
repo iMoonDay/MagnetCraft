@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
-import com.imoonday.magnetcraft.api.EntityAttractNbt;
+import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
@@ -12,6 +12,7 @@ import net.minecraft.world.World;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 public class AttractSensorEntity extends BlockEntity {
 
@@ -27,16 +28,14 @@ public class AttractSensorEntity extends BlockEntity {
         if (world.isClient) {
             return;
         }
-        HashMap<Double, Direction> disList = new HashMap<>();
-        world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(30), EntityAttractNbt::isAttracting)
-                .forEach(otherEntity -> disList.put(Math.sqrt(pos.getSquaredDistance(otherEntity.getPos())), Direction.getFacing(pos.getX() - otherEntity.getX(), pos.getY() - otherEntity.getY(), pos.getZ() - otherEntity.getZ())));
-        if (!disList.isEmpty()) {
+        HashMap<Double, Direction> disList = world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(30), MagnetCraftEntity::isAttracting).stream().collect(Collectors.toMap(otherEntity -> Math.sqrt(pos.getSquaredDistance(otherEntity.getPos())), otherEntity -> Direction.getFacing(pos.getX() - otherEntity.getX(), pos.getY() - otherEntity.getY(), pos.getZ() - otherEntity.getZ()), (a, b) -> b, HashMap::new));
+        if (disList.isEmpty()) {
+            entity.direction = Direction.UP;
+            entity.power = 0;
+        } else {
             int minDis = Collections.min(disList.keySet()).intValue();
             entity.direction = disList.getOrDefault(Collections.min(disList.keySet()), Direction.UP);
             entity.power = 30 - minDis >= 0 ? (30 - minDis) / 2 : 0;
-        } else {
-            entity.direction = Direction.UP;
-            entity.power = 0;
         }
         world.updateNeighborsAlways(pos, state.getBlock());
     }

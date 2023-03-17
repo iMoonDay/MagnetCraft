@@ -10,11 +10,12 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 
 public class EnchantmentRegistries {
 
-    public static final Enchantment ATTRACT_ENCHANTMENT = register("attract", new AttractEnchantment());
-    public static final Enchantment AUTOMATIC_COLLECTION_ENCHANTMENT = register("automatic_collection", new AutomaticCollectionEnchantment());
-    public static final Enchantment AUTOMATIC_LOOTING_ENCHANTMENT = register("automatic_looting", new AutomaticLootingEnchantment());
-    public static final Enchantment DEGAUSSING_PROTECTION_ENCHANTMENT = register("degaussing_protection", new DegaussingProtectionEnchantment());
-    public static final Enchantment FASTER_COOLDOWN_ENCHANTMENT = register("faster_cooldown", new FasterCooldownEnchantment());
+    public static final AttractEnchantment ATTRACT_ENCHANTMENT = register("attract", new AttractEnchantment());
+    public static final AutomaticCollectionEnchantment AUTOMATIC_COLLECTION_ENCHANTMENT = register("automatic_collection", new AutomaticCollectionEnchantment());
+    public static final AutomaticLootingEnchantment AUTOMATIC_LOOTING_ENCHANTMENT = register("automatic_looting", new AutomaticLootingEnchantment());
+    public static final DegaussingProtectionEnchantment DEGAUSSING_PROTECTION_ENCHANTMENT = register("degaussing_protection", new DegaussingProtectionEnchantment());
+    public static final FasterCooldownEnchantment FASTER_COOLDOWN_ENCHANTMENT = register("faster_cooldown", new FasterCooldownEnchantment());
+    public static final MagneticLevitationEnchantment MAGNETIC_LEVITATION_ENCHANTMENT = register("magnetic_levitation", new MagneticLevitationEnchantment());
 
     public static void register() {
         MagnetCraft.LOGGER.info("EnchantmentRegistries.class Loaded");

@@ -34,7 +34,7 @@
   "custom": {
     "loom:injected_interfaces": {
       "net/minecraft/class_1297": [
-        "com/imoonday/magnetcraft/api/EntityAttractNbt"
+        "com/imoonday/magnetcraft/api/MagnetCraftEntity"
       ]
     }
   }

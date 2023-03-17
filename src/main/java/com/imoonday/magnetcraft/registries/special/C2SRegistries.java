@@ -66,5 +66,17 @@ public class C2SRegistries {
             server.execute(() -> player.jumping = jumping);
         });
 
+        ServerPlayNetworking.registerGlobalReceiver(AUTOMATIC_LEVITATION_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+            if (EnchantmentMethods.hasEnchantment(player, EquipmentSlot.FEET, MAGNETIC_LEVITATION_ENCHANTMENT)) {
+                boolean enable = !((MagnetCraftEntity) player).getAutomaticLevitation();
+                ((MagnetCraftEntity) player).setAutomaticLevitation(enable);
+                String OnOff = enable ? "on" : "off";
+                player.sendMessage(Text.translatable("text.magnetcraft.message.automatic_levitation." + OnOff));
+                PacketByteBuf clientBuf = PacketByteBufs.create();
+                clientBuf.writeBoolean(enable);
+                ServerPlayNetworking.send(player, AUTOMATIC_LEVITATION_PACKET_ID, clientBuf);
+            }
+        }));
+
     }
 }

@@ -36,5 +36,15 @@ public class S2CRegistries {
             });
         });
 
+        ClientPlayNetworking.registerGlobalReceiver(AUTOMATIC_LEVITATION_PACKET_ID, (client, handler, buf, responseSender) -> {
+            boolean enable = buf.readBoolean();
+            client.execute(() -> {
+                ClientPlayerEntity player = client.player;
+                if (player != null) {
+                    ((MagnetCraftEntity) player).setAutomaticLevitation(enable);
+                }
+            });
+        });
+
     }
 }

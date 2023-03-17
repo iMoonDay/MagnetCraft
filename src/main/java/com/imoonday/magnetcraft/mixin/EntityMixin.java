@@ -30,6 +30,7 @@ public class EntityMixin implements MagnetCraftEntity {
     protected boolean ignoreFallDamage = false;
     protected boolean magneticLevitationMode = true;
     protected int levitationTick = 0;
+    protected boolean automaticLevitation = false;
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     public void tick(CallbackInfo ci) {
@@ -41,6 +42,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.isFollowing = this.isFollowing();
         this.ignoreFallDamage = this.ignoreFallDamage();
         this.magneticLevitationMode = this.getMagneticLevitationMode();
+        this.automaticLevitation = this.getAutomaticLevitation();
         if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
             AttractMethods.attracting(entity, entity.getAttractDis());
         }
@@ -195,6 +197,19 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putInt("LevitationTick", Math.max(tick, 0));
     }
 
+    @Override
+    public boolean getAutomaticLevitation() {
+        if (!this.attractData.contains("AutomaticLevitation")) {
+            this.attractData.putBoolean("AutomaticLevitation", false);
+        }
+        return this.attractData.getBoolean("AutomaticLevitation");
+    }
+
+    @Override
+    public void setAutomaticLevitation(boolean enable) {
+        this.attractData.putBoolean("AutomaticLevitation", enable);
+    }
+
     @Inject(method = "writeNbt", at = @At("TAIL"))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
         this.attractData.putDouble("AttractDis", this.getAttractDis());
@@ -205,6 +220,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putBoolean("IgnoreFallDamage", this.ignoreFallDamage());
         this.attractData.putBoolean("MagneticLevitationMode", this.getMagneticLevitationMode());
         this.attractData.putInt("LevitationTick", this.getLevitationTick());
+        this.attractData.putBoolean("AutomaticLevitation", this.getAutomaticLevitation());
         nbt.put("AttractData", this.attractData);
     }
 
@@ -236,6 +252,9 @@ public class EntityMixin implements MagnetCraftEntity {
             }
             if (data.contains("LevitationTick")) {
                 this.levitationTick = data.getInt("LevitationTick");
+            }
+            if (data.contains("AutomaticLevitation")) {
+                this.automaticLevitation = data.getBoolean("AutomaticLevitation");
             }
         }
     }

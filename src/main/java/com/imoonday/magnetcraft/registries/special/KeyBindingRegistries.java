@@ -38,6 +38,12 @@ public class KeyBindingRegistries {
                         GLFW.GLFW_KEY_LEFT_ALT,
                         "key.category.magnetcraft"));
 
+        KeyBinding changeAutomaticLevitation = KeyBindingHelper.registerKeyBinding(
+                new KeyBinding("key.magnetcraft.automaticLevitation",
+                        InputUtil.Type.KEYSYM,
+                        GLFW.GLFW_KEY_RIGHT_ALT,
+                        "key.category.magnetcraft"));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ClientPlayerEntity player = client.player;
             ClientWorld world = client.world;
@@ -55,6 +61,9 @@ public class KeyBindingRegistries {
             }
             while (changeMagneticLevitationMode.wasPressed()) {
                 ClientPlayNetworking.send(MAGNETIC_LEVITATION_MODE_PACKET_ID, PacketByteBufs.empty());
+            }
+            while (changeAutomaticLevitation.wasPressed()) {
+                ClientPlayNetworking.send(AUTOMATIC_LEVITATION_PACKET_ID, PacketByteBufs.empty());
             }
         });
     }

@@ -47,4 +47,8 @@ public interface MagnetCraftEntity {
 
     void setLevitationTick(int tick);
 
+    boolean getAutomaticLevitation();
+
+    void setAutomaticLevitation(boolean enable);
+
 }

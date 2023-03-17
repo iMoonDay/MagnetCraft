@@ -45,16 +45,18 @@ public class MagneticLevitationEnchantment extends Enchantment {
         boolean level1 = stack.isOf(ItemRegistries.MAGNETIC_IRON_BOOTS);
         boolean level2 = stack.isOf(ItemRegistries.NETHERITE_MAGNETIC_IRON_BOOTS);
         double multiplier = level2 ? 2.0 : level1 ? 1.0 : 0.5;
+        double speed = 0.25 * multiplier;
         int lvl = EnchantmentMethods.getEnchantmentLvl(player, EquipmentSlot.FEET, MAGNETIC_LEVITATION_ENCHANTMENT);
         int tick = player.getLevitationTick();
         int maxSec = (int) ((10 + lvl * 10) * multiplier);
         String displayTime = ((tick / 20) + (tick % 20 == 0 ? 0 : 1)) + " / " + maxSec;
-        if (!player.isOnGround() && player.jumping) {
+        boolean auto = player.getAutomaticLevitation();
+        if (!player.isOnGround() && (player.jumping || auto)) {
             double heightMultiplier = MagneticIronArmorItem.isInMagneticIronSuit(player) ? 1.5 : NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(player) ? 2.0 : 1.0;
             double height = (1.5 + (double) lvl / 2.0) * heightMultiplier + 0.1;
             player.setNoGravity(true);
             boolean collide = DoubleStream.iterate(0, d -> d <= height, d -> d + 0.1).anyMatch(d -> (!player.doesNotCollide(0, -d, 0)));
-            player.setVelocity(player.getVelocity().x, tick >= maxSec * 20 ? -0.1 : collide ? player.isInSneakingPose() ? 0 : 0.25 * multiplier : !player.doesNotCollide(0, -height - 0.1, 0) ? 0 : -0.1, player.getVelocity().z);
+            player.setVelocity(player.getVelocity().x, tick >= maxSec * 20 ? -0.1 : collide ? player.isSneaking() ? auto ? -speed : 0 : speed : !player.doesNotCollide(0, -height - 0.1, 0) ? player.isSneaking() && auto ? -speed : 0 : -0.1, player.getVelocity().z);
             if (player.world.isClient) {
                 player.world.addParticle(ParticleTypes.FIREWORK, player.getX(), player.getY(), player.getZ(), player.getRandom().nextGaussian() * 0.05, -player.getVelocity().y * 0.5, player.getRandom().nextGaussian() * 0.05);
             }

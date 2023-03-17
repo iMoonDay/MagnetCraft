@@ -10,6 +10,7 @@ import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.damage.DamageTypes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
@@ -76,7 +77,7 @@ public class LivingEntityMixin {
     @Inject(method = "damage", at = @At(value = "HEAD"), cancellable = true)
     protected void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
-        if (entity.ignoreFallDamage() && source.isFromFalling() && !entity.world.isClient) {
+        if (entity.ignoreFallDamage() && source.isOf(DamageTypes.FALL) && !entity.world.isClient) {
             entity.setIgnoreFallDamage(false);
             cir.setReturnValue(false);
         }

@@ -136,8 +136,8 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         this.context.run((world, pos) -> this.dropInventory(player, this.input));
     }
 
@@ -190,7 +190,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
                 return ItemStack.EMPTY;
             }
             if (itemStack2.isEmpty()) {
-                slot2.setStack(ItemStack.EMPTY);
+                slot2.setStackNoCallbacks(ItemStack.EMPTY);
             } else {
                 slot2.markDirty();
             }

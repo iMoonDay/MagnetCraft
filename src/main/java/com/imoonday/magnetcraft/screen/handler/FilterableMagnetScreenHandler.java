@@ -110,8 +110,8 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         this.filterSlots.clear();
         this.shulkerBoxSlots.clear();
     }
@@ -181,7 +181,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
             }
 
             if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.setStackNoCallbacks(ItemStack.EMPTY);
             } else {
                 slot.markDirty();
                 FilterableMagnetScreenHandler.this.onContentChanged(this.filterSlots);
@@ -241,9 +241,9 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
                 itemStack = slot.getStack();
                 if (itemStack.isEmpty() && slot.canInsert(stack)) {
                     if (stack.getCount() > slot.getMaxItemCount()) {
-                        slot.setStack(stack.split(slot.getMaxItemCount()));
+                        slot.setStackNoCallbacks(stack.split(slot.getMaxItemCount()));
                     } else {
-                        slot.setStack(stack.split(stack.getCount()));
+                        slot.setStackNoCallbacks(stack.split(stack.getCount()));
                     }
                     slot.markDirty();
                     FilterableMagnetScreenHandler.this.onContentChanged(this.filterSlots);

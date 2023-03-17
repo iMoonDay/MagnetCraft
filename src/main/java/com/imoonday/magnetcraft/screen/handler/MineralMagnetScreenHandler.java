@@ -70,8 +70,8 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
     }
 
     @Override
-    public void close(PlayerEntity player) {
-        super.close(player);
+    public void onClosed(PlayerEntity player) {
+        super.onClosed(player);
         this.shulkerBoxSlots.clear();
     }
 
@@ -131,7 +131,7 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
             }
 
             if (originalStack.isEmpty()) {
-                slot.setStack(ItemStack.EMPTY);
+                slot.setStackNoCallbacks(ItemStack.EMPTY);
             } else {
                 MineralMagnetScreenHandler.this.onContentChanged(this.shulkerBoxSlots);
                 slot.markDirty();

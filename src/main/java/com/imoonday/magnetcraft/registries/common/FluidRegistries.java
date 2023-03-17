@@ -20,10 +20,10 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 
 public class FluidRegistries {
 
-    public static FlowableFluid STILL_MAGNETIC_FLUID = register("magnetic_fluid", new MagneticFluid.Still());
-    public static FlowableFluid FLOWING_MAGNETIC_FLUID = register("flowing_magnetic_fluid", new MagneticFluid.Flowing());
-    public static Item MAGNETIC_FLUID_BUCKET = ItemRegistries.register("magnetic_fluid_bucket", new BucketItem(STILL_MAGNETIC_FLUID, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)));
-    public static Block MAGNETIC_FLUID = BlockRegistries.register("magnetic_fluid", new FluidBlock(STILL_MAGNETIC_FLUID, FabricBlockSettings.copy(Blocks.WATER)) {
+    public static final FlowableFluid STILL_MAGNETIC_FLUID = register("magnetic_fluid", new MagneticFluid.Still());
+    public static final FlowableFluid FLOWING_MAGNETIC_FLUID = register("flowing_magnetic_fluid", new MagneticFluid.Flowing());
+    public static final Item MAGNETIC_FLUID_BUCKET = ItemRegistries.register("magnetic_fluid_bucket", new BucketItem(STILL_MAGNETIC_FLUID, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)));
+    public static final Block MAGNETIC_FLUID = BlockRegistries.register("magnetic_fluid", new FluidBlock(STILL_MAGNETIC_FLUID, FabricBlockSettings.copy(Blocks.WATER)) {
     });
 
     public static void register() {

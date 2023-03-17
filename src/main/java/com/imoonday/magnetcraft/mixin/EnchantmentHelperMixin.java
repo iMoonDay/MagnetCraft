@@ -27,10 +27,8 @@ public class EnchantmentHelperMixin {
         ArrayList<EnchantmentLevelEntry> list = Lists.newArrayList();
         Item item = stack.getItem();
         boolean bl = stack.isOf(Items.BOOK);
-        block0:
-        for (Enchantment enchantment : Registries.ENCHANTMENT) {
-            if (enchantment.isTreasure() && !treasureAllowed || !enchantment.isAvailableForRandomSelection() || !enchantment.type.isAcceptableItem(item) && !bl)
-                continue;
+        block0: for (Enchantment enchantment : Registries.ENCHANTMENT) {
+            if (enchantment.isTreasure() && !treasureAllowed || !enchantment.isAvailableForRandomSelection() || !enchantment.target.isAcceptableItem(item) && !bl) continue;
             boolean b1 = enchantment.equals(EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT) && !EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT.isAcceptableItem(stack);
             boolean b2 = enchantment.equals(Enchantments.UNBREAKING) && (stack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) || stack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) || stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM));
             if (b1 || b2) {

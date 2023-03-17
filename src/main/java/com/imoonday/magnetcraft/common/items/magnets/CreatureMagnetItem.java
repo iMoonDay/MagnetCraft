@@ -29,7 +29,7 @@ import java.util.UUID;
 
 public class CreatureMagnetItem extends SwitchableItem {
 
-    public static UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
 
     public CreatureMagnetItem(Settings settings) {
         super(settings);

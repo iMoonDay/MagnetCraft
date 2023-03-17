@@ -61,17 +61,17 @@ public class ItemRegistries {
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = register("magnet_controller", new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
     public static final PortableDemagnetizerItem PORTABLE_DEMAGNETIZER_ITEM = register("portable_demagnetizer", new PortableDemagnetizerItem(new FabricItemSettings().maxCount(1)));
 
-    public static SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, new Item.Settings()));
-    public static CustomPickaxeItem MAGNETIC_IRON_PICKAXE = register("magnetic_iron_pickaxe", new CustomPickaxeItem(MagneticIronToolMaterial.INSTANCE, 1, -2.8f, new Item.Settings()));
-    public static CustomAxeItem MAGNETIC_IRON_AXE = register("magnetic_iron_axe", new CustomAxeItem(MagneticIronToolMaterial.INSTANCE, 5.5f, -3.0f, new Item.Settings()));
-    public static CustomShovelItem MAGNETIC_IRON_SHOVEL = register("magnetic_iron_shovel", new CustomShovelItem(MagneticIronToolMaterial.INSTANCE, 1.5f, -3.0f, new Item.Settings()));
-    public static CustomHoeItem MAGNETIC_IRON_HOE = register("magnetic_iron_hoe", new CustomHoeItem(MagneticIronToolMaterial.INSTANCE, -2, -1.0f, new Item.Settings()));
+    public static final SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, new Item.Settings()));
+    public static final CustomPickaxeItem MAGNETIC_IRON_PICKAXE = register("magnetic_iron_pickaxe", new CustomPickaxeItem(MagneticIronToolMaterial.INSTANCE, 1, -2.8f, new Item.Settings()));
+    public static final CustomAxeItem MAGNETIC_IRON_AXE = register("magnetic_iron_axe", new CustomAxeItem(MagneticIronToolMaterial.INSTANCE, 5.5f, -3.0f, new Item.Settings()));
+    public static final CustomShovelItem MAGNETIC_IRON_SHOVEL = register("magnetic_iron_shovel", new CustomShovelItem(MagneticIronToolMaterial.INSTANCE, 1.5f, -3.0f, new Item.Settings()));
+    public static final CustomHoeItem MAGNETIC_IRON_HOE = register("magnetic_iron_hoe", new CustomHoeItem(MagneticIronToolMaterial.INSTANCE, -2, -1.0f, new Item.Settings()));
 
-    public static SwordItem NETHERITE_MAGNETIC_IRON_SWORD = register("netherite_magnetic_iron_sword", new SwordItem(NetheriteMagneticIronToolMaterial.INSTANCE, 4, -2.4f, new Item.Settings().fireproof()));
-    public static CustomPickaxeItem NETHERITE_MAGNETIC_IRON_PICKAXE = register("netherite_magnetic_iron_pickaxe", new CustomPickaxeItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2, -2.8f, new Item.Settings().fireproof()));
-    public static CustomAxeItem NETHERITE_MAGNETIC_IRON_AXE = register("netherite_magnetic_iron_axe", new CustomAxeItem(NetheriteMagneticIronToolMaterial.INSTANCE, 6.0f, -3.0f, new Item.Settings().fireproof()));
-    public static CustomShovelItem NETHERITE_MAGNETIC_IRON_SHOVEL = register("netherite_magnetic_iron_shovel", new CustomShovelItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2.5f, -3.0f, new Item.Settings().fireproof()));
-    public static CustomHoeItem NETHERITE_MAGNETIC_IRON_HOE = register("netherite_magnetic_iron_hoe", new CustomHoeItem(NetheriteMagneticIronToolMaterial.INSTANCE, -3, 0.0f, new Item.Settings().fireproof()));
+    public static final SwordItem NETHERITE_MAGNETIC_IRON_SWORD = register("netherite_magnetic_iron_sword", new SwordItem(NetheriteMagneticIronToolMaterial.INSTANCE, 4, -2.4f, new Item.Settings().fireproof()));
+    public static final CustomPickaxeItem NETHERITE_MAGNETIC_IRON_PICKAXE = register("netherite_magnetic_iron_pickaxe", new CustomPickaxeItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2, -2.8f, new Item.Settings().fireproof()));
+    public static final CustomAxeItem NETHERITE_MAGNETIC_IRON_AXE = register("netherite_magnetic_iron_axe", new CustomAxeItem(NetheriteMagneticIronToolMaterial.INSTANCE, 6.0f, -3.0f, new Item.Settings().fireproof()));
+    public static final CustomShovelItem NETHERITE_MAGNETIC_IRON_SHOVEL = register("netherite_magnetic_iron_shovel", new CustomShovelItem(NetheriteMagneticIronToolMaterial.INSTANCE, 2.5f, -3.0f, new Item.Settings().fireproof()));
+    public static final CustomHoeItem NETHERITE_MAGNETIC_IRON_HOE = register("netherite_magnetic_iron_hoe", new CustomHoeItem(NetheriteMagneticIronToolMaterial.INSTANCE, -3, 0.0f, new Item.Settings().fireproof()));
 
     public static final MagneticIronArmorMaterial MAGNETIC_IRON_MATERIAL = new MagneticIronArmorMaterial();
     public static final MagneticIronArmorItem MAGNETIC_IRON_HELMET = register("magnetic_iron_helmet", new MagneticIronArmorItem(MAGNETIC_IRON_MATERIAL, EquipmentSlot.HEAD, new Item.Settings()));

@@ -59,7 +59,7 @@ public class EntityMixin implements MagnetCraftEntity {
     @Override
     public boolean clearAttractData() {
         this.attractData = new NbtCompound();
-        return true;
+        return this.attractData.equals(new NbtCompound());
     }
 
     @Override

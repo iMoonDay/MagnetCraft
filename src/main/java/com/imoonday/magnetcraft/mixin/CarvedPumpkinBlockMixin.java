@@ -53,11 +53,6 @@ public class CarvedPumpkinBlockMixin {
         if (result1 != null && (magneticIronGolemEntity = EntityRegistries.MAGNETIC_IRON_GOLEM.create(world)) != null) {
             magneticIronGolemEntity.setPlayerCreated(true);
             spawnEntity(world, result1, magneticIronGolemEntity.withLodestone(), result1.translate(1, 2, 0).getBlockPos());
-//            if (!world.isClient) {
-//                PacketByteBuf buf = PacketByteBufs.create();
-//                buf.writeInt(magneticIronGolemEntity.getId());
-//                PlayerLookup.tracking(magneticIronGolemEntity).forEach(player -> ServerPlayNetworking.send(player, GOLEM_PACKET_ID, buf));
-//            }
         } else {
             if (result2 != null && (magneticIronGolemEntity = EntityRegistries.MAGNETIC_IRON_GOLEM.create(world)) != null) {
                 magneticIronGolemEntity.setPlayerCreated(true);

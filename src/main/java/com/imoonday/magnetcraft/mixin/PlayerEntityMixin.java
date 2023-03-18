@@ -40,18 +40,19 @@ public abstract class PlayerEntityMixin {
             if ((player.isOnGround() || player.getAbilities().flying) && player.getLevitationTick() > 0) {
                 player.setLevitationTick(player.getLevitationTick() - 3);
             }
-            if (!player.world.isClient && !player.isSpectator()) {
-                if (!player.getAbilities().flying && player.hasNoGravity()) {
-                    player.setNoGravity(false);
-                }
+            if (!player.isSpectator() && !player.getAbilities().creativeMode && player.hasNoGravity()) {
+                player.setNoGravity(false);
+            }
+            if (!world.isClient && !player.isSpectator()) {
                 ItemStack stack = player.getEquippedStack(EquipmentSlot.FEET);
                 boolean hasTick = stack.getNbt() != null && stack.getNbt().contains("UsedTick");
                 int tick = hasTick ? stack.getNbt().getInt("UsedTick") : 0;
                 if (EnchantmentMethods.hasEnchantment(stack, MAGNETIC_LEVITATION_ENCHANTMENT) && player.getMagneticLevitationMode() && !player.getAbilities().creativeMode) {
                     stack.getOrCreateNbt().putInt("UsedTick", ++tick);
                 }
-                while (stack.getNbt().getInt("UsedTick") >= 60 * 20) {
-                    stack.getOrCreateNbt().putInt("UsedTick", stack.getOrCreateNbt().getInt("UsedTick") - 60 * 20);
+                int maxTick = 60 * 20;
+                while (hasTick && stack.getNbt().getInt("UsedTick") >= maxTick) {
+                    stack.getOrCreateNbt().putInt("UsedTick", stack.getOrCreateNbt().getInt("UsedTick") - maxTick);
                     DamageMethods.addDamage(stack, player.getRandom(), 1, true);
                 }
             }

@@ -48,17 +48,24 @@ public class MagneticLevitationEnchantment extends Enchantment {
         double speed = 0.25 * multiplier;
         int lvl = EnchantmentMethods.getEnchantmentLvl(player, EquipmentSlot.FEET, MAGNETIC_LEVITATION_ENCHANTMENT);
         int tick = player.getLevitationTick();
-        int maxSec = (int) ((10 + lvl * 10) * multiplier);
-        String displayTime = ((tick / 20) + (tick % 20 == 0 ? 0 : 1)) + " / " + maxSec;
+        int maxTick = (int) ((10 + lvl * 10) * multiplier) * 20;
         boolean auto = player.getAutomaticLevitation();
         boolean isClient = player.world.isClient;
         boolean survival = !player.isSpectator() && !player.getAbilities().creativeMode;
+        StringBuilder displayTime = new StringBuilder();
+        if (!isClient) {
+            int maxSlot = 20;
+            double percent = ((double) tick / maxTick) * maxSlot;
+            int i1 = Math.max(0, (int) Math.min(percent, maxSlot));
+            int i2 = Math.max(0, (int) Math.max(maxSlot - percent + 1, 0));
+            displayTime.append("▓".repeat(i1)).append("░".repeat(i1 + i2 > maxSlot ? --i2 : i2));
+        }
         if (!player.isOnGround() && (player.jumping || auto)) {
             double heightMultiplier = MagneticIronArmorItem.isInMagneticIronSuit(player) ? 1.5 : NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(player) ? 2.0 : 1.0;
             double height = (1.5 + (double) lvl / 2.0) * heightMultiplier + 0.1;
             player.setNoGravity(true);
             boolean collide = DoubleStream.iterate(0, d -> d <= height, d -> d + 0.1).anyMatch(d -> (!player.doesNotCollide(0, -d, 0)));
-            player.setVelocity(player.getVelocity().x, tick >= maxSec * 20 ? -0.1 : collide ? player.isSneaking() ? auto ? -speed : 0 : speed : !player.doesNotCollide(0, -height - 0.1, 0) ? player.isSneaking() && auto ? -speed : 0 : -0.1, player.getVelocity().z);
+            player.setVelocity(player.getVelocity().x, tick >= maxTick ? -0.1 : collide ? player.isSneaking() ? auto && !player.jumping ? -speed : 0 : speed : !player.doesNotCollide(0, -height - 0.1, 0) ? player.isSneaking() && auto ? -speed : 0 : -0.1, player.getVelocity().z);
             if (isClient) {
                 player.world.addParticle(ParticleTypes.FIREWORK, player.getX(), player.getY(), player.getZ(), player.getRandom().nextGaussian() * 0.05, -player.getVelocity().y * 0.5, player.getRandom().nextGaussian() * 0.05);
             }
@@ -70,7 +77,7 @@ public class MagneticLevitationEnchantment extends Enchantment {
                 if (!isClient) {
                     int usedTick = stack.getNbt() != null && stack.getNbt().contains("UsedTick") ? stack.getOrCreateNbt().getInt("UsedTick") : 0;
                     stack.getOrCreateNbt().putInt("UsedTick", ++usedTick);
-                    player.sendMessage(Text.literal(displayTime), true);
+                    player.sendMessage(Text.literal(displayTime.toString()), true);
                 }
             }
             player.getInventory().markDirty();
@@ -79,7 +86,7 @@ public class MagneticLevitationEnchantment extends Enchantment {
             if (survival && tick > 0) {
                 player.setLevitationTick(++tick);
                 if (!isClient) {
-                    player.sendMessage(Text.literal(displayTime), true);
+                    player.sendMessage(Text.literal(displayTime.toString()), true);
                 }
             }
         }

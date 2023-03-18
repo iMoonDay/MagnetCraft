@@ -47,7 +47,7 @@ public class KeyBindingRegistries {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ClientPlayerEntity player = client.player;
             ClientWorld world = client.world;
-            if (player == null && world == null) {
+            if (player == null || world == null) {
                 return;
             }
             while (attractEnchantmentsSwitch.wasPressed()) {

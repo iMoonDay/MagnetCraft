@@ -68,6 +68,8 @@ public class BlockRegistries {
     public static final BlockEntityType<AttractSensorEntity> ATTRACT_SENSOR_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("attract_sensor"), FabricBlockEntityTypeBuilder.create(AttractSensorEntity::new, ATTRACT_SENSOR_BLOCK).build());
     public static final AdvancedGrindstoneBlock ADVANCED_GRINDSTONE_BLOCK = register("advanced_grindstone", new AdvancedGrindstoneBlock(FabricBlockSettings.copy(Blocks.GRINDSTONE)));
     public static final VerticalRepeaterBlock VERTICAL_REPEATER_BLOCK = register("vertical_repeater", new VerticalRepeaterBlock(FabricBlockSettings.copy(Blocks.OBSERVER)));
+    public static final CircularRepeaterBlock CIRCULAR_REPEATER_BLOCK = register("circular_repeater", new CircularRepeaterBlock(FabricBlockSettings.copy(Blocks.REPEATER)));
+    public static final ElectromagneticRelayBlock ELECTROMAGNETIC_RELAY_BLOCK = register("electromagnetic_relay", new ElectromagneticRelayBlock(FabricBlockSettings.copy(Blocks.COMPARATOR)));
 
     public static final Map<Item, CauldronBehavior> MAGNETIC_FLUID_CAULDRON_BEHAVIOR = CauldronBehavior.createMap();
     public static final Block MAGNETIC_FLUID_CAULDRON = registerBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(AbstractBlock.Settings.copy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));
@@ -154,5 +156,7 @@ public class BlockRegistries {
         BlockRenderLayerMap.INSTANCE.putBlock(MAGLEV_REPEATER_BLOCK, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(MAGLEV_COMPARATOR_BLOCK, RenderLayer.getCutout());
         BlockRenderLayerMap.INSTANCE.putBlock(MAGNETIC_FLUID_CAULDRON, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(CIRCULAR_REPEATER_BLOCK, RenderLayer.getCutout());
+        BlockRenderLayerMap.INSTANCE.putBlock(ELECTROMAGNETIC_RELAY_BLOCK, RenderLayer.getCutout());
     }
 }

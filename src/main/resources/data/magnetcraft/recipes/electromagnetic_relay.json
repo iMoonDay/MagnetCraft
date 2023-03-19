@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " 1 ",
+    "232",
+    " 1 "
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:redstone"
+    },
+    "2": {
+      "item": "magnetcraft:magnet_fragment"
+    },
+    "3": {
+      "item": "magnetcraft:maglev_comparator"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:electromagnetic_relay",
+    "count": 1
+  }
+}

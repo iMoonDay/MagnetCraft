@@ -44,12 +44,12 @@ public class AttractMethods {
         if (!world.isClient) {
             boolean blockCanAttract = world.getOtherEntities(null, Box.from(pos).expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && pos.isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator())).isEmpty();
             if (blockCanAttract) {
-                attracting(world, pos, dis, filter, allowedItems);
+                tryAttract(world, pos, dis, filter, allowedItems);
             }
         }
     }
 
-    public static void attracting(Entity entity, double dis) {
+    public static void tryAttract(Entity entity, double dis) {
         if (entity.world.isClient) {
             return;
         }
@@ -93,17 +93,14 @@ public class AttractMethods {
                 }
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = entity.getPos().add(0, 0.5, 0).subtract(targetEntity.getPos()).multiply(0.05);
-                    if (targetEntity.horizontalCollision) {
-                        vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
-                    }
-                    targetEntity.setVelocity(vec);
+                    targetEntity.setVelocity(targetEntity.horizontalCollision? vec.multiply(1, 0, 1).add(0, 0.25, 0) :vec);
                     PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                 }
             }
         });
     }
 
-    public static void attracting(World world, Vec3d pos, double dis, boolean filter, ArrayList<Item> allowedItems) {
+    public static void tryAttract(World world, Vec3d pos, double dis, boolean filter, ArrayList<Item> allowedItems) {
         int degaussingDis = ModConfig.getValue().degaussingDis;
         boolean whitelistEnable = ModConfig.getConfig().whitelist.enable;
         boolean blacklistEnable = ModConfig.getConfig().blacklist.enable;
@@ -125,10 +122,7 @@ public class AttractMethods {
                 boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, MagnetCraftEntity::isAttracting) != null;
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = pos.subtract(targetEntity.getPos()).multiply(0.05);
-                    if (targetEntity.horizontalCollision) {
-                        vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
-                    }
-                    targetEntity.setVelocity(vec);
+                    targetEntity.setVelocity(targetEntity.horizontalCollision? vec.multiply(1, 0, 1).add(0, 0.25, 0) :vec);
                     PlayerLookup.tracking(targetEntity).forEach(player -> player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                 }
             }
@@ -136,39 +130,41 @@ public class AttractMethods {
     }
 
     public static boolean isSameStack(ItemStack stack, ItemEntity entity) {
-        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
-            boolean stackDamagePass = true;
-            boolean stackNbtPass = true;
-            NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
-            String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
-            boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item));
-            if (stack.getNbt().getBoolean("CompareDamage") && inList) {
-                stackDamagePass = list.stream()
-                        .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
-                        .anyMatch(nbtElement -> ((NbtCompound) nbtElement).getInt("Damage") == entity.getStack().getDamage());
-            }
-            if (stack.getNbt().getBoolean("CompareNbt") && inList) {
-                NbtCompound nbt = entity.getStack().getNbt();
-                NbtCompound nbtWithoutDamage = new NbtCompound();
-                if (nbt != null) {
-                    nbtWithoutDamage = nbt.copy();
-                    nbtWithoutDamage.remove("Damage");
-                }
-                NbtCompound finalNbt = nbtWithoutDamage;
-                stackNbtPass = list.stream()
-                        .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
-                        .peek(nbtElement -> ((NbtCompound) nbtElement).getCompound("tag").remove("Damage"))
-                        .anyMatch(nbtElement -> ((NbtCompound) nbtElement).getCompound("tag").equals(finalNbt));
-            }
-            boolean isWhitelist = stack.getNbt().getBoolean("Whitelist");
-            return (!isWhitelist || inList && stackDamagePass && stackNbtPass) && (isWhitelist || !inList || !stackDamagePass || !stackNbtPass);
+        if (stack == null || stack.getNbt() == null || !stack.getNbt().getBoolean("Filterable")) {
+            return true;
         }
-        return true;
+        boolean stackDamagePass = true;
+        boolean stackNbtPass = true;
+        NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
+        String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
+        boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item));
+        if (stack.getNbt().getBoolean("CompareDamage") && inList) {
+            stackDamagePass = list.stream()
+                    .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
+                    .map(nbtElement -> (NbtCompound) nbtElement)
+                    .anyMatch(NbtCompound -> NbtCompound.getInt("Damage") == entity.getStack().getDamage());
+        }
+        if (stack.getNbt().getBoolean("CompareNbt") && inList) {
+            NbtCompound nbt = entity.getStack().getNbt();
+            NbtCompound nbtWithoutDamage = new NbtCompound();
+            if (nbt != null) {
+                nbtWithoutDamage = nbt.copy();
+                nbtWithoutDamage.remove("Damage");
+            }
+            NbtCompound finalNbt = nbtWithoutDamage;
+            stackNbtPass = list.stream()
+                    .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
+                    .map(nbtElement -> (NbtCompound) nbtElement)
+                    .peek(NbtCompound -> NbtCompound.getCompound("tag").remove("Damage"))
+                    .anyMatch(NbtCompound -> NbtCompound.getCompound("tag").equals(finalNbt));
+        }
+        boolean isWhitelist = stack.getNbt().getBoolean("Whitelist");
+        return (!isWhitelist || inList && stackDamagePass && stackNbtPass) && (isWhitelist || !inList || !stackDamagePass || !stackNbtPass);
     }
 
     public static void tickCheck(LivingEntity entity) {
         ModConfig.DefaultValue value = ModConfig.getConfig().value;
-        double[] minDis = new double[]{value.electromagnetAttractMinDis, value.permanentMagnetAttractMinDis, value.polarMagnetAttractMinDis};//电磁铁,永磁铁,无极磁铁最小范围
+        double[] minDis = new double[]{value.electromagnetAttractMinDis, value.permanentMagnetAttractMinDis, value.polarMagnetAttractMinDis};
         double creatureDis = value.creatureMagnetAttractDis;
         double horseArmorAttractDis = value.horseArmorAttractDis;
         double magnetHandSpacing = value.magnetHandSpacing;
@@ -282,28 +278,25 @@ public class AttractMethods {
                         if (handMagnetHasEnch) {
                             dis += enchMinDis + (enchLvl - 1) * disPerLvl;
                         }
-                        if (dis > finalDis) {
-                            finalDis = dis;
-                        }
+                        finalDis = Math.max(dis,finalDis);
                     }
                 }
             }
             if (hasEffect) {
                 amplifier = Objects.requireNonNull(entity.getStatusEffect(EffectRegistries.ATTRACT_EFFECT)).getAmplifier();
                 dis = attractDefaultDis + amplifier * disPerAmplifier;
-                if (dis > finalDis) {
-                    finalDis = dis;
-                }
+                finalDis = Math.max(dis,finalDis);
             }
             if (horseArmorAttracting) {
                 dis = horseArmorAttractDis;
-                if (dis > finalDis) {
-                    finalDis = dis;
-                }
+                finalDis = Math.max(dis,finalDis);
             }
-            if (MagneticIronArmorItem.isInMagneticIronSuit(entity)) finalDis *= magnetSetMultiplier;
-            if (NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(entity))
+            if (MagneticIronArmorItem.isInMagneticIronSuit(entity)) {
+                finalDis *= magnetSetMultiplier;
+            }
+            if (NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(entity)) {
                 finalDis *= netheriteMagnetSetMultiplier;
+            }
             entity.setAttracting(true, finalDis);
         } else {
             entity.setAttracting(false);
@@ -318,27 +311,19 @@ public class AttractMethods {
                 if (handElectromagnet || handPermanent) {
                     if (mainhandElectromagnet) {
                         telDis = value.electromagnetTeleportMinDis + value.magnetHandSpacing;
-                        if (telDis > finalTelDis) {
-                            finalTelDis = telDis;
-                        }
+                        finalTelDis = Math.max(telDis,finalTelDis);
                     }
                     if (offhandElectromagnet) {
                         telDis = value.electromagnetTeleportMinDis;
-                        if (telDis > finalTelDis) {
-                            finalTelDis = telDis;
-                        }
+                        finalTelDis = Math.max(telDis,finalTelDis);
                     }
                     if (mainhandPermanent) {
                         telDis = value.permanentMagnetTeleportMinDis + value.magnetHandSpacing;
-                        if (telDis > finalTelDis) {
-                            finalTelDis = telDis;
-                        }
+                        finalTelDis = Math.max(telDis,finalTelDis);
                     }
                     if (offhandPermanent) {
                         telDis = value.permanentMagnetTeleportMinDis;
-                        if (telDis > finalTelDis) {
-                            finalTelDis = telDis;
-                        }
+                        finalTelDis = Math.max(telDis,finalTelDis);
                     }
                     message = ": " + finalTelDis;
                     text = text.copy().append(" ").append(Text.translatable("text.magnetcraft.message.teleport").append(message));

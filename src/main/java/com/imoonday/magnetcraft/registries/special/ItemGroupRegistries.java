@@ -39,6 +39,8 @@ public class ItemGroupRegistries {
                     content.add(MAGLEV_OAK_DOOR_BLOCK);
                     content.add(MAGLEV_IRON_DOOR_BLOCK);
                     content.add(MAGLEV_REPEATER_BLOCK);
+                    content.add(CIRCULAR_REPEATER_BLOCK);
+                    content.add(ELECTROMAGNETIC_RELAY_BLOCK);
                     content.add(MAGLEV_COMPARATOR_BLOCK);
                     content.add(MAGNETIC_PRESSURE_PLATE);
                     content.add(MAGLEV_RAIL_BLOCK);
@@ -194,6 +196,8 @@ public class ItemGroupRegistries {
             content.addAfter(Items.OAK_DOOR, MAGLEV_OAK_DOOR_BLOCK);
             content.addAfter(Items.IRON_DOOR, MAGLEV_IRON_DOOR_BLOCK);
             content.addAfter(Items.REPEATER, MAGLEV_REPEATER_BLOCK);
+            content.addAfter(MAGLEV_REPEATER_BLOCK, CIRCULAR_REPEATER_BLOCK);
+            content.addAfter(CIRCULAR_REPEATER_BLOCK, ELECTROMAGNETIC_RELAY_BLOCK);
             content.addAfter(Items.COMPARATOR, MAGLEV_COMPARATOR_BLOCK);
             content.addAfter(MAGLEV_COMPARATOR_BLOCK, VERTICAL_REPEATER_BLOCK);
         });

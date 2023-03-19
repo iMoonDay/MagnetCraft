@@ -20,12 +20,16 @@
       "magnetcraft:maglev_detector_rail",
       "magnetcraft:maglev_activator_rail",
       "magnetcraft:maglev_lever",
+      "magnetcraft:maglev_lever_from_lever",
       "magnetcraft:maglev_oak_door",
       "magnetcraft:maglev_iron_door",
       "magnetcraft:maglev_oak_button",
       "magnetcraft:maglev_stone_button",
       "magnetcraft:maglev_repeater",
-      "magnetcraft:maglev_comparator"
+      "magnetcraft:maglev_comparator",
+      "magnetcraft:circular_repeater",
+      "magnetcraft:circular_repeater_2",
+      "magnetcraft:electromagnetic_relay"
     ]
   }
 }

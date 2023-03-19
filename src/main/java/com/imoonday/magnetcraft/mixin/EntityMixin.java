@@ -44,7 +44,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.magneticLevitationMode = this.getMagneticLevitationMode();
         this.automaticLevitation = this.getAutomaticLevitation();
         if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
-            AttractMethods.attracting(entity, entity.getAttractDis());
+            AttractMethods.tryAttract(entity, entity.getAttractDis());
         }
     }
 

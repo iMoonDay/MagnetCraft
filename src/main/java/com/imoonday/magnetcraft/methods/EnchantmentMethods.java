@@ -6,6 +6,8 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 
+import java.util.Arrays;
+
 public class EnchantmentMethods {
 
     public static boolean hasEnchantment(LivingEntity entity, EquipmentSlot equipmentSlot, Enchantment enchantment) {
@@ -25,11 +27,7 @@ public class EnchantmentMethods {
     }
 
     public static int getEnchantmentLvl(LivingEntity entity, Enchantment enchantment) {
-        int lvl = 0;
-        for (EquipmentSlot slot : EquipmentSlot.values()) {
-            lvl += EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(slot));
-        }
-        return lvl;
+        return Arrays.stream(EquipmentSlot.values()).mapToInt(slot -> EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(slot))).sum();
     }
 
     public static int getEnchantmentLvl(ItemStack stack, Enchantment enchantment) {

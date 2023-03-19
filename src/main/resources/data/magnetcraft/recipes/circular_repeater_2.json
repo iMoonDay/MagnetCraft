@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "121"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:redstone"
+    },
+    "2": {
+      "item": "magnetcraft:maglev_repeater"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:circular_repeater",
+    "count": 2
+  }
+}

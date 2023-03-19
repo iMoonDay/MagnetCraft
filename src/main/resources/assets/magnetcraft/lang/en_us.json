@@ -115,6 +115,8 @@
   "block.magnetcraft.maglev_comparator": "Maglev Comparator",
   "block.magnetcraft.vertical_repeater": "Vertical Redstone Replicators",
   "block.magnetcraft.magnetic_fluid_cauldron": "Magnetic Fluid Cauldron",
+  "block.magnetcraft.circular_repeater": "Circular Repeater",
+  "block.magnetcraft.electromagnetic_relay": "Electromagnetic Relay",
   "entity.magnetcraft.magnetic_iron_golem": "Magnetic Iron Golem",
   "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "Magnetic Iron Golem with Lodestone",
   "container.magnetcraft.advanced_grindstone_title": "Enchantment Extraction",

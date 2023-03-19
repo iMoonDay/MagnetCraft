@@ -31,6 +31,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
 
@@ -174,11 +175,10 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
     }
 
     public static void putItemEntityIn(World world, BlockPos blockPos, LodestoneEntity blockEntity, Direction direction) {
-        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).forEach(entity -> {
+        world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).stream().map(entity -> (ItemEntity) entity).forEach(entity -> {
             DefaultedList<ItemStack> inventory = blockEntity.inventory;
-            ItemStack stack = ((ItemEntity) entity).getStack();
-            ArrayList<Item> allowedItems = new ArrayList<>();
-            blockEntity.inventory.forEach(itemStack -> allowedItems.add(itemStack.getItem()));
+            ItemStack stack = entity.getStack();
+            ArrayList<Item> allowedItems = blockEntity.inventory.stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
             if (!blockEntity.filter || allowedItems.contains(stack.getItem())) {
                 boolean hasEmptySlot = false;
                 boolean hasSameStack = false;
@@ -188,7 +188,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                 for (int i = 0; i < inventory.size(); i++) {
                     ItemStack inventoryStack = inventory.get(i);
                     hasEmptySlot = inventoryStack.isEmpty();
-                    hasSameStack = ItemStack.canCombine(stack,inventoryStack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
+                    hasSameStack = ItemStack.canCombine(stack, inventoryStack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
                     overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
                     if (hasEmptySlot || hasSameStack) {
                         slot = i;

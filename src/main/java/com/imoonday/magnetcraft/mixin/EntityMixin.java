@@ -1,9 +1,9 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.AttractMethods;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.Entity;
@@ -44,7 +44,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.magneticLevitationMode = this.getMagneticLevitationMode();
         this.automaticLevitation = this.getAutomaticLevitation();
         if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
-            AttractMethods.tryAttract(entity, entity.getAttractDis());
+            MagnetCraft.AttractMethods.tryAttract(entity, entity.getAttractDis());
         }
     }
 

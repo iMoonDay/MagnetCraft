@@ -3,7 +3,7 @@ package com.imoonday.magnetcraft.mixin;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.FluidRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -42,7 +42,7 @@ public class ItemEntityMixin extends EntityMixin {
                         int damage = stack.getDamage();
                         int maxDamage = stack.getMaxDamage();
                         if (random.nextBetween(1, maxDamage * 400) <= damage) {
-                            DamageMethods.addDamage(stack, random, -maxDamage / 10, false);
+                            MagnetCraft.DamageMethods.addDamage(stack, random, -maxDamage / 10, false);
                             mainhandRepair = damage - stack.getDamage();
                             success = true;
                         }

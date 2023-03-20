@@ -2,7 +2,7 @@ package com.imoonday.magnetcraft.common.enchantments;
 
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
-import com.imoonday.magnetcraft.methods.EnchantmentMethods;
+import com.imoonday.magnetcraft.MagnetCraft.EnchantmentMethods;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;

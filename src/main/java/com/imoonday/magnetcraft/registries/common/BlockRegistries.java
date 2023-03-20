@@ -75,6 +75,12 @@ public class BlockRegistries {
     public static final Block MAGNETIC_FLUID_CAULDRON = registerBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(AbstractBlock.Settings.copy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));
 
     public static void register() {
+        cauldronBehaviorRegister();
+        addFeature();
+        MagnetCraft.LOGGER.info("BlockRegistries.class Loaded");
+    }
+
+    private static void cauldronBehaviorRegister() {
         CauldronBehavior.EMPTY_CAULDRON_BEHAVIOR.put(Items.POTION, (state, world, pos, player, hand, stack) -> {
             if (PotionUtil.getPotion(stack) != PotionRegistries.ATTRACT_POTION) {
                 return ActionResult.PASS;
@@ -119,10 +125,12 @@ public class BlockRegistries {
             }
             return ActionResult.success(world.isClient);
         });
+    }
+
+    private static void addFeature() {
         BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, ORE_MAGNETITE_SMALL_PLACED_KEY);
         BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, ORE_MAGNETITE_MIDDLE_PLACED_KEY);
         BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, ORE_MAGNETITE_UPPER_PLACED_KEY);
-        MagnetCraft.LOGGER.info("BlockRegistries.class Loaded");
     }
 
     static <T extends Block> T register(String id, T block) {

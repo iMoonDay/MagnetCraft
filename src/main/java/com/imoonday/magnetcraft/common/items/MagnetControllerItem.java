@@ -2,8 +2,7 @@ package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.CooldownMethods;
-import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -74,23 +73,23 @@ public class MagnetControllerItem extends FilterableItem {
             sneaking = false;
         }
         if ((sneaking && !rightClickReversal) || (!sneaking && rightClickReversal) && selected) {
-            if (!user.isCreative() && DamageMethods.isEmptyDamage(user, hand)) {
+            if (!user.isCreative() && MagnetCraft.DamageMethods.isEmptyDamage(user, hand)) {
                 return;
             }
-            DamageMethods.addDamage(user, hand, 1, true);
+            MagnetCraft.DamageMethods.addDamage(user, hand, 1, true);
             if (user.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT)) {
                 user.removeStatusEffect(EffectRegistries.DEGAUSSING_EFFECT);
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_MILK, 1, 1);
-                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+                MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
             } else {
                 user.addStatusEffect(new StatusEffectInstance(EffectRegistries.DEGAUSSING_EFFECT, 60 * 20, 0, true, false, true));
                 user.playSound(SoundEvents.ENTITY_WANDERING_TRADER_DRINK_POTION, 1, 1);
-                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 6 * 20);
+                MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 6 * 20);
             }
         } else {
                 changeMagnetEnable(user);
             if (hand != null) {
-                CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+                MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
             } else {
                 int percent = ModConfig.getValue().coolingPercentage;
                 user.getItemCooldownManager().set(ItemRegistries.MAGNET_CONTROLLER_ITEM, 20 * percent / 100);

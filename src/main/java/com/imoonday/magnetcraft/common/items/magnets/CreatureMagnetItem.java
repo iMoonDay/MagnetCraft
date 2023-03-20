@@ -2,8 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.CooldownMethods;
-import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -91,7 +90,7 @@ public class CreatureMagnetItem extends SwitchableItem {
                 return super.use(world, user, hand);
             }
             enabledSwitch(world, user, hand);
-            CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+            MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
         }
         return super.use(world, user, hand);
     }
@@ -119,7 +118,7 @@ public class CreatureMagnetItem extends SwitchableItem {
                 entity.setAttractOwner(user.getUuid());
             }
             if (!creative) {
-                CooldownMethods.setCooldown(user, stack, 20);
+                MagnetCraft.CooldownMethods.setCooldown(user, stack, 20);
             }
         }
         return ActionResult.PASS;
@@ -183,8 +182,8 @@ public class CreatureMagnetItem extends SwitchableItem {
         PlayerEntity playerByUuid = entity.world.getPlayerByUuid(entity.getAttractOwner());
         boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
         if (!(entity instanceof PlayerEntity) && hasAttractOwner && playerByUuid != null && entity.getPos().isInRange(playerByUuid.getPos(), creatureDis) && playerByUuid.canAttract()) {
-            boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
-            boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
+            boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
+            boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
             if (attractOwnerMainhandCreature || attractOwnerOffhandCreature) {
                 CreatureMagnetItem.followAttractOwner(entity, playerByUuid);
                 entity.setFollowing(true);

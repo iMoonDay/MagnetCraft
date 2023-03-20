@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.common.enchantments.MagneticLevitationEnchantment;
-import com.imoonday.magnetcraft.methods.DamageMethods;
-import com.imoonday.magnetcraft.methods.EnchantmentMethods;
+import com.imoonday.magnetcraft.MagnetCraft.EnchantmentMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
@@ -53,7 +53,7 @@ public abstract class PlayerEntityMixin {
                 int maxTick = 60 * 20;
                 while (hasTick && stack.getNbt().getInt("UsedTick") >= maxTick) {
                     stack.getOrCreateNbt().putInt("UsedTick", stack.getOrCreateNbt().getInt("UsedTick") - maxTick);
-                    DamageMethods.addDamage(stack, player.getRandom(), 1, true);
+                    MagnetCraft.DamageMethods.addDamage(stack, player.getRandom(), 1, true);
                 }
             }
             player.getInventory().markDirty();

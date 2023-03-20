@@ -2,7 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.CooldownMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
@@ -64,7 +64,7 @@ public class PolorMagnetItem extends FilterableItem {
                 }
                 enabledSwitch(world, user, hand);
             }
-            CooldownMethods.setCooldown(user, user.getStackInHand(hand), 30);
+            MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 30);
         }
         return super.use(world, user, hand);
     }

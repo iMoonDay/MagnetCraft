@@ -27,6 +27,11 @@ public class FluidRegistries {
     });
 
     public static void register() {
+        itemDispenserBehaviorRegister();
+        MagnetCraft.LOGGER.info("FluidRegistries.class Loaded");
+    }
+
+    private static void itemDispenserBehaviorRegister(){
         ItemDispenserBehavior dispenserBehavior = new ItemDispenserBehavior() {
             private final ItemDispenserBehavior fallbackBehavior = new ItemDispenserBehavior();
 
@@ -43,7 +48,6 @@ public class FluidRegistries {
             }
         };
         DispenserBlock.registerBehavior(MAGNETIC_FLUID_BUCKET, dispenserBehavior);
-        MagnetCraft.LOGGER.info("FluidRegistries.class Loaded");
     }
 
     static <T extends FlowableFluid> T register(String id, T fluid) {

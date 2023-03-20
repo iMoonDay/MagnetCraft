@@ -2,8 +2,7 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.CooldownMethods;
-import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
 import net.minecraft.block.Block;
@@ -88,25 +87,25 @@ public class ElectromagnetItem extends FilterableItem {
                 }
                 enabledSwitch(world, user, hand);
             }
-        } else if (!DamageMethods.isEmptyDamage(user, hand)) {
+        } else if (!MagnetCraft.DamageMethods.isEmptyDamage(user, hand)) {
             if (!world.isClient) {
-                DamageMethods.addDamage(user, hand, 1, false);
+                MagnetCraft.DamageMethods.addDamage(user, hand, 1, false);
             }
             teleportItems(world, user, dis, hand);
         }
-        CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+        MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
         return super.use(world, user, hand);
     }
 
     public static void teleportItems(World world, PlayerEntity player, double dis, Hand hand) {
         boolean message = ModConfig.getConfig().displayMessageFeedback;
         int magnetHandSpacing = ModConfig.getValue().magnetHandSpacing;
-        if (DamageMethods.isEmptyDamage(player, hand)) return;
+        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) return;
         if (hand == Hand.MAIN_HAND) dis += magnetHandSpacing;
         double finalDis = dis;
         int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).size();
         player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).forEach(targetEntity -> {
-            DamageMethods.addDamage(player, hand, 1, true);
+            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
             if (targetEntity instanceof ExperienceOrbEntity entity) {
                 int amount = entity.getExperienceAmount();
                 player.addExperience(amount);

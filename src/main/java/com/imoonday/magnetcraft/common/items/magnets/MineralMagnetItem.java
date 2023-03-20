@@ -1,8 +1,7 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.methods.CooldownMethods;
-import com.imoonday.magnetcraft.methods.DamageMethods;
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.screen.handler.MineralMagnetScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
@@ -58,7 +57,7 @@ public class MineralMagnetItem extends Item {
             if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).getItemCooldownManager().isCoolingDown(MINERAL_MAGNET_ITEM)) {
                 return 0.0F;
             }
-            return DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;
+            return MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;
         });
     }
 
@@ -136,13 +135,13 @@ public class MineralMagnetItem extends Item {
                 });
             }
         } else {
-            if (!DamageMethods.isEmptyDamage(user, hand)) {
+            if (!MagnetCraft.DamageMethods.isEmptyDamage(user, hand)) {
                 int value = searchMineral(user, hand);
                 boolean success = value > 0;
                 if (success && !user.isCreative()) {
-                    CooldownMethods.setCooldown(user, user.getStackInHand(hand), value * 20);
+                    MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), value * 20);
                 } else {
-                    CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+                    MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
                 }
             }
         }
@@ -177,23 +176,23 @@ public class MineralMagnetItem extends Item {
             int others = 0;
             int value;
             boolean isEmptyDamage = false;
-            DamageMethods.addDamage(player, hand, 1, false);
+            MagnetCraft.DamageMethods.addDamage(player, hand, 1, false);
             if (player.experienceLevel < requiredExperienceLevel && !player.isCreative()) {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
             }
             for (int x = -10; x <= 10; x++) {
-                if (DamageMethods.isEmptyDamage(player, hand)) {
+                if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
                     isEmptyDamage = true;
                     break;
                 }
                 for (int y = -10; y <= 10; y++) {
-                    if (DamageMethods.isEmptyDamage(player, hand)) {
+                    if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
                         isEmptyDamage = true;
                         break;
                     }
                     for (int z = -10; z <= 10; z++) {
-                        if (DamageMethods.isEmptyDamage(player, hand)) {
+                        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
                             isEmptyDamage = true;
                             break;
                         }
@@ -246,7 +245,7 @@ public class MineralMagnetItem extends Item {
                             }
                             total++;
                             totalValue += value;
-                            DamageMethods.addDamage(player, hand, value, true);
+                            MagnetCraft.DamageMethods.addDamage(player, hand, value, true);
                         }
                     }
                 }

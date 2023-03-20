@@ -1,9 +1,9 @@
 {
     "ambientocclusion": false,
     "textures": {
-        "particle": "magnetcraft:block/electromagnetic_relay",
+        "particle": "magnetcraft:block/electromagnetic_relay_off_left",
         "slab": "magnetcraft:block/smooth_stone",
-        "top": "magnetcraft:block/electromagnetic_relay",
+        "top": "magnetcraft:block/electromagnetic_relay_off_left",
         "unlit": "minecraft:block/redstone_torch_off",
         "lit": "minecraft:block/redstone_torch"
     },

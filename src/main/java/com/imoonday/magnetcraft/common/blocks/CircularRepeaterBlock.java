@@ -54,16 +54,21 @@ public class CircularRepeaterBlock extends RepeaterBlock {
         boolean powered = this.isLocked(world, pos, state) ? state.get(POWERED) : this.hasPower(world, pos, state);
         int tick = state.get(TICK) + 1;
         boolean outputing = state.get(OUTPUTING);
-        int maxTick = switch (state.get(DELAY)) {
-            case 1 -> 1;
-            case 2 -> 4;
-            case 3 -> 10;
-            case 4 -> 20;
-            default -> 0;
-        };
-        if (tick > maxTick) {
+        if (powered) {
+            int maxTick = switch (state.get(DELAY)) {
+                case 1 -> 1;
+                case 2 -> 4;
+                case 3 -> 10;
+                case 4 -> 20;
+                default -> 0;
+            };
+            if (tick > maxTick) {
+                tick = 1;
+                outputing = !outputing;
+            }
+        } else {
             tick = 1;
-            outputing = !outputing;
+            outputing = true;
         }
         world.setBlockState(pos, state.with(TICK, tick).with(OUTPUTING, outputing).with(POWERED, powered), Block.NOTIFY_LISTENERS);
         world.scheduleBlockTick(pos, this, this.getUpdateDelayInternal(state), TickPriority.VERY_HIGH);

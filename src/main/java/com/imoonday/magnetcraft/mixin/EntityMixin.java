@@ -210,7 +210,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putBoolean("AutomaticLevitation", enable);
     }
 
-    @Inject(method = "writeNbt", at = @At("TAIL"))
+    @Inject(method = "writeNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
         this.attractData.putDouble("AttractDis", this.getAttractDis());
         this.attractData.putBoolean("isAttracting", this.isAttracting() && this.canAttract());
@@ -224,7 +224,7 @@ public class EntityMixin implements MagnetCraftEntity {
         nbt.put("AttractData", this.attractData);
     }
 
-    @Inject(method = "readNbt", at = @At("TAIL"))
+    @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     public void readPocketsDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
         if (nbt.contains("AttractData")) {
             NbtCompound data = nbt.getCompound("AttractData");

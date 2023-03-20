@@ -31,6 +31,7 @@ import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
@@ -97,15 +98,12 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                     case 6 -> Direction.DOWN;
                     default -> null;
                 };
-                ArrayList<Item> allowedItems = new ArrayList<>();
-                entity.inventory.forEach(stack -> allowedItems.add(stack.getItem()));
+                ArrayList<Item> allowedItems = entity.inventory.stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
                 AttractMethods.attractItems(world, centerPos, dis, entity.filter, allowedItems);
                 if (direction != null) {
                     putItemEntityIn(world, pos, entity, direction);
                 } else {
-                    for (Direction direction2 : new Direction[]{Direction.SOUTH, Direction.WEST, Direction.NORTH, Direction.EAST, Direction.UP, Direction.DOWN}) {
-                        putItemEntityIn(world, pos, entity, direction2);
-                    }
+                    Arrays.stream(Direction.values()).forEach(direction2 -> putItemEntityIn(world, pos, entity, direction2));
                 }
             }
         }

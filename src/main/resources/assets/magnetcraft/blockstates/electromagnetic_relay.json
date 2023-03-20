@@ -1,63 +1,243 @@
 {
   "variants": {
-    "facing=east,pass=true,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_off",
+    "facing=east,pass=true,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_both",
       "y": 270
     },
-    "facing=east,pass=true,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_on",
+    "facing=east,pass=true,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_both",
       "y": 270
     },
-    "facing=east,pass=false,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_off",
+    "facing=east,pass=false,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_both",
       "y": 270
     },
-    "facing=east,pass=false,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_on",
+    "facing=east,pass=false,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_both",
       "y": 270
     },
-    "facing=north,pass=true,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_off",
+    "facing=north,pass=true,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_both",
       "y": 180
     },
-    "facing=north,pass=true,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_on",
+    "facing=north,pass=true,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_both",
       "y": 180
     },
-    "facing=north,pass=false,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_off",
+    "facing=north,pass=false,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_both",
       "y": 180
     },
-    "facing=north,pass=false,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_on",
+    "facing=north,pass=false,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_both",
       "y": 180
     },
-    "facing=south,pass=true,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_off"
+    "facing=south,pass=true,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_both"
     },
-    "facing=south,pass=true,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_on"
+    "facing=south,pass=true,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_both"
     },
-    "facing=south,pass=false,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_off"
+    "facing=south,pass=false,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_both"
     },
-    "facing=south,pass=false,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_on"
+    "facing=south,pass=false,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_both"
     },
-    "facing=west,pass=true,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_off",
+    "facing=west,pass=true,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_both",
       "y": 90
     },
-    "facing=west,pass=true,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_pass_on",
+    "facing=west,pass=true,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_both",
       "y": 90
     },
-    "facing=west,pass=false,powered=false": {
-      "model": "magnetcraft:block/electromagnetic_relay_off",
+    "facing=west,pass=false,powered=false,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_both",
       "y": 90
     },
-    "facing=west,pass=false,powered=true": {
-      "model": "magnetcraft:block/electromagnetic_relay_on",
+    "facing=west,pass=false,powered=true,pass_from=both": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_both",
+      "y": 90
+    },
+    "facing=east,pass=true,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_left",
+      "y": 270
+    },
+    "facing=east,pass=true,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_left",
+      "y": 270
+    },
+    "facing=east,pass=false,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_left",
+      "y": 270
+    },
+    "facing=east,pass=false,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_left",
+      "y": 270
+    },
+    "facing=north,pass=true,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_left",
+      "y": 180
+    },
+    "facing=north,pass=true,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_left",
+      "y": 180
+    },
+    "facing=north,pass=false,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_left",
+      "y": 180
+    },
+    "facing=north,pass=false,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_left",
+      "y": 180
+    },
+    "facing=south,pass=true,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_left"
+    },
+    "facing=south,pass=true,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_left"
+    },
+    "facing=south,pass=false,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_left"
+    },
+    "facing=south,pass=false,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_left"
+    },
+    "facing=west,pass=true,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_left",
+      "y": 90
+    },
+    "facing=west,pass=true,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_left",
+      "y": 90
+    },
+    "facing=west,pass=false,powered=false,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_left",
+      "y": 90
+    },
+    "facing=west,pass=false,powered=true,pass_from=left": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_left",
+      "y": 90
+    },
+    "facing=east,pass=true,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_right",
+      "y": 270
+    },
+    "facing=east,pass=true,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_right",
+      "y": 270
+    },
+    "facing=east,pass=false,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_right",
+      "y": 270
+    },
+    "facing=east,pass=false,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_right",
+      "y": 270
+    },
+    "facing=north,pass=true,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_right",
+      "y": 180
+    },
+    "facing=north,pass=true,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_right",
+      "y": 180
+    },
+    "facing=north,pass=false,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_right",
+      "y": 180
+    },
+    "facing=north,pass=false,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_right",
+      "y": 180
+    },
+    "facing=south,pass=true,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_right"
+    },
+    "facing=south,pass=true,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_right"
+    },
+    "facing=south,pass=false,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_right"
+    },
+    "facing=south,pass=false,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_right"
+    },
+    "facing=west,pass=true,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_right",
+      "y": 90
+    },
+    "facing=west,pass=true,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_right",
+      "y": 90
+    },
+    "facing=west,pass=false,powered=false,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_right",
+      "y": 90
+    },
+    "facing=west,pass=false,powered=true,pass_from=right": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_right",
+      "y": 90
+    },
+    "facing=east,pass=true,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_none",
+      "y": 270
+    },
+    "facing=east,pass=true,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_none",
+      "y": 270
+    },
+    "facing=east,pass=false,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_none",
+      "y": 270
+    },
+    "facing=east,pass=false,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_none",
+      "y": 270
+    },
+    "facing=north,pass=true,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_none",
+      "y": 180
+    },
+    "facing=north,pass=true,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_none",
+      "y": 180
+    },
+    "facing=north,pass=false,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_none",
+      "y": 180
+    },
+    "facing=north,pass=false,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_none",
+      "y": 180
+    },
+    "facing=south,pass=true,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_none"
+    },
+    "facing=south,pass=true,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_none"
+    },
+    "facing=south,pass=false,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_none"
+    },
+    "facing=south,pass=false,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_none"
+    },
+    "facing=west,pass=true,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_off_none",
+      "y": 90
+    },
+    "facing=west,pass=true,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_pass_on_none",
+      "y": 90
+    },
+    "facing=west,pass=false,powered=false,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_off_none",
+      "y": 90
+    },
+    "facing=west,pass=false,powered=true,pass_from=none": {
+      "model": "magnetcraft:block/electromagnetic_relay_on_none",
       "y": 90
     }
   }

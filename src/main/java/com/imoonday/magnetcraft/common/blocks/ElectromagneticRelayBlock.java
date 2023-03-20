@@ -6,8 +6,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
+import net.minecraft.state.property.EnumProperty;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.StringIdentifiable;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.random.Random;
@@ -16,14 +18,17 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
+import java.util.Arrays;
+
 public class ElectromagneticRelayBlock extends AbstractRedstoneGateBlock {
 
-    private static final BooleanProperty PASS = BooleanProperty.of("pass");
-    private static final IntProperty POWER = Properties.POWER;
+    protected static final BooleanProperty PASS = BooleanProperty.of("pass");
+    protected static final IntProperty POWER = Properties.POWER;
+    protected static final EnumProperty<PassFrom> PASS_FROM = EnumProperty.of("pass_from", PassFrom.class);
 
     public ElectromagneticRelayBlock(Settings settings) {
         super(settings);
-        this.setDefaultState((this.stateManager.getDefaultState()).with(FACING, Direction.NORTH).with(POWERED, false).with(PASS, false).with(POWER, 0));
+        this.setDefaultState((this.stateManager.getDefaultState()).with(FACING, Direction.NORTH).with(POWERED, false).with(PASS, false).with(POWER, 0).with(PASS_FROM, PassFrom.NONE));
     }
 
     @Override
@@ -41,10 +46,15 @@ public class ElectromagneticRelayBlock extends AbstractRedstoneGateBlock {
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
         super.scheduledTick(state, world, pos, random);
-        world.setBlockState(pos, state.with(POWER, getPower(world, pos, state)).with(POWERED, hasPower(world, pos, state)).with(PASS, this.hasInputSides(world, pos, state)), Block.NOTIFY_LISTENERS);
+        Direction direction = state.get(FACING);
+        Direction direction2 = direction.rotateYClockwise();
+        Direction direction3 = direction.rotateYCounterclockwise();
+        boolean left = this.getInputLevel(world, pos.offset(direction2), direction2) > 0;
+        boolean right = this.getInputLevel(world, pos.offset(direction3), direction3) > 0;
+        world.setBlockState(pos, state.with(POWER, getPower(world, pos, state)).with(POWERED, hasPower(world, pos, state)).with(PASS, this.hasInputSides(world, pos, state)).with(PASS_FROM, left && right ? PassFrom.BOTH : left ? PassFrom.LEFT : right ? PassFrom.RIGHT : PassFrom.NONE), Block.NOTIFY_LISTENERS);
     }
 
-    protected boolean hasInputSides(WorldView world, BlockPos pos, BlockState state){
+    protected boolean hasInputSides(WorldView world, BlockPos pos, BlockState state) {
         return this.getMaxInputLevelSides(world, pos, state) > 0;
     }
 
@@ -66,7 +76,8 @@ public class ElectromagneticRelayBlock extends AbstractRedstoneGateBlock {
             if (blockState.isOf(Blocks.REDSTONE_WIRE)) {
                 return blockState.get(RedstoneWireBlock.POWER);
             }
-            return Math.max(blockState.getWeakRedstonePower(world, pos, dir.getOpposite()), world.getStrongRedstonePower(pos, dir.getOpposite()));
+            int[] powers = new int[]{blockState.getWeakRedstonePower(world, pos, dir.getOpposite()), blockState.getStrongRedstonePower(world, pos, dir.getOpposite()), world.getStrongRedstonePower(pos, dir)};
+            return Arrays.stream(powers).max().getAsInt();
         }
         return 0;
     }
@@ -89,6 +100,29 @@ public class ElectromagneticRelayBlock extends AbstractRedstoneGateBlock {
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, POWERED, PASS, POWER);
+        builder.add(FACING, POWERED, PASS, POWER, PASS_FROM);
     }
+
+    protected enum PassFrom implements StringIdentifiable {
+        LEFT("left"),
+        RIGHT("right"),
+        BOTH("both"),
+        NONE("none");
+
+        private final String name;
+
+        PassFrom(String name) {
+            this.name = name;
+        }
+
+        public String toString() {
+            return this.name;
+        }
+
+        @Override
+        public String asString() {
+            return this.name;
+        }
+    }
+
 }

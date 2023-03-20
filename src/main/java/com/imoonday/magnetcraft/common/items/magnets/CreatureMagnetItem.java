@@ -125,7 +125,7 @@ public class CreatureMagnetItem extends SwitchableItem {
     }
 
     public static void followAttractOwner(LivingEntity followingEntity, LivingEntity attractingEntity, boolean usingMagnet) {
-        if (attractingEntity.world.isClient || followingEntity.world.isClient) {
+        if (attractingEntity.world.isClient || followingEntity.world.isClient || !attractingEntity.isAlive() || !followingEntity.isAlive()) {
             return;
         }
         Vec3d vec = attractingEntity.getPos().subtract(followingEntity.getPos()).multiply(0.05);
@@ -134,7 +134,7 @@ public class CreatureMagnetItem extends SwitchableItem {
         }
         followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
         followingEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, attractingEntity.getEyePos());
-        if (followingEntity.getPos().isInRange(attractingEntity.getPos(), 1) || followingEntity.collidesWith(attractingEntity)) {
+        if (followingEntity.getPos().isInRange(attractingEntity.getPos(), 1) || followingEntity.collidesWith(attractingEntity) || followingEntity.getBoundingBox().intersects(attractingEntity.getBoundingBox().expand(0.1))) {
             vec = Vec3d.ZERO;
         }
         if (attractingEntity.getVelocity().y < 0 && followingEntity.getPos().y > attractingEntity.getY()) {

@@ -230,6 +230,11 @@ public class EntityMixin implements MagnetCraftEntity {
     @Override
     public void setAdsorbedByEntity(boolean adsorbed) {
         this.attractData.putBoolean("isAdsorbedByEntity", adsorbed);
+        if (adsorbed) {
+            this.setAdsorbedByBlock(false);
+        } else {
+            this.setAdsorptionEntityId(CreatureMagnetItem.EMPTY_UUID);
+        }
     }
 
     @Override
@@ -243,6 +248,11 @@ public class EntityMixin implements MagnetCraftEntity {
     @Override
     public void setAdsorbedByBlock(boolean adsorbed) {
         this.attractData.putBoolean("isAdsorbedByBlock", adsorbed);
+        if (adsorbed) {
+            this.setAdsorbedByEntity(false);
+        } else {
+            this.setAdsorptionBlockPos(new BlockPos(0, 0, 0));
+        }
     }
 
     @Override
@@ -255,6 +265,9 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public void setAdsorptionEntityId(UUID uuid) {
+        if (!uuid.equals(CreatureMagnetItem.EMPTY_UUID)) {
+            this.setAdsorbedByEntity(true);
+        }
         this.attractData.putUuid("AdsorptionEntityId", uuid);
     }
 
@@ -269,6 +282,9 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public void setAdsorptionBlockPos(BlockPos pos) {
+        if (!pos.equals(new BlockPos(0, 0, 0))) {
+            this.setAdsorbedByBlock(true);
+        }
         this.attractData.putIntArray("AdsorptionBlockPos", new int[]{pos.getX(), pos.getY(), pos.getZ()});
     }
 

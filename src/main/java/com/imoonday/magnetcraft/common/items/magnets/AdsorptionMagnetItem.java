@@ -14,11 +14,13 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -42,6 +44,19 @@ public class AdsorptionMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        if (!world.isClient) {
+            if (user.isSneaking()) {
+                NbtCompound nbt = user.getStackInHand(hand).getNbt();
+                if (nbt != null && nbt.contains("CurrentEntity")) {
+                    nbt.remove("CurrentEntity");
+                    user.sendMessage(Text.literal("已清除选择"));
+                }
+            } else {
+                int i = world.getOtherEntities(null, user.getBoundingBox().expand(30), entity -> (entity.isAdsorbedByBlock() || entity.isAdsorbedByEntity())).size();
+                user.sendMessage(Text.literal("附近有 " + i + " 个正在被吸附的实体"));
+            }
+        }
+        user.getInventory().markDirty();
         return super.use(world, user, hand);
     }
 
@@ -59,9 +74,6 @@ public class AdsorptionMagnetItem extends Item {
         }
         Entity entity = player.world.getEntityById(stack.getNbt().getInt("CurrentEntity"));
         if (entity instanceof LivingEntity livingEntity) {
-            livingEntity.setAdsorbedByEntity(false);
-            livingEntity.setAdsorbedByBlock(true);
-            livingEntity.setAdsorptionEntityId(CreatureMagnetItem.EMPTY_UUID);
             livingEntity.setAdsorptionBlockPos(pos);
             int dis = (int) livingEntity.getPos().distanceTo(pos.toCenterPos());
             if (!player.world.isClient) {
@@ -88,8 +100,6 @@ public class AdsorptionMagnetItem extends Item {
                     if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
                         entity.setAdsorbedByEntity(false);
                         entity.setAdsorbedByBlock(false);
-                        entity.setAdsorptionEntityId(CreatureMagnetItem.EMPTY_UUID);
-                        entity.setAdsorptionBlockPos(new BlockPos(0, 0, 0));
                         if (stackInHand.getNbt() != null && stackInHand.getNbt().contains("CurrentEntity")) {
                             stackInHand.getNbt().remove("CurrentEntity");
                             user.getInventory().markDirty();
@@ -98,15 +108,12 @@ public class AdsorptionMagnetItem extends Item {
                     if (!user.world.isClient) {
                         user.sendMessage(Text.literal("已清除数据"));
                     }
-                    return ActionResult.FAIL;
+                    return ActionResult.SUCCESS;
                 }
             }
             Entity currentEntity = user.world.getEntityById(stackInHand.getNbt().getInt("CurrentEntity"));
             if (currentEntity != null) {
-                currentEntity.setAdsorbedByEntity(true);
-                currentEntity.setAdsorbedByBlock(false);
                 currentEntity.setAdsorptionEntityId(entity.getUuid());
-                currentEntity.setAdsorptionBlockPos(new BlockPos(0, 0, 0));
                 int dis = (int) currentEntity.getPos().distanceTo(entity.getPos());
                 if (!user.world.isClient) {
                     stackInHand.getNbt().remove("CurrentEntity");
@@ -161,13 +168,10 @@ public class AdsorptionMagnetItem extends Item {
         Vec3d pos = blockPos.toCenterPos();
         Vec3d vec = pos.subtract(adsorbedEntity.getPos()).multiply(0.05);
         if (adsorbedEntity.horizontalCollision) {
-            vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
+            vec = adsorbedEntity.getPos().isInRange(pos, 1) || adsorbedEntity.getBoundingBox().intersects(new Box(blockPos).expand(0.5)) ? Vec3d.ZERO : vec.multiply(1, 0, 1).add(0, 0.25, 0);
         }
         adsorbedEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
         adsorbedEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, pos);
-        if (adsorbedEntity.getPos().isInRange(pos, 1)) {
-            vec = Vec3d.ZERO;
-        }
         adsorbedEntity.setVelocity(vec);
         if (!adsorbedEntity.isOnGround()) {
             adsorbedEntity.setIgnoreFallDamage(true);

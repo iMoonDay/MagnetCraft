@@ -32,5 +32,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         PortableDemagnetizerItem.registerClient();
         MagneticFluid.registerClient();
         EntityRendererRegistries.registerClient();
+        AdsorptionMagnetItem.registerClient();
     }
 }

@@ -36,7 +36,7 @@ public class CropMagnetItem extends FilterableItem {
 
     public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.CROP_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (livingEntity instanceof PlayerEntity && ((PlayerEntity) livingEntity).getItemCooldownManager().isCoolingDown(ItemRegistries.CROP_MAGNET_ITEM)) {
+            if (livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.CROP_MAGNET_ITEM)) {
                 return 0.0F;
             }
             return MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;

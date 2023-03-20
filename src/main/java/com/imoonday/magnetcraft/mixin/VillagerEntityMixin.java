@@ -28,7 +28,7 @@ public class VillagerEntityMixin {
     @Inject(method = "interactMob", at = @At(value = "HEAD"), cancellable = true)
     public void interactMob(PlayerEntity player, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
         ItemStack itemStack = player.getStackInHand(hand);
-        if (itemStack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
+        if (itemStack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM) || itemStack.isOf(ItemRegistries.ADSORPTION_MAGNET_ITEM)) {
             cir.setReturnValue(ActionResult.PASS);
         }
     }

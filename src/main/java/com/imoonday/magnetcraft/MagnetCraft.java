@@ -112,7 +112,7 @@ public class MagnetCraft implements ModInitializer {
                     }
                     if (!hasNearerPlayer && !hasNearerEntity) {
                         Vec3d vec = entity.getPos().add(0, 0.5, 0).subtract(targetEntity.getPos()).multiply(0.05);
-                        targetEntity.setVelocity(targetEntity.horizontalCollision? vec.multiply(1, 0, 1).add(0, 0.25, 0) :vec);
+                        targetEntity.setVelocity(targetEntity.horizontalCollision ? vec.multiply(1, 0, 1).add(0, 0.25, 0) : vec);
                         PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                     }
                 }
@@ -141,7 +141,7 @@ public class MagnetCraft implements ModInitializer {
                     boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, MagnetCraftEntity::isAttracting) != null;
                     if (!hasNearerPlayer && !hasNearerEntity) {
                         Vec3d vec = pos.subtract(targetEntity.getPos()).multiply(0.05);
-                        targetEntity.setVelocity(targetEntity.horizontalCollision? vec.multiply(1, 0, 1).add(0, 0.25, 0) :vec);
+                        targetEntity.setVelocity(targetEntity.horizontalCollision ? vec.multiply(1, 0, 1).add(0, 0.25, 0) : vec);
                         PlayerLookup.tracking(targetEntity).forEach(player -> player.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                     }
                 }
@@ -203,12 +203,12 @@ public class MagnetCraft implements ModInitializer {
             if ((user instanceof PlayerEntity player && player.getAbilities().creativeMode && damage > 0) || !stack.isDamageable()) {
                 return;
             }
+            int stackDamage = stack.getDamage();
+            int stackMaxDamage = stack.getMaxDamage();
+            int finalDamage = stackDamage + damage;
             if (unbreaking) {
-                stack.damage(damage, user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
+                stack.damage(finalDamage > stackMaxDamage ? 0 : Math.max(damage, 0), user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
             } else {
-                int stackDamage = stack.getDamage();
-                int stackMaxDamage = stack.getMaxDamage();
-                int finalDamage = stackDamage + damage;
                 stack.setDamage(finalDamage > stackMaxDamage ? stackMaxDamage : Math.max(finalDamage, 0));
             }
         }
@@ -218,7 +218,7 @@ public class MagnetCraft implements ModInitializer {
                 return;
             }
             if (unbreaking) {
-                stack.damage(damage, random,null);
+                stack.damage(damage, random, null);
             } else {
                 int stackDamage = stack.getDamage();
                 int stackMaxDamage = stack.getMaxDamage();

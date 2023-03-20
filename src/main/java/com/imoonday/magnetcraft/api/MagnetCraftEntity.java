@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.api;
 
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
 
@@ -50,5 +51,21 @@ public interface MagnetCraftEntity {
     boolean getAutomaticLevitation();
 
     void setAutomaticLevitation(boolean enable);
+
+    boolean isAdsorbedByEntity();
+
+    void setAdsorbedByEntity(boolean adsorbed);
+
+    boolean isAdsorbedByBlock();
+
+    void setAdsorbedByBlock(boolean adsorbed);
+
+    UUID getAdsorptionEntityId();
+
+    void setAdsorptionEntityId(UUID uuid);
+
+    BlockPos getAdsorptionBlockPos();
+
+    void setAdsorptionBlockPos(BlockPos pos);
 
 }

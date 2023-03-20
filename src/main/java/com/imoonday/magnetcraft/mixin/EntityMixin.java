@@ -10,6 +10,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.BlockPos;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -31,6 +32,10 @@ public class EntityMixin implements MagnetCraftEntity {
     protected boolean magneticLevitationMode = true;
     protected int levitationTick = 0;
     protected boolean automaticLevitation = false;
+    protected boolean isAdsorbedByEntity = false;
+    protected boolean isAdsorbedByBlock = false;
+    protected UUID adsorptionEntityId = CreatureMagnetItem.EMPTY_UUID;
+    protected BlockPos adsorptionBlockPos = new BlockPos(0, 0, 0);
 
     @Inject(method = "tick", at = @At(value = "TAIL"))
     public void tick(CallbackInfo ci) {
@@ -43,6 +48,10 @@ public class EntityMixin implements MagnetCraftEntity {
         this.ignoreFallDamage = this.ignoreFallDamage();
         this.magneticLevitationMode = this.getMagneticLevitationMode();
         this.automaticLevitation = this.getAutomaticLevitation();
+        this.isAdsorbedByEntity = this.isAdsorbedByEntity();
+        this.isAdsorbedByBlock = this.isAdsorbedByBlock();
+        this.adsorptionEntityId = this.getAdsorptionEntityId();
+        this.adsorptionBlockPos = this.getAdsorptionBlockPos();
         if (entity.isAttracting() && entity.getEnable() && entity.isAlive()) {
             MagnetCraft.AttractMethods.tryAttract(entity, entity.getAttractDis());
         }
@@ -210,6 +219,59 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putBoolean("AutomaticLevitation", enable);
     }
 
+    @Override
+    public boolean isAdsorbedByEntity() {
+        if (!this.attractData.contains("isAdsorbedByEntity")) {
+            this.attractData.putBoolean("isAdsorbedByEntity", false);
+        }
+        return this.attractData.getBoolean("isAdsorbedByEntity") && !this.isAdsorbedByBlock();
+    }
+
+    @Override
+    public void setAdsorbedByEntity(boolean adsorbed) {
+        this.attractData.putBoolean("isAdsorbedByEntity", adsorbed);
+    }
+
+    @Override
+    public boolean isAdsorbedByBlock() {
+        if (!this.attractData.contains("isAdsorbedByBlock")) {
+            this.attractData.putBoolean("isAdsorbedByBlock", false);
+        }
+        return this.attractData.getBoolean("isAdsorbedByBlock") && !this.isAdsorbedByEntity();
+    }
+
+    @Override
+    public void setAdsorbedByBlock(boolean adsorbed) {
+        this.attractData.putBoolean("isAdsorbedByBlock", adsorbed);
+    }
+
+    @Override
+    public UUID getAdsorptionEntityId() {
+        if (!this.attractData.contains("AdsorptionEntityId")) {
+            this.attractData.putUuid("AdsorptionEntityId", CreatureMagnetItem.EMPTY_UUID);
+        }
+        return this.attractData.getUuid("AdsorptionEntityId");
+    }
+
+    @Override
+    public void setAdsorptionEntityId(UUID uuid) {
+        this.attractData.putUuid("AdsorptionEntityId", uuid);
+    }
+
+    @Override
+    public BlockPos getAdsorptionBlockPos() {
+        if (!this.attractData.contains("AdsorptionBlockPos") || this.attractData.getIntArray("AdsorptionBlockPos").length != 3) {
+            this.attractData.putIntArray("AdsorptionBlockPos", new int[]{0, 0, 0});
+        }
+        int[] pos = this.attractData.getIntArray("AdsorptionBlockPos");
+        return new BlockPos(pos[0], pos[1], pos[2]);
+    }
+
+    @Override
+    public void setAdsorptionBlockPos(BlockPos pos) {
+        this.attractData.putIntArray("AdsorptionBlockPos", new int[]{pos.getX(), pos.getY(), pos.getZ()});
+    }
+
     @Inject(method = "writeNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
         this.attractData.putDouble("AttractDis", this.getAttractDis());
@@ -221,6 +283,10 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putBoolean("MagneticLevitationMode", this.getMagneticLevitationMode());
         this.attractData.putInt("LevitationTick", this.getLevitationTick());
         this.attractData.putBoolean("AutomaticLevitation", this.getAutomaticLevitation());
+        this.attractData.putBoolean("isAdsorbedByEntity", this.isAdsorbedByEntity());
+        this.attractData.putBoolean("isAdsorbedByBlock", this.isAdsorbedByBlock());
+        this.attractData.putUuid("AdsorptionEntityId", this.getAdsorptionEntityId());
+        this.attractData.putIntArray("AdsorptionBlockPos", new int[]{this.getAdsorptionBlockPos().getX(), this.getAdsorptionBlockPos().getY(), this.getAdsorptionBlockPos().getZ()});
         nbt.put("AttractData", this.attractData);
     }
 
@@ -255,6 +321,18 @@ public class EntityMixin implements MagnetCraftEntity {
             }
             if (data.contains("AutomaticLevitation")) {
                 this.automaticLevitation = data.getBoolean("AutomaticLevitation");
+            }
+            if (data.contains("isAdsorbedByEntity")) {
+                this.isAdsorbedByEntity = data.getBoolean("isAdsorbedByEntity");
+            }
+            if (data.contains("isAdsorbedByBlock")) {
+                this.isAdsorbedByBlock = data.getBoolean("isAdsorbedByBlock");
+            }
+            if (data.contains("AdsorptionEntityId")) {
+                this.adsorptionEntityId = data.getUuid("AdsorptionEntityId");
+            }
+            if (data.contains("AdsorptionBlockPos") && data.getIntArray("AdsorptionBlockPos").length == 3) {
+                this.adsorptionBlockPos = new BlockPos(data.getIntArray("AdsorptionBlockPos")[0], data.getIntArray("AdsorptionBlockPos")[1], data.getIntArray("AdsorptionBlockPos")[2]);
             }
         }
     }

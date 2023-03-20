@@ -57,6 +57,7 @@ public class ItemRegistries {
     public static final CreatureMagnetItem CREATURE_MAGNET_ITEM = register("creature_magnet", new CreatureMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(300)));
     public static final MineralMagnetItem MINERAL_MAGNET_ITEM = register("mineral_magnet", new MineralMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(9 * 64)));
     public static final CropMagnetItem CROP_MAGNET_ITEM = register("crop_magnet", new CropMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(32 * 64)));
+    public static final AdsorptionMagnetItem ADSORPTION_MAGNET_ITEM = register("adsorption_magnet", new AdsorptionMagnetItem(new FabricItemSettings().maxCount(1).maxDamage(5 * 64)));
 
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = register("magnet_controller", new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
     public static final PortableDemagnetizerItem PORTABLE_DEMAGNETIZER_ITEM = register("portable_demagnetizer", new PortableDemagnetizerItem(new FabricItemSettings().maxCount(1)));

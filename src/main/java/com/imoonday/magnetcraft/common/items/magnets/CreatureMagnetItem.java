@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.SwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
@@ -124,22 +124,22 @@ public class CreatureMagnetItem extends SwitchableItem {
         return ActionResult.PASS;
     }
 
-    public static void followAttractOwner(LivingEntity followingEntity, PlayerEntity attractingPlayer) {
-        if (attractingPlayer.world.isClient || followingEntity.world.isClient) {
+    public static void followAttractOwner(LivingEntity followingEntity, LivingEntity attractingEntity, boolean usingMagnet) {
+        if (attractingEntity.world.isClient || followingEntity.world.isClient) {
             return;
         }
-        Vec3d vec = attractingPlayer.getPos().subtract(followingEntity.getPos()).multiply(0.05);
+        Vec3d vec = attractingEntity.getPos().subtract(followingEntity.getPos()).multiply(0.05);
         if (followingEntity.horizontalCollision) {
             vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
         }
         followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
-        followingEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, attractingPlayer.getEyePos());
-        if (followingEntity.getPos().isInRange(attractingPlayer.getPos(), 1)) {
+        followingEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, attractingEntity.getEyePos());
+        if (followingEntity.getPos().isInRange(attractingEntity.getPos(), 1) || followingEntity.collidesWith(attractingEntity)) {
             vec = Vec3d.ZERO;
         }
-        if (attractingPlayer.getVelocity().y < 0 && followingEntity.getPos().y > attractingPlayer.getY()) {
-            vec = vec.multiply(1, 0, 1).add(0, attractingPlayer.getVelocity().y, 0);
-        } else if (attractingPlayer.getVelocity().y == 0 && followingEntity.getPos().y > attractingPlayer.getY()) {
+        if (attractingEntity.getVelocity().y < 0 && followingEntity.getPos().y > attractingEntity.getY()) {
+            vec = vec.multiply(1, 0, 1).add(0, attractingEntity.getVelocity().y, 0);
+        } else if (attractingEntity.getVelocity().y == 0 && followingEntity.getPos().y > attractingEntity.getY()) {
             vec = vec.multiply(1, 0, 1).add(0, -0.75, 0);
         }
         followingEntity.setVelocity(vec);
@@ -147,14 +147,13 @@ public class CreatureMagnetItem extends SwitchableItem {
             followingEntity.setIgnoreFallDamage(true);
         }
         PlayerLookup.tracking(followingEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(followingEntity)));
-        if (!attractingPlayer.isSpectator() && !(attractingPlayer.isCreative())) {
-            ItemStack stack;
-            if (attractingPlayer.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
-                stack = attractingPlayer.getMainHandStack();
+        if (attractingEntity instanceof PlayerEntity player && usingMagnet && !player.isSpectator() && !(player.isCreative())) {
+            if (player.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
+                ItemStack stack = player.getMainHandStack();
                 int tick = stack.getOrCreateNbt().getInt("UsedTick");
                 stack.getOrCreateNbt().putInt("UsedTick", ++tick);
             } else {
-                stack = attractingPlayer.getOffHandStack();
+                ItemStack stack = player.getOffHandStack();
                 int tick = stack.getOrCreateNbt().getInt("UsedTick");
                 stack.getOrCreateNbt().putInt("UsedTick", ++tick);
             }
@@ -185,7 +184,7 @@ public class CreatureMagnetItem extends SwitchableItem {
             boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
             boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
             if (attractOwnerMainhandCreature || attractOwnerOffhandCreature) {
-                CreatureMagnetItem.followAttractOwner(entity, playerByUuid);
+                CreatureMagnetItem.followAttractOwner(entity, playerByUuid, true);
                 entity.setFollowing(true);
                 return;
             }

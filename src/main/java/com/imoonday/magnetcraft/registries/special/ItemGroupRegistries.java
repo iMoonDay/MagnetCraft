@@ -40,8 +40,8 @@ public class ItemGroupRegistries {
                     content.add(MAGLEV_IRON_DOOR_BLOCK);
                     content.add(MAGLEV_REPEATER_BLOCK);
                     content.add(CIRCULAR_REPEATER_BLOCK);
-                    content.add(ELECTROMAGNETIC_RELAY_BLOCK);
                     content.add(MAGLEV_COMPARATOR_BLOCK);
+                    content.add(ELECTROMAGNETIC_RELAY_BLOCK);
                     content.add(MAGNETIC_PRESSURE_PLATE);
                     content.add(MAGLEV_RAIL_BLOCK);
                     content.add(MAGLEV_POWERED_RAIL_BLOCK);
@@ -92,6 +92,7 @@ public class ItemGroupRegistries {
                     content.add(MINERAL_MAGNET_ITEM.getDefaultStack());
                     content.add(MineralMagnetItem.getAllCoresStack());
                     content.add(CROP_MAGNET_ITEM.getDefaultStack());
+                    content.add(ADSORPTION_MAGNET_ITEM);
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                     content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
                     content.add(MAGNETIC_FLUID_BUCKET);
@@ -154,6 +155,7 @@ public class ItemGroupRegistries {
             content.add(MINERAL_MAGNET_ITEM.getDefaultStack());
             content.add(MineralMagnetItem.getAllCoresStack());
             content.add(CROP_MAGNET_ITEM.getDefaultStack());
+            content.add(ADSORPTION_MAGNET_ITEM);
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
@@ -197,9 +199,9 @@ public class ItemGroupRegistries {
             content.addAfter(Items.IRON_DOOR, MAGLEV_IRON_DOOR_BLOCK);
             content.addAfter(Items.REPEATER, MAGLEV_REPEATER_BLOCK);
             content.addAfter(MAGLEV_REPEATER_BLOCK, CIRCULAR_REPEATER_BLOCK);
-            content.addAfter(CIRCULAR_REPEATER_BLOCK, ELECTROMAGNETIC_RELAY_BLOCK);
             content.addAfter(Items.COMPARATOR, MAGLEV_COMPARATOR_BLOCK);
-            content.addAfter(MAGLEV_COMPARATOR_BLOCK, VERTICAL_REPEATER_BLOCK);
+            content.addAfter(MAGLEV_COMPARATOR_BLOCK, ELECTROMAGNETIC_RELAY_BLOCK);
+            content.addAfter(ELECTROMAGNETIC_RELAY_BLOCK, VERTICAL_REPEATER_BLOCK);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.SPAWN_EGGS).register(content -> {

@@ -4,6 +4,7 @@ import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
+import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.screen.handler.MagneticIronGolemScreenHandler;
@@ -38,6 +39,7 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
 import java.util.stream.IntStream;
 
 @SuppressWarnings("RedundantCast")
@@ -57,12 +59,12 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
 
     @Override
     public boolean isAttracting() {
-        return this.isHasLodestone() && ((MagnetCraftEntity) this).canAttract();
+        return (this.isHasLodestone() || this.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT)) && ((MagnetCraftEntity) this).canAttract();
     }
 
     @Override
     public double getAttractDis() {
-        return this.isHasLodestone() && ((MagnetCraftEntity) this).canAttract() ? ModConfig.getGolemValue().attractDis : 0;
+        return this.isHasLodestone() && ((MagnetCraftEntity) this).canAttract() ? ModConfig.getGolemValue().attractDis : this.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT) ? ModConfig.getConfig().value.attractDefaultDis + Objects.requireNonNull(this.getStatusEffect(EffectRegistries.ATTRACT_EFFECT)).getAmplifier() * ModConfig.getConfig().value.disPerAmplifier : 0;
     }
 
     public void setHasLodestone(boolean hasLodestone) {
@@ -123,7 +125,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
     @Override
     public void tick() {
         super.tick();
-        if (this.getHealth() > 0 && this.isAttracting()) {
+        if (this.getHealth() > 0 && this.isAttracting() && this.isHasLodestone()) {
             this.world.getEntitiesByClass(ItemEntity.class, this.getBoundingBox(), itemEntity -> true).forEach(this::insertItem);
         }
     }
@@ -180,7 +182,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         Block block = Block.getBlockFromItem(player.getStackInHand(hand).getItem());
         ItemStack itemStack = player.getStackInHand(hand);
         float g = 1.0f + (this.random.nextFloat() - this.random.nextFloat()) * 0.2f;
-        if (itemStack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
+        if (itemStack.isOf(ItemRegistries.CREATURE_MAGNET_ITEM) || itemStack.isOf(ItemRegistries.ADSORPTION_MAGNET_ITEM)) {
             return ActionResult.PASS;
         } else if (itemStack.isOf(ItemRegistries.MAGNETIC_IRON_INGOT)) {
             float f = this.getHealth();

@@ -3,6 +3,7 @@ package com.imoonday.magnetcraft.mixin;
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
+import com.imoonday.magnetcraft.common.items.magnets.AdsorptionMagnetItem;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
@@ -23,6 +24,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -49,6 +51,9 @@ public class LivingEntityMixin {
             tick(entity);
             MagneticFluid.tick(entity);
             CreatureMagnetItem.followingCheck(entity);
+            if (world instanceof ServerWorld serverWorld) {
+                AdsorptionMagnetItem.tickCheck(serverWorld);
+            }
             if (entity.isOnGround()) {
                 entity.setIgnoreFallDamage(false);
             }

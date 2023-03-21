@@ -1,10 +1,7 @@
 package com.imoonday.magnetcraft.registries.common;
 
 import com.imoonday.magnetcraft.MagnetCraft;
-import com.imoonday.magnetcraft.common.items.CraftingModuleItem;
-import com.imoonday.magnetcraft.common.items.GlintItem;
-import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
-import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
+import com.imoonday.magnetcraft.common.items.*;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.magnets.*;
@@ -45,6 +42,7 @@ public class ItemRegistries {
     public static final CraftingModuleItem CREATURE_MAGNET_CRAFTING_MODULE_ITEM = register("creature_magnet_crafting_module", new CraftingModuleItem(new FabricItemSettings().maxCount(16)));
     public static final CraftingModuleItem MINERAL_MAGNET_CRAFTING_MODULE_ITEM = register("mineral_magnet_crafting_module", new CraftingModuleItem(new FabricItemSettings().maxCount(16)));
     public static final CraftingModuleItem CROP_MAGNET_CRAFTING_MODULE_ITEM = register("crop_magnet_crafting_module", new CraftingModuleItem(new FabricItemSettings().maxCount(16)));
+    public static final CraftingModuleItem ADSORPTION_MAGNET_CRAFTING_MODULE_ITEM = register("adsorption_magnet_crafting_module", new CraftingModuleItem(new FabricItemSettings().maxCount(16)));
 
     public static final Item RESTORE_MODULE_ITEM = register("restore_module", new Item(new FabricItemSettings().maxCount(16)));
     public static final Item FILTER_MODULE_ITEM = register("filter_module", new Item(new FabricItemSettings().maxCount(16)));
@@ -61,6 +59,8 @@ public class ItemRegistries {
 
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = register("magnet_controller", new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
     public static final PortableDemagnetizerItem PORTABLE_DEMAGNETIZER_ITEM = register("portable_demagnetizer", new PortableDemagnetizerItem(new FabricItemSettings().maxCount(1)));
+
+    public static final SmallMagneticSuckerItem SMALL_MAGNETIC_SUCKER_ITEM = register("small_magnetic_sucker",new SmallMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
 
     public static final SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, new Item.Settings()));
     public static final CustomPickaxeItem MAGNETIC_IRON_PICKAXE = register("magnetic_iron_pickaxe", new CustomPickaxeItem(MagneticIronToolMaterial.INSTANCE, 1, -2.8f, new Item.Settings()));

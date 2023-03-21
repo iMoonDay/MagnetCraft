@@ -22,7 +22,7 @@ public class ItemGroupRegistries {
         FabricItemGroup.builder(id("magnet"))
                 .displayName(Text.translatable("group.magnetcraft.magnet"))
                 .icon(() -> new ItemStack(ELECTROMAGNET_ITEM))
-                .entries((context,content) -> {
+                .entries((context, content) -> {
                     content.add(MAGNETITE_BLOCK);
                     content.add(DEEPSLATE_MAGNETITE_BLOCK);
                     content.add(RAW_MAGNET_BLOCK);
@@ -80,6 +80,7 @@ public class ItemGroupRegistries {
                     content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
+                    content.add(ADSORPTION_MAGNET_CRAFTING_MODULE_ITEM);
                     content.add(RESTORE_MODULE_ITEM);
                     content.add(FILTER_MODULE_ITEM);
                     content.add(EXTRACTION_MODULE_ITEM);
@@ -95,6 +96,7 @@ public class ItemGroupRegistries {
                     content.add(ADSORPTION_MAGNET_ITEM);
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                     content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
+                    content.add(SMALL_MAGNETIC_SUCKER_ITEM);
                     content.add(MAGNETIC_FLUID_BUCKET);
                     content.add(MAGNETIC_IRON_GOLEM_SPAWN_EGG);
                 }).build();
@@ -143,6 +145,7 @@ public class ItemGroupRegistries {
             content.add(CREATURE_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(MINERAL_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(CROP_MAGNET_CRAFTING_MODULE_ITEM);
+            content.add(ADSORPTION_MAGNET_CRAFTING_MODULE_ITEM);
             content.add(RESTORE_MODULE_ITEM);
             content.add(FILTER_MODULE_ITEM);
             content.add(EXTRACTION_MODULE_ITEM);
@@ -158,6 +161,7 @@ public class ItemGroupRegistries {
             content.add(ADSORPTION_MAGNET_ITEM);
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
+            content.add(SMALL_MAGNETIC_SUCKER_ITEM);
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
             content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);

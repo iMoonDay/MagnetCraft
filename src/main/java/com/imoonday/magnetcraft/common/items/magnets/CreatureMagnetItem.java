@@ -50,7 +50,7 @@ public class CreatureMagnetItem extends SwitchableItem {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(Items.GOLDEN_APPLE) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(Items.GOLDEN_APPLE);
     }
 
     @Override

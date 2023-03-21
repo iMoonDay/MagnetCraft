@@ -93,7 +93,7 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(EMERALD) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(EMERALD);
     }
 
     @Override

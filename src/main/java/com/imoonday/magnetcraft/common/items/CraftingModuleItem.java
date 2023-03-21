@@ -19,4 +19,5 @@ public class CraftingModuleItem extends Item {
         String key = itemStack.getTranslationKey().replace("_crafting_module", "");
         tooltip.add(Text.translatable(key).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
     }
+
 }

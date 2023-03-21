@@ -45,7 +45,7 @@ public class ElectromagnetItem extends FilterableItem {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(Items.ENDER_PEARL) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(Items.ENDER_PEARL);
     }
 
     @Override

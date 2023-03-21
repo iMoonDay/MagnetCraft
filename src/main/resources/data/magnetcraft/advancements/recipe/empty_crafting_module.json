@@ -31,7 +31,9 @@
       "magnetcraft:magnet_template_from_magnet",
       "magnetcraft:filter_module",
       "magnetcraft:extraction_module",
-      "magnetcraft:demagnetize_module"
+      "magnetcraft:demagnetize_module",
+      "magnetcraft:adsorption_magnet_crafting_module",
+      "magnetcraft:adsorption_magnet"
     ]
   }
 }

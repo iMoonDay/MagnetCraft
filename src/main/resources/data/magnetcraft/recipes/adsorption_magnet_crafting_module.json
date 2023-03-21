@@ -1,0 +1,32 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "345",
+    "161"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnetic_suspended_powder"
+    },
+    "2": {
+      "item": "magnetcraft:magnet_block"
+    },
+    "3": {
+      "item": "minecraft:redstone"
+    },
+    "4": {
+      "item": "magnetcraft:creature_magnet_crafting_module"
+    },
+    "5": {
+      "item": "minecraft:diamond"
+    },
+    "6": {
+      "item": "minecraft:lead"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:adsorption_magnet_crafting_module",
+    "count": 1
+  }
+}

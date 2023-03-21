@@ -52,7 +52,7 @@ public class CropMagnetItem extends FilterableItem {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(Items.GOLDEN_CARROT) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(Items.GOLDEN_CARROT);
     }
 
     @Override

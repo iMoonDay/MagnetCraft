@@ -217,12 +217,12 @@ public class MagnetCraft implements ModInitializer {
             if (!stack.isDamageable()) {
                 return;
             }
+            int stackDamage = stack.getDamage();
+            int stackMaxDamage = stack.getMaxDamage();
+            int finalDamage = stackDamage + damage;
             if (unbreaking) {
-                stack.damage(damage, random, null);
+                stack.damage(finalDamage > stackMaxDamage ? 0 : Math.max(damage, 0), random, null);
             } else {
-                int stackDamage = stack.getDamage();
-                int stackMaxDamage = stack.getMaxDamage();
-                int finalDamage = stackDamage + damage;
                 stack.setDamage(finalDamage > stackMaxDamage ? stackMaxDamage : Math.max(finalDamage, 0));
             }
         }

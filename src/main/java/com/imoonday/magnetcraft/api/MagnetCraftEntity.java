@@ -62,10 +62,10 @@ public interface MagnetCraftEntity {
 
     UUID getAdsorptionEntityId();
 
-    void setAdsorptionEntityId(UUID uuid);
+    void setAdsorptionEntityId(UUID uuid, boolean clear);
 
     BlockPos getAdsorptionBlockPos();
 
-    void setAdsorptionBlockPos(BlockPos pos);
+    void setAdsorptionBlockPos(BlockPos pos, boolean clear);
 
 }

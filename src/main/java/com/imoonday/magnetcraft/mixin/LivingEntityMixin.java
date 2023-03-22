@@ -1,5 +1,7 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.MagnetCraft;
+import com.imoonday.magnetcraft.MagnetCraft.EnchantmentMethods;
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
@@ -8,8 +10,6 @@ import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft.EnchantmentMethods;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.FluidRegistries;

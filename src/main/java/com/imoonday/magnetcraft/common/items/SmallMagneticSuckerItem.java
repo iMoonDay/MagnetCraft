@@ -119,7 +119,7 @@ public class SmallMagneticSuckerItem extends Item {
             if (state == null) {
                 state = blockFromItem.getDefaultState();
             }
-            if (state.canPlaceAt(world, placePos) && (world.getBlockState(placePos).isAir() || !world.getBlockState(placePos).getFluidState().isEmpty()) && (state.getCollisionShape(world, placePos).isEmpty() || world.getOtherEntities(null, new Box(placePos), entity -> !entity.canAvoidTraps()).isEmpty())) {
+            if (state.canPlaceAt(world, placePos) && (world.getBlockState(placePos).isAir() || !world.getBlockState(placePos).getFluidState().isEmpty()) && (state.getCollisionShape(world, placePos).isEmpty() || world.getOtherEntities(null, new Box(placePos), entity -> entity instanceof LivingEntity livingEntity && !livingEntity.canAvoidTraps()).isEmpty())) {
                 world.setBlockState(placePos, state);
                 blockFromItem.onPlaced(world, placePos, state, player, stackInMagnet);
                 BlockItem.writeNbtToBlockEntity(world, player, placePos, stackInMagnet);
@@ -130,10 +130,11 @@ public class SmallMagneticSuckerItem extends Item {
                 return ActionResult.SUCCESS;
             }
             return ActionResult.PASS;
-        }
-        if (player != null && (player.getAbilities().creativeMode || !MagnetCraft.DamageMethods.isEmptyDamage(stack))) {
-            stack.getOrCreateNbt().putIntArray("Pos", new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
-            player.setCurrentHand(hand);
+        } else {
+            if (player != null && (player.getAbilities().creativeMode || !MagnetCraft.DamageMethods.isEmptyDamage(stack))) {
+                stack.getOrCreateNbt().putIntArray("Pos", new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
+                player.setCurrentHand(hand);
+            }
         }
         return ActionResult.FAIL;
     }

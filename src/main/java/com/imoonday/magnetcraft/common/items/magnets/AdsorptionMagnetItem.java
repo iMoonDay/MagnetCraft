@@ -27,6 +27,7 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.IntStream;
 
 public class AdsorptionMagnetItem extends Item {
@@ -97,16 +98,17 @@ public class AdsorptionMagnetItem extends Item {
         if (stack.getNbt() == null || !stack.getNbt().contains("CurrentEntity") || MagnetCraft.DamageMethods.isEmptyDamage(stack)) {
             return ActionResult.PASS;
         }
-        Entity entity = player.world.getEntityById(stack.getNbt().getInt("CurrentEntity"));
+        if (player.world.isClient) {
+            return ActionResult.PASS;
+        }
+        Entity entity = ((ServerWorld) player.world).getEntity(stack.getNbt().getUuid("CurrentEntity"));
         if (entity instanceof LivingEntity livingEntity) {
             livingEntity.setAdsorptionBlockPos(pos, false);
             int dis = (int) livingEntity.getPos().distanceTo(pos.toCenterPos());
-            if (!player.world.isClient) {
-                stack.getNbt().remove("CurrentEntity");
-                int randomDamage = player.getRandom().nextBetween(1, Math.max(dis, 1));
-                IntStream.rangeClosed(1, randomDamage).forEach(i -> MagnetCraft.DamageMethods.addDamage(player, hand, 1, true));
-                player.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.6"));
-            }
+            stack.getNbt().remove("CurrentEntity");
+            int randomDamage = player.getRandom().nextBetween(1, Math.max(dis, 1));
+            IntStream.rangeClosed(1, randomDamage).forEach(i -> MagnetCraft.DamageMethods.addDamage(player, hand, 1, true));
+            player.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.6"));
             player.getInventory().markDirty();
             return ActionResult.SUCCESS;
         }
@@ -120,52 +122,50 @@ public class AdsorptionMagnetItem extends Item {
             if (MagnetCraft.DamageMethods.isEmptyDamage(stackInHand)) {
                 return ActionResult.PASS;
             }
-            if (stackInHand.getNbt() == null || !stackInHand.getNbt().contains("CurrentEntity") || stackInHand.getNbt().getInt("CurrentEntity") == entity.getId()) {
-                if (!(entity instanceof PlayerEntity)) {
-                    if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
-                        entity.setAdsorbedByEntity(false);
-                        entity.setAdsorbedByBlock(false);
-                        if (stackInHand.getNbt() != null && stackInHand.getNbt().contains("CurrentEntity")) {
-                            stackInHand.getNbt().remove("CurrentEntity");
-                            user.getInventory().markDirty();
+            if (!user.world.isClient) {
+                if (stackInHand.getNbt() == null || !stackInHand.getNbt().contains("CurrentEntity") || stackInHand.getNbt().getUuid("CurrentEntity").equals(entity.getUuid())) {
+                    if (!(entity instanceof PlayerEntity)) {
+                        if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
+                            entity.setAdsorbedByEntity(false);
+                            entity.setAdsorbedByBlock(false);
+                            if (stackInHand.getNbt() != null && stackInHand.getNbt().contains("CurrentEntity")) {
+                                stackInHand.getNbt().remove("CurrentEntity");
+                            }
                         }
-                    }
-                    if (!user.world.isClient) {
                         user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.5"));
+                        user.getInventory().markDirty();
+                        return ActionResult.SUCCESS;
                     }
-                    return ActionResult.SUCCESS;
                 }
-            }
-            Entity currentEntity = user.world.getEntityById(stackInHand.getNbt().getInt("CurrentEntity"));
-            if (currentEntity != null) {
-                currentEntity.setAdsorptionEntityId(entity.getUuid(), false);
-                int dis = (int) currentEntity.getPos().distanceTo(entity.getPos());
-                if (!user.world.isClient) {
-                    stackInHand.getNbt().remove("CurrentEntity");
-                    int randomDamage = user.getRandom().nextBetween(1, Math.max(dis, 1));
-                    IntStream.rangeClosed(1, randomDamage).forEach(i -> MagnetCraft.DamageMethods.addDamage(user, hand, 1, true));
-                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.4"));
-                }
-                user.getInventory().markDirty();
-            } else {
-                if (!user.world.isClient) {
+                Entity currentEntity = ((ServerWorld) user.world).getEntity(stackInHand.getNbt().getUuid("CurrentEntity"));
+                if (currentEntity != null) {
+                    currentEntity.setAdsorptionEntityId(entity.getUuid(), false);
+                    int dis = (int) currentEntity.getPos().distanceTo(entity.getPos());
+                    if (!user.world.isClient) {
+                        stackInHand.getNbt().remove("CurrentEntity");
+                        int randomDamage = user.getRandom().nextBetween(1, Math.max(dis, 1));
+                        IntStream.rangeClosed(1, randomDamage).forEach(i -> MagnetCraft.DamageMethods.addDamage(user, hand, 1, true));
+                        user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.4"));
+                    }
+                    user.getInventory().markDirty();
+                } else {
                     user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.3"));
                 }
             }
+            user.getInventory().markDirty();
         } else {
-            if (entity instanceof PlayerEntity) {
-                if (!user.world.isClient) {
+            if (!user.world.isClient) {
+                if (entity instanceof PlayerEntity) {
                     user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.2"));
-                }
-            } else {
-                int id = entity.getId();
-                stackInHand.getOrCreateNbt().putInt("CurrentEntity", id);
-                user.getInventory().markDirty();
-                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20, 0, false, false, false));
-                if (!user.world.isClient) {
+                } else {
+                    UUID id = entity.getUuid();
+                    stackInHand.getOrCreateNbt().putUuid("CurrentEntity", id);
+                    user.getInventory().markDirty();
+                    entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20, 0, false, false, false));
                     user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.1"));
                 }
             }
+            user.getInventory().markDirty();
             return ActionResult.SUCCESS;
         }
         return ActionResult.PASS;
@@ -197,10 +197,12 @@ public class AdsorptionMagnetItem extends Item {
         Vec3d pos = blockPos.toCenterPos();
         Vec3d vec = pos.subtract(entity.getPos()).multiply(0.05);
         if (entity.horizontalCollision) {
-            vec = entity.getPos().isInRange(pos, 1) || entity.getBoundingBox().intersects(new Box(blockPos).expand(0.5)) ? Vec3d.ZERO : vec.multiply(1, 0, 1).add(0, 0.25, 0);
+            vec = entity.getPos().isInRange(pos, 1) || entity.getBoundingBox().intersects(new Box(blockPos).expand(0.5, 0, 0.5)) ? Vec3d.ZERO : vec.multiply(1, 0, 1).add(0, 0.25, 0);
         }
         entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
-        entity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, pos);
+        if (!entity.getBlockPos().equals(blockPos.up())) {
+            entity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, pos);
+        }
         entity.setVelocity(vec);
         if (!entity.isOnGround()) {
             entity.setIgnoreFallDamage(true);

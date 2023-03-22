@@ -112,16 +112,18 @@ public class CreatureMagnetItem extends SwitchableItem {
         boolean enable = stack.getOrCreateNbt().getBoolean("Enable");
         boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
         if ((((!sneaking && !reversal) || (sneaking && reversal)) || !sneakToSwitch) && enable && !cooling && entityCanAttract) {
-            if (hasAttractOwner) {
+            if (hasAttractOwner && !entity.isAdsorbedByEntity() && !entity.isAdsorbedByBlock()) {
                 entity.setAttractOwner(CreatureMagnetItem.EMPTY_UUID);
             } else {
+                entity.setAdsorbedByEntity(false);
+                entity.setAdsorbedByBlock(false);
                 entity.setAttractOwner(user.getUuid());
             }
             if (!creative) {
                 MagnetCraft.CooldownMethods.setCooldown(user, stack, 20);
             }
         }
-        return ActionResult.PASS;
+        return ActionResult.SUCCESS;
     }
 
     public static void followAttractOwner(LivingEntity followingEntity, LivingEntity attractingEntity, boolean usingMagnet) {
@@ -137,7 +139,7 @@ public class CreatureMagnetItem extends SwitchableItem {
         if (followingEntity.getPos().isInRange(attractingEntity.getPos(), 1) || followingEntity.collidesWith(attractingEntity) || followingEntity.getBoundingBox().intersects(attractingEntity.getBoundingBox().expand(0.1))) {
             vec = Vec3d.ZERO;
         }
-        if (attractingEntity.getVelocity().y < 0 && followingEntity.getPos().y > attractingEntity.getY()) {
+        if (attractingEntity.getVelocity().y < -0.1 && followingEntity.getPos().y > attractingEntity.getY()) {
             vec = vec.multiply(1, 0, 1).add(0, attractingEntity.getVelocity().y, 0);
         } else if (attractingEntity.getVelocity().y == 0 && followingEntity.getPos().y > attractingEntity.getY()) {
             vec = vec.multiply(1, 0, 1).add(0, -0.75, 0);
@@ -183,7 +185,7 @@ public class CreatureMagnetItem extends SwitchableItem {
         if (!(entity instanceof PlayerEntity) && hasAttractOwner && playerByUuid != null && entity.getPos().isInRange(playerByUuid.getPos(), creatureDis) && playerByUuid.canAttract()) {
             boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
             boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
-            if (attractOwnerMainhandCreature || attractOwnerOffhandCreature) {
+            if ((attractOwnerMainhandCreature || attractOwnerOffhandCreature) && !entity.isAdsorbedByEntity() && !entity.isAdsorbedByBlock()) {
                 CreatureMagnetItem.followAttractOwner(entity, playerByUuid, true);
                 entity.setFollowing(true);
                 return;

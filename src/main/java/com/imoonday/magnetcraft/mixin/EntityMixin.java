@@ -267,6 +267,7 @@ public class EntityMixin implements MagnetCraftEntity {
     public void setAdsorptionEntityId(UUID uuid, boolean clear) {
         if (!clear) {
             this.setAdsorbedByEntity(true);
+            this.setFollowing(false);
         }
         this.attractData.putUuid("AdsorptionEntityId", uuid);
     }
@@ -284,6 +285,7 @@ public class EntityMixin implements MagnetCraftEntity {
     public void setAdsorptionBlockPos(BlockPos pos, boolean clear) {
         if (!clear) {
             this.setAdsorbedByBlock(true);
+            this.setFollowing(false);
         }
         this.attractData.putIntArray("AdsorptionBlockPos", new int[]{pos.getX(), pos.getY(), pos.getZ()});
     }

@@ -67,7 +67,8 @@ public class CropMagnetItem extends FilterableItem {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
+        ItemStack stackInHand = user.getStackInHand(hand);
+        if (stackInHand.getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
             if (!user.world.isClient) {
                 openScreen(user, hand, this);
             }
@@ -79,13 +80,13 @@ public class CropMagnetItem extends FilterableItem {
                 boolean success = crops > 0;
                 if (success && !user.isCreative()) {
                     user.getHungerManager().setFoodLevel(user.getHungerManager().getFoodLevel() - removeFoodLevel);
-                    MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), (1 + removeFoodLevel) * 5 * 20);
+                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, (1 + removeFoodLevel) * 5 * 20);
                 } else {
-                    MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 20);
                 }
             }
         }
-        return super.use(world, user, hand);
+        return TypedActionResult.success(stackInHand, !MagnetCraft.DamageMethods.isEmptyDamage(stackInHand));
     }
 
     @Override

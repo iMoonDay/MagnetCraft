@@ -1,8 +1,8 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
+import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.FilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
 import net.minecraft.block.Block;
@@ -76,8 +76,9 @@ public class ElectromagnetItem extends FilterableItem {
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
         }
+        ItemStack stackInHand = user.getStackInHand(hand);
         if ((sneaking && !reversal) || (!sneaking && reversal)) {
-            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+            if (stackInHand.getOrCreateNbt().getBoolean("Filterable")) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
                 }
@@ -93,8 +94,8 @@ public class ElectromagnetItem extends FilterableItem {
             }
             teleportItems(world, user, dis, hand);
         }
-        MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
-        return super.use(world, user, hand);
+        MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 20);
+        return TypedActionResult.success(stackInHand, !MagnetCraft.DamageMethods.isEmptyDamage(stackInHand));
     }
 
     public static void teleportItems(World world, PlayerEntity player, double dis, Hand hand) {

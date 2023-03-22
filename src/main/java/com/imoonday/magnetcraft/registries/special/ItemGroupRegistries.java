@@ -97,6 +97,7 @@ public class ItemGroupRegistries {
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                     content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
                     content.add(SMALL_MAGNETIC_SUCKER_ITEM);
+                    content.add(LARGE_MAGNETIC_SUCKER_ITEM);
                     content.add(MAGNETIC_FLUID_BUCKET);
                     content.add(MAGNETIC_IRON_GOLEM_SPAWN_EGG);
                 }).build();
@@ -162,6 +163,7 @@ public class ItemGroupRegistries {
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
             content.add(SMALL_MAGNETIC_SUCKER_ITEM);
+            content.add(LARGE_MAGNETIC_SUCKER_ITEM);
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
             content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);

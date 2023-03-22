@@ -58,8 +58,9 @@ public class PermanentMagnetItem extends FilterableItem {
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
         }
+        ItemStack stackInHand = user.getStackInHand(hand);
         if ((sneaking && !reversal) || (!sneaking && reversal)) {
-            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+            if (stackInHand.getOrCreateNbt().getBoolean("Filterable")) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
                 }
@@ -72,8 +73,8 @@ public class PermanentMagnetItem extends FilterableItem {
         } else {
             ElectromagnetItem.teleportItems(world, user, dis, hand);
         }
-        MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 10);
-        return super.use(world, user, hand);
+        MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 10);
+        return TypedActionResult.success(stackInHand);
     }
 
     @Override

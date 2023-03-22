@@ -114,7 +114,8 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
+        ItemStack stackInHand = user.getStackInHand(hand);
+        if (stackInHand.getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
             if (!user.world.isClient) {
                 int slot = hand == Hand.MAIN_HAND ? user.getInventory().selectedSlot : -1;
                 user.openHandledScreen(new ExtendedScreenHandlerFactory() {
@@ -125,7 +126,7 @@ public class MineralMagnetItem extends Item {
 
                     @Override
                     public Text getDisplayName() {
-                        return Text.translatable(user.getStackInHand(hand).getItem().getTranslationKey());
+                        return Text.translatable(stackInHand.getItem().getTranslationKey());
                     }
 
                     @Override
@@ -139,13 +140,13 @@ public class MineralMagnetItem extends Item {
                 int value = searchMineral(user, hand);
                 boolean success = value > 0;
                 if (success && !user.isCreative()) {
-                    MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), value * 20);
+                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, value * 20);
                 } else {
-                    MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
+                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 20);
                 }
             }
         }
-        return super.use(world, user, hand);
+        return TypedActionResult.success(stackInHand,!MagnetCraft.DamageMethods.isEmptyDamage(stackInHand));
     }
 
     @Override

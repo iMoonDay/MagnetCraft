@@ -89,6 +89,9 @@ public class ModConfig implements ConfigData {
         //使用冷却增减百分比
         @ConfigEntry.BoundedDiscrete(max = 200)
         public int coolingPercentage = 100;
+        //吸盘最大半径
+        @ConfigEntry.BoundedDiscrete(max = 15,min = 1)
+        public int suckerMaxRadius = 5;
         //装备乘数
         public double magnetSetMultiplier = 1.5;
         public double netheriteMagnetSetMultiplier = 2;

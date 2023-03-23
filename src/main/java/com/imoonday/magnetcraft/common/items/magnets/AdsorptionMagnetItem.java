@@ -37,12 +37,7 @@ public class AdsorptionMagnetItem extends Item {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.ADSORPTION_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.ADSORPTION_MAGNET_ITEM)) {
-                return 0.0F;
-            }
-            return MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;
-        });
+        ModelPredicateProviderRegistry.register(ItemRegistries.ADSORPTION_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.ADSORPTION_MAGNET_ITEM) ? 0.0F : MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F);
     }
 
     @Override
@@ -92,13 +87,7 @@ public class AdsorptionMagnetItem extends Item {
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getBlockPos();
         Hand hand = context.getHand();
-        if (player == null || !player.isSneaking()) {
-            return ActionResult.PASS;
-        }
-        if (stack.getNbt() == null || !stack.getNbt().contains("CurrentEntity") || MagnetCraft.DamageMethods.isEmptyDamage(stack)) {
-            return ActionResult.PASS;
-        }
-        if (player.world.isClient) {
+        if (player == null || !player.isSneaking() || stack.getNbt() == null || !stack.getNbt().contains("CurrentEntity") || MagnetCraft.DamageMethods.isEmptyDamage(stack) || player.world.isClient) {
             return ActionResult.PASS;
         }
         Entity entity = ((ServerWorld) player.world).getEntity(stack.getNbt().getUuid("CurrentEntity"));
@@ -123,19 +112,17 @@ public class AdsorptionMagnetItem extends Item {
                 return ActionResult.PASS;
             }
             if (!user.world.isClient) {
-                if (stackInHand.getNbt() == null || !stackInHand.getNbt().contains("CurrentEntity") || stackInHand.getNbt().getUuid("CurrentEntity").equals(entity.getUuid())) {
-                    if (!(entity instanceof PlayerEntity)) {
-                        if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
-                            entity.setAdsorbedByEntity(false);
-                            entity.setAdsorbedByBlock(false);
-                            if (stackInHand.getNbt() != null && stackInHand.getNbt().contains("CurrentEntity")) {
-                                stackInHand.getNbt().remove("CurrentEntity");
-                            }
+                if ((stackInHand.getNbt() == null || !stackInHand.getNbt().contains("CurrentEntity") || stackInHand.getNbt().getUuid("CurrentEntity").equals(entity.getUuid())) && !(entity instanceof PlayerEntity)) {
+                    if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
+                        entity.setAdsorbedByEntity(false);
+                        entity.setAdsorbedByBlock(false);
+                        if (stackInHand.getNbt() != null && stackInHand.getNbt().contains("CurrentEntity")) {
+                            stackInHand.getNbt().remove("CurrentEntity");
                         }
-                        user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.5"));
-                        user.getInventory().markDirty();
-                        return ActionResult.SUCCESS;
                     }
+                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.5"));
+                    user.getInventory().markDirty();
+                    return ActionResult.SUCCESS;
                 }
                 Entity currentEntity = ((ServerWorld) user.world).getEntity(stackInHand.getNbt().getUuid("CurrentEntity"));
                 if (currentEntity != null) {

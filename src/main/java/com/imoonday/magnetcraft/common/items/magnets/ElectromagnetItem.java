@@ -37,10 +37,7 @@ public class ElectromagnetItem extends FilterableItem {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable")) return 0.0F;
-            return itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F;
-        });
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable") ? 0.0F : itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F);
     }
 
     @Override

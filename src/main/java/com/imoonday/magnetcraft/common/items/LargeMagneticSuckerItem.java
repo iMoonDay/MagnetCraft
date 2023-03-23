@@ -1,36 +1,34 @@
 package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.MagnetCraft;
-import net.minecraft.block.BedBlock;
+import com.imoonday.magnetcraft.api.AbstractMagneticSuckerItem;
+import com.imoonday.magnetcraft.config.ModConfig;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.DoorBlock;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.enums.BedPart;
-import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.*;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.sound.BlockSoundGroup;
-import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.Hand;
-import net.minecraft.util.UseAction;
+import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.*;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.World;
-import net.minecraft.world.event.GameEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class LargeMagneticSuckerItem extends Item {
+public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     public LargeMagneticSuckerItem(Settings settings) {
         super(settings);
@@ -38,17 +36,23 @@ public class LargeMagneticSuckerItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-
-    }
-
-    @Override
-    public int getMaxUseTime(ItemStack stack) {
-        return 40;
-    }
-
-    @Override
-    public UseAction getUseAction(ItemStack stack) {
-        return UseAction.BOW;
+        if (stack.getNbt() != null) {
+            if (stack.getNbt().contains("Extend")) {
+                int extend = stack.getNbt().getInt("Extend");
+                tooltip.add(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.1", ++extend));
+            }
+            if (stack.getNbt().contains("Replace")) {
+                boolean replace = stack.getOrCreateNbt().getBoolean("Replace");
+                Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.mode." + (replace ? 1 : 2));
+                tooltip.add(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.2", mode));
+            }
+            if (stack.getNbt().contains("Blocks")) {
+                stack.getNbt().getList("Blocks", NbtElement.COMPOUND_TYPE).stream().map(NbtCompound.class::cast).map(nbtCompound -> ItemStack.fromNbt(nbtCompound.getCompound("Block"))).map(ItemStack::getName).forEach(text -> tooltip.add(text.copyContentOnly().formatted(Formatting.GRAY).formatted(Formatting.BOLD)));
+            }
+            //相对位置
+            //玩家朝向
+            //完全复制
+        }
     }
 
     @Override
@@ -58,8 +62,9 @@ public class LargeMagneticSuckerItem extends Item {
         }
         BlockPos centerBlockPos = new BlockPos(stack.getOrCreateNbt().getIntArray("Pos")[0], stack.getOrCreateNbt().getIntArray("Pos")[1], stack.getOrCreateNbt().getIntArray("Pos")[2]);
         NbtList list = stack.getOrCreateNbt().getList("Blcoks", NbtElement.COMPOUND_TYPE);
-        for (int i = 1; i >= -1; --i) {
-            for (int j = 1; j >= -1; --j) {
+        int extend = stack.getOrCreateNbt().getInt("Extend");
+        for (int i = extend; i >= -extend; --i) {
+            for (int j = extend; j >= -extend; --j) {
                 BlockPos pos = centerBlockPos.add(i, 0, j);
                 BlockState state = world.getBlockState(pos);
                 if (state.getHardness(world, centerBlockPos) == -1.0f && !player.isCreative()) {
@@ -70,32 +75,13 @@ public class LargeMagneticSuckerItem extends Item {
                 }
                 Block block = state.getBlock();
                 ItemStack blockStack = new ItemStack(block);
-                NbtCompound nbt = new NbtCompound();
-                NbtCompound itemNbt = blockStack.writeNbt(new NbtCompound());
-                BlockEntity blockEntity = world.getBlockEntity(pos);
-                if (blockEntity != null) {
-                    NbtCompound tag = new NbtCompound();
-                    tag.put(BlockItem.BLOCK_ENTITY_TAG_KEY, blockEntity.createNbtWithId());
-                    itemNbt.put("tag", tag);
-                }
-                nbt.putInt("OffsetX", i);
-                nbt.putInt("OffsetZ", j);
-                nbt.put("Block", itemNbt);
-                list.add(nbt);
-                world.removeBlockEntity(pos);
-                if (block instanceof DoorBlock) {
-                    world.breakBlock(state.get(DoorBlock.HALF) == DoubleBlockHalf.UPPER ? pos.down() : pos, false, player);
-                } else if (block instanceof BedBlock) {
-                    world.breakBlock(state.get(BedBlock.PART) == BedPart.FOOT ? pos.offset(state.get(BedBlock.FACING)) : pos, false, player);
-                } else {
-                    world.breakBlock(pos, false, player);
-                }
-                BlockSoundGroup blockSoundGroup = state.getSoundGroup();
-                world.playSound(player, pos, blockSoundGroup.getBreakSound(), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f);
-                world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Emitter.of(player, state));
-                if (!player.getAbilities().creativeMode) {
-                    MagnetCraft.DamageMethods.addDamage(stack, player.getRandom(), 1, true);
-                }
+                NbtCompound blocks = new NbtCompound();
+                NbtCompound itemNbt = getItemNbt(world, pos, state, blockStack);
+                blocks.put("Block", itemNbt);
+                blocks.putInt("OffsetX", i);
+                blocks.putInt("OffsetZ", j);
+                list.add(blocks);
+                breakBlock(stack, world, player, pos, state, block);
             }
         }
         stack.getOrCreateNbt().put("Blocks", list);
@@ -112,6 +98,65 @@ public class LargeMagneticSuckerItem extends Item {
         if (stack.getNbt() != null && stack.getNbt().contains("Pos")) {
             stack.getNbt().remove("Pos");
         }
+        if (stack.getNbt() != null && stack.getNbt().contains("Direction")) {
+            stack.getNbt().remove("Direction");
+        }
+    }
+
+    @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        nbtSet(stack);
+        return stack;
+    }
+
+    @Override
+    public void onCraft(ItemStack stack, World world, PlayerEntity player) {
+        nbtSet(stack);
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        nbtCheck(stack);
+    }
+
+    private static void nbtCheck(ItemStack stack) {
+        if (stack.getNbt() == null || !stack.getNbt().contains("Extend") || !stack.getNbt().contains("Replace")) {
+            nbtSet(stack);
+        }
+    }
+
+    private static void nbtSet(ItemStack stack) {
+        if (stack.getNbt() == null || !stack.getNbt().contains("Extend")) {
+            stack.getOrCreateNbt().putInt("Extend", 1);
+        }
+        if (stack.getNbt() == null || !stack.getNbt().contains("Replace")) {
+            stack.getOrCreateNbt().putBoolean("Replace", false);
+        }
+    }
+
+    @Override
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack stack = user.getStackInHand(hand);
+        if (!user.isSneaking()) {
+            int extend = stack.getOrCreateNbt().getInt("Extend");
+            int maxRadius = ModConfig.getValue().suckerMaxRadius;
+            if (++extend > --maxRadius) {
+                extend = 0;
+            }
+            stack.getOrCreateNbt().putInt("Extend", extend);
+            if (!world.isClient) {
+                user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.1", ++extend), true);
+            }
+        } else {
+            boolean finalValue = !stack.getOrCreateNbt().getBoolean("Replace");
+            stack.getOrCreateNbt().putBoolean("Replace", finalValue);
+            Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.mode." + (finalValue ? 1 : 2));
+            if (!world.isClient) {
+                user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.2", mode), true);
+            }
+        }
+        return TypedActionResult.success(stack);
     }
 
     @Override
@@ -123,52 +168,38 @@ public class LargeMagneticSuckerItem extends Item {
         BlockPos blockPos = context.getBlockPos();
         Direction side = context.getSide();
         Vec3d hitPos = context.getHitPos();
-        boolean inside = context.hitsInsideBlock();
         if (player == null) {
             return ActionResult.FAIL;
         }
         if (stack.getNbt() != null && stack.getNbt().contains("Blocks")) {
-            List<NbtCompound> stackNbts = stack.getNbt().getList("Blocks", NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).toList();
-            for (NbtCompound nbt : stackNbts) {
+            List<NbtCompound> blocks = stack.getNbt().getList("Blocks", NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).toList();
+            for (NbtCompound nbt : blocks) {
                 Vec3i offset = new Vec3i(nbt.getInt("OffsetX"), 0, nbt.getInt("OffsetZ"));
                 Direction originalDir = Direction.byId(stack.getOrCreateNbt().getInt("Direction"));
                 Direction placeDir = player.getHorizontalFacing();
-                BlockRotation rotation = BlockRotation.NONE;
-                if (!originalDir.equals(Direction.UP) && !originalDir.equals(Direction.DOWN)) {
-                    if (originalDir.rotateYClockwise().equals(placeDir)) {
-                        rotation = BlockRotation.CLOCKWISE_90;
-                    } else if (originalDir.rotateYCounterclockwise().equals(placeDir)) {
-                        rotation = BlockRotation.COUNTERCLOCKWISE_90;
-                    } else if (originalDir.getOpposite().equals(placeDir)) {
-                        rotation = BlockRotation.CLOCKWISE_180;
-                    }
-                }
-                ItemStack stackInMagnet = ItemStack.fromNbt(nbt.getCompound("Block"));
-                Block blockFromItem = Block.getBlockFromItem(stackInMagnet.getItem());
+                BlockRotation rotation = getOffsetRotation(originalDir, placeDir);
+                ItemStack blockItemStack = ItemStack.fromNbt(nbt.getCompound("Block"));
+                Block blockFromItem = Block.getBlockFromItem(blockItemStack.getItem());
                 BlockPos offsetPos = BlockPos.ORIGIN.add(offset).rotate(rotation);
                 BlockPos placePos = blockPos.offset(side).add(offsetPos);
-                ItemPlacementContext ctx = new ItemPlacementContext(world, player, hand, stackInMagnet, new BlockHitResult(hitPos.add(Vec3d.of(offset)), Direction.UP, placePos, inside));
-                BlockState state = blockFromItem.getPlacementState(ctx);
-                if (state == null) {
-                    state = blockFromItem.getDefaultState();
+                Vec3d newHitPos = hitPos.offset(side, 1).add(Vec3d.of(offsetPos));
+                BlockHitResult hit = new BlockHitResult(newHitPos, Direction.UP, placePos.down(), false);
+                ItemUsageContext newContext = new ItemUsageContext(world, player, hand, blockItemStack, hit);
+                ItemPlacementContext ctx = new ItemPlacementContext(newContext);
+                BlockState state = getPlacementState(blockFromItem, ctx);
+                BlockState blockState = world.getBlockState(placePos);
+                boolean replace = stack.getOrCreateNbt().getBoolean("Replace");
+                if (!blockState.isAir() && offerOrBreak(player, world, blockItemStack, placePos, replace)) {
+                    continue;
                 }
-                if (!world.getBlockState(placePos).isAir()) {
-                    if (world.getBlockState(placePos).getHardness(world, placePos) == -1.0f && !player.isCreative()) {
-                        player.getInventory().offerOrDrop(stackInMagnet);
-                        continue;
-                    }
-                    world.breakBlock(placePos, true, player);
+                if (state == null || tryPlaceFailed(ctx, state)) {
+                    player.getInventory().offerOrDrop(blockItemStack);
+                    continue;
                 }
-                if (state.canPlaceAt(world, placePos) && (state.getCollisionShape(world, placePos).isEmpty() || world.getOtherEntities(null, new Box(placePos), entity -> entity instanceof LivingEntity livingEntity && !livingEntity.canAvoidTraps()).isEmpty())) {
-                    world.setBlockState(placePos, state);
-                    blockFromItem.onPlaced(world, placePos, state, player, stackInMagnet);
-                    BlockItem.writeNbtToBlockEntity(world, player, placePos, stackInMagnet);
-                    BlockSoundGroup blockSoundGroup = state.getSoundGroup();
-                    world.playSound(player, placePos, blockSoundGroup.getPlaceSound(), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f);
-                    world.emitGameEvent(GameEvent.BLOCK_PLACE, placePos, GameEvent.Emitter.of(player, state));
-                }
+                place(stack, player, world, blockItemStack, placePos, state);
             }
             stack.getNbt().remove("Blocks");
+            stack.getNbt().remove("Direction");
             return ActionResult.SUCCESS;
         } else {
             if (player.getAbilities().creativeMode || !MagnetCraft.DamageMethods.isEmptyDamage(stack)) {
@@ -178,5 +209,30 @@ public class LargeMagneticSuckerItem extends Item {
         }
         return ActionResult.FAIL;
     }
+
+    private static boolean offerOrBreak(PlayerEntity player, World world, ItemStack blockItemStack, BlockPos placePos, boolean replace) {
+        if (world.getBlockState(placePos).getHardness(world, placePos) == -1.0f && !player.isCreative() || !replace) {
+            player.getInventory().offerOrDrop(blockItemStack);
+            return true;
+        }
+        world.breakBlock(placePos, true, player);
+        return false;
+    }
+
+    @NotNull
+    private static BlockRotation getOffsetRotation(Direction originalDir, Direction placeDir) {
+        BlockRotation rotation = BlockRotation.NONE;
+        if (!originalDir.equals(Direction.UP) && !originalDir.equals(Direction.DOWN)) {
+            if (originalDir.rotateYClockwise().equals(placeDir)) {
+                rotation = BlockRotation.CLOCKWISE_90;
+            } else if (originalDir.rotateYCounterclockwise().equals(placeDir)) {
+                rotation = BlockRotation.COUNTERCLOCKWISE_90;
+            } else if (originalDir.getOpposite().equals(placeDir)) {
+                rotation = BlockRotation.CLOCKWISE_180;
+            }
+        }
+        return rotation;
+    }
+
 
 }

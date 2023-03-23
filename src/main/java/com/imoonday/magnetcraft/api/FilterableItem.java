@@ -60,11 +60,7 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
             for (int i = 0; i < itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).size(); i++) {
                 NbtCompound filter = itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).getCompound(i);
                 ItemStack stack = ItemStack.fromNbt(filter);
-                String stackName = stack.getTranslationKey();
-                if (stackName.equals(Text.translatable(stackName).getString())) {
-                    stackName = stackName.replace("item.", "block.");
-                }
-                tooltip.add(Text.literal("[" + i + "] ").append(Text.translatable(stackName)).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+                tooltip.add(Text.literal("[" + i + "] ").append(stack.getName()).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
             }
         }
     }

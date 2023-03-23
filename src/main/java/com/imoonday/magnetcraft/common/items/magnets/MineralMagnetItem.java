@@ -35,6 +35,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.imoonday.magnetcraft.api.FilterableItem.shulkerBoxCheck;
 import static com.imoonday.magnetcraft.api.FilterableItem.shulkerBoxSet;
@@ -53,32 +56,16 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(MINERAL_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> {
-            if (livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(MINERAL_MAGNET_ITEM)) {
-                return 0.0F;
-            }
-            return MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F;
-        });
+        ModelPredicateProviderRegistry.register(MINERAL_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(MINERAL_MAGNET_ITEM) ? 0.0F : MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F);
     }
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        ArrayList<String> list = new ArrayList<>();
-        for (int i = 0; i < stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).size(); i++) {
-            if (stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getBoolean("enable")) {
-                list.add(stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getString("id"));
-            }
-        }
+        ArrayList<String> list = IntStream.range(0, stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).size()).filter(i -> stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getBoolean("enable")).mapToObj(i -> stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getString("id")).collect(Collectors.toCollection(ArrayList::new));
         if (list.isEmpty()) {
             tooltip.add(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.1").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         } else {
-            for (String name : list) {
-                Identifier identifier = Identifier.tryParse(name);
-                if (identifier != null) {
-                    String stackName = "item." + identifier.toTranslationKey();
-                    tooltip.add(Text.translatable(stackName).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-                }
-            }
+            list.stream().map(Identifier::tryParse).filter(Objects::nonNull).map(identifier -> "item." + identifier.toTranslationKey()).map(stackName -> Text.translatable(stackName).formatted(Formatting.GRAY).formatted(Formatting.BOLD)).forEach(tooltip::add);
         }
     }
 

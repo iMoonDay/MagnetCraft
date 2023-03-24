@@ -63,6 +63,7 @@ public class ItemRegistries {
     public static final MagnetControllerItem MAGNET_CONTROLLER_ITEM = register("magnet_controller", new MagnetControllerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
     public static final PortableDemagnetizerItem PORTABLE_DEMAGNETIZER_ITEM = register("portable_demagnetizer", new PortableDemagnetizerItem(new FabricItemSettings().maxCount(1)));
 
+    public static final Item MAGNETIC_SUCKER_CORE_ITEM = register("magnetic_sucker_core", new Item(new FabricItemSettings().maxCount(1)));
     public static final SmallMagneticSuckerItem SMALL_MAGNETIC_SUCKER_ITEM = register("small_magnetic_sucker",new SmallMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
     public static final LargeMagneticSuckerItem LARGE_MAGNETIC_SUCKER_ITEM = register("large_magnetic_sucker",new LargeMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(300)));
 

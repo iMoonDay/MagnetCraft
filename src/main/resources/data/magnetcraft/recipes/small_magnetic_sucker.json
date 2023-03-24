@@ -1,0 +1,23 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "212",
+    "131",
+    "212"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    },
+    "2": {
+      "item": "minecraft:copper_ingot"
+    },
+    "3": {
+      "item": "magnetcraft:magnetic_sucker_core"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:small_magnetic_sucker",
+    "count": 1
+  }
+}

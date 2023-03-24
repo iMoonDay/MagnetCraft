@@ -93,7 +93,7 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
             ItemPlacementContext ctx = new ItemPlacementContext(newContext);
             BlockPos placePos = blockPos.offset(direction);
             BlockState state = getPlacementState(blockFromItem, ctx);
-            return state == null || tryPlaceFailed(ctx, state) ? ActionResult.FAIL : place(stack, player, world, blockItemStack, placePos, state);
+            return state == null || tryPlaceFailed(ctx, state) ? ActionResult.FAIL : place(stack, player, world, blockItemStack, placePos, state, true, false);
         } else {
             if (player != null && (player.getAbilities().creativeMode || !MagnetCraft.DamageMethods.isEmptyDamage(stack))) {
                 stack.getOrCreateNbt().putIntArray(POS, new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});

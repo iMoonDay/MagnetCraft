@@ -100,6 +100,7 @@ public class ItemGroupRegistries {
                     content.add(ADSORPTION_MAGNET_ITEM);
                     content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
                     content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
+                    content.add(MAGNETIC_SUCKER_CORE_ITEM);
                     content.add(SMALL_MAGNETIC_SUCKER_ITEM);
                     content.add(LARGE_MAGNETIC_SUCKER_ITEM);
                     content.add(MAGNETIC_FLUID_BUCKET);
@@ -166,6 +167,7 @@ public class ItemGroupRegistries {
             content.add(ADSORPTION_MAGNET_ITEM);
             content.add(MAGNET_CONTROLLER_ITEM.getDefaultStack());
             content.add(PORTABLE_DEMAGNETIZER_ITEM.getDefaultStack());
+            content.add(MAGNETIC_SUCKER_CORE_ITEM);
             content.add(SMALL_MAGNETIC_SUCKER_ITEM);
             content.add(LARGE_MAGNETIC_SUCKER_ITEM);
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);

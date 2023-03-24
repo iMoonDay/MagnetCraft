@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "212",
+    "131",
+    "242"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnet_block"
+    },
+    "2": {
+      "item": "minecraft:copper_block"
+    },
+    "3": {
+      "item": "magnetcraft:magnetic_sucker_core"
+    },
+    "4": {
+      "item": "magnetcraft:netherite_magnetic_iron_ingot"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:large_magnetic_sucker",
+    "count": 1
+  }
+}

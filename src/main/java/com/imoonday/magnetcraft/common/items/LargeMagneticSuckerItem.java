@@ -15,6 +15,8 @@ import net.minecraft.item.ItemUsageContext;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.nbt.NbtString;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.hit.BlockHitResult;
@@ -26,6 +28,7 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,6 +44,11 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
     public static final String OFFSET_Z = "OffsetZ";
     public static final String POS = "Pos";
     public static final String DIRECTION = "Direction";
+    public static final String CURRENT_SELECT = "CurrentSelect";
+    public static final String POSITION = "Position";
+    public static final String TOWARDS = "Towards";
+    public static final String COPY = "Copy";
+    public static final String[] NBTS = {CURRENT_SELECT, EXTEND, REPLACE, POSITION, TOWARDS, COPY};
 
     public LargeMagneticSuckerItem(Settings settings) {
         super(settings);
@@ -49,21 +57,59 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         if (stack.getNbt() != null) {
+            int select = -1;
+            MutableText selectedText = Text.empty();
+            if (stack.getNbt().contains(CURRENT_SELECT)) {
+                select = stack.getOrCreateNbt().getInt(CURRENT_SELECT);
+                selectedText = Text.translatable("item.magnetcraft.large_magnetic_sucker.select").formatted(Formatting.YELLOW).formatted(Formatting.BOLD);
+            }
             if (stack.getNbt().contains(EXTEND)) {
                 int extend = stack.getOrCreateNbt().getInt(EXTEND);
-                tooltip.add(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.1", ++extend));
+                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.radius", ++extend);
+                if (select == 0) {
+                    text.append(selectedText);
+                }
+                tooltip.add(text);
             }
             if (stack.getNbt().contains(REPLACE)) {
                 boolean replace = stack.getOrCreateNbt().getBoolean(REPLACE);
-                Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.mode." + (replace ? 1 : 2));
-                tooltip.add(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.2", mode));
+                Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.replace." + (replace ? 1 : 2));
+                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.replace", mode);
+                if (select == 1) {
+                    text.append(selectedText);
+                }
+                tooltip.add(text);
+            }
+            if (stack.getNbt().contains(POSITION)) {
+                boolean position = stack.getOrCreateNbt().getBoolean(POSITION);
+                Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.position." + (position ? 1 : 2));
+                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.position", mode);
+                if (select == 2) {
+                    text.append(selectedText);
+                }
+                tooltip.add(text);
+            }
+            if (stack.getNbt().contains(TOWARDS)) {
+                boolean towards = stack.getOrCreateNbt().getBoolean(TOWARDS);
+                Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.towards." + (towards ? 1 : 2));
+                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.towards", mode);
+                if (select == 3) {
+                    text.append(selectedText);
+                }
+                tooltip.add(text);
+            }
+            if (stack.getNbt().contains(COPY)) {
+                boolean copy = stack.getOrCreateNbt().getBoolean(COPY);
+                Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.copy." + (copy ? 1 : 2));
+                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.copy", mode);
+                if (select == 4) {
+                    text.append(selectedText);
+                }
+                tooltip.add(text);
             }
             if (stack.getNbt().contains(BLOCKS)) {
                 stack.getNbt().getList(BLOCKS, NbtElement.COMPOUND_TYPE).stream().map(NbtCompound.class::cast).map(nbtCompound -> ItemStack.fromNbt(nbtCompound.getCompound(BLOCK))).map(ItemStack::getName).forEach(text -> tooltip.add(text.copyContentOnly().formatted(Formatting.GRAY).formatted(Formatting.BOLD)));
             }
-            //相对位置
-            //玩家朝向
-            //完全复制
         }
     }
 
@@ -133,39 +179,100 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
     }
 
     private static void nbtCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains(EXTEND) || !stack.getNbt().contains(REPLACE)) {
+        int containNbt = (int) Arrays.stream(NBTS).filter(nbt -> stack.getNbt() != null && stack.getNbt().contains(nbt)).count();
+        if (containNbt < NBTS.length || stack.getNbt() == null) {
             nbtSet(stack);
         }
     }
 
     private static void nbtSet(ItemStack stack) {
+        if (stack.getNbt() == null || !stack.getNbt().contains(CURRENT_SELECT)) {
+            stack.getOrCreateNbt().putInt(CURRENT_SELECT, 0);
+        }
         if (stack.getNbt() == null || !stack.getNbt().contains(EXTEND)) {
             stack.getOrCreateNbt().putInt(EXTEND, 1);
         }
         if (stack.getNbt() == null || !stack.getNbt().contains(REPLACE)) {
             stack.getOrCreateNbt().putBoolean(REPLACE, false);
         }
+        if (stack.getNbt() == null || !stack.getNbt().contains(POSITION)) {
+            stack.getOrCreateNbt().putBoolean(POSITION, true);
+        }
+        if (stack.getNbt() == null || !stack.getNbt().contains(TOWARDS)) {
+            stack.getOrCreateNbt().putBoolean(TOWARDS, true);
+        }
+        if (stack.getNbt() == null || !stack.getNbt().contains(COPY)) {
+            stack.getOrCreateNbt().putBoolean(COPY, false);
+        }
     }
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
-        if (!user.isSneaking()) {
-            int extend = stack.getOrCreateNbt().getInt(EXTEND);
-            int maxRadius = ModConfig.getValue().suckerMaxRadius;
-            if (++extend > --maxRadius) {
-                extend = 0;
-            }
-            stack.getOrCreateNbt().putInt(EXTEND, extend);
-            if (!world.isClient) {
-                user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.1", ++extend), true);
+        int select = stack.getOrCreateNbt().getInt(CURRENT_SELECT);
+        if (user.isSneaking()) {
+            switch (select) {
+                case 0 -> {
+                    int extend = stack.getOrCreateNbt().getInt(EXTEND);
+                    int maxRadius = ModConfig.getValue().suckerMaxRadius;
+                    if (++extend > --maxRadius) {
+                        extend = 0;
+                    }
+                    stack.getOrCreateNbt().putInt(EXTEND, extend);
+                    if (!world.isClient) {
+                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.radius", ++extend), true);
+                    }
+                }
+                case 1 -> {
+                    boolean finalValue = !stack.getOrCreateNbt().getBoolean(REPLACE);
+                    stack.getOrCreateNbt().putBoolean(REPLACE, finalValue);
+                    Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.replace." + (finalValue ? 1 : 2));
+                    if (!world.isClient) {
+                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.replace", mode), true);
+                    }
+                }
+                case 2 -> {
+                    boolean finalValue = !stack.getOrCreateNbt().getBoolean(POSITION);
+                    stack.getOrCreateNbt().putBoolean(POSITION, finalValue);
+                    Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.position." + (finalValue ? 1 : 2));
+                    if (!world.isClient) {
+                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.position", mode), true);
+                    }
+                }
+                case 3 -> {
+                    boolean finalValue = !stack.getOrCreateNbt().getBoolean(TOWARDS);
+                    stack.getOrCreateNbt().putBoolean(TOWARDS, finalValue);
+                    Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.towards." + (finalValue ? 1 : 2));
+                    if (!world.isClient) {
+                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.towards", mode), true);
+                    }
+                }
+                case 4 -> {
+                    boolean finalValue = !stack.getOrCreateNbt().getBoolean(COPY);
+                    stack.getOrCreateNbt().putBoolean(COPY, finalValue);
+                    Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.copy." + (finalValue ? 1 : 2));
+                    if (!world.isClient) {
+                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.copy", mode), true);
+                    }
+                }
             }
         } else {
-            boolean finalValue = !stack.getOrCreateNbt().getBoolean(REPLACE);
-            stack.getOrCreateNbt().putBoolean(REPLACE, finalValue);
-            Text mode = Text.translatable("item.magnetcraft.large_magnetic_sucker.mode." + (finalValue ? 1 : 2));
+            if (++select >= NBTS.length - 1) {
+                select = 0;
+            }
+            stack.getOrCreateNbt().putInt(CURRENT_SELECT, select);
+            String mode = switch (select) {
+                case 0 -> "radius";
+                case 1 -> "replace";
+                case 2 -> "position";
+                case 3 -> "towards";
+                case 4 -> "copy";
+                default -> throw new IllegalStateException("Unexpected value: " + select);
+            };
+            Text selected = Text.translatable("item.magnetcraft.large_magnetic_sucker." + mode);
+            String name = selected.getString().replace(": %s", "");
             if (!world.isClient) {
-                user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.tooltip.2", mode), true);
+                user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.current_select", name), true);
             }
         }
         return TypedActionResult.success(stack);
@@ -185,11 +292,16 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
         }
         if (stack.getNbt() != null && stack.getNbt().contains(BLOCKS)) {
             List<NbtCompound> blocks = stack.getNbt().getList(BLOCKS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).toList();
+            boolean replace = stack.getOrCreateNbt().getBoolean(REPLACE);
+            boolean position = stack.getOrCreateNbt().getBoolean(POSITION);
+            boolean towards = stack.getOrCreateNbt().getBoolean(TOWARDS);
+            boolean copy = stack.getOrCreateNbt().getBoolean(COPY);
+            boolean failed = false;
             for (NbtCompound nbt : blocks) {
                 Vec3i offset = new Vec3i(nbt.getInt(OFFSET_X), 0, nbt.getInt(OFFSET_Z));
                 Direction originalDir = Direction.byId(stack.getOrCreateNbt().getInt(DIRECTION));
                 Direction placeDir = player.getHorizontalFacing();
-                BlockRotation rotation = getOffsetRotation(originalDir, placeDir);
+                BlockRotation rotation = getOffsetRotation(originalDir, placeDir, position);
                 ItemStack blockItemStack = ItemStack.fromNbt(nbt.getCompound(BLOCK));
                 Block blockFromItem = Block.getBlockFromItem(blockItemStack.getItem());
                 BlockPos offsetPos = BlockPos.ORIGIN.add(offset).rotate(rotation);
@@ -199,16 +311,27 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
                 ItemUsageContext newContext = new ItemUsageContext(world, player, hand, blockItemStack, hit);
                 ItemPlacementContext ctx = new ItemPlacementContext(newContext);
                 BlockState state = getPlacementState(blockFromItem, ctx);
-                BlockState blockState = world.getBlockState(placePos);
-                boolean replace = stack.getOrCreateNbt().getBoolean(REPLACE);
-                if (!blockState.isAir() && offerOrBreak(player, world, blockItemStack, placePos, replace)) {
+                BlockState originalBlockState = world.getBlockState(placePos);
+                if (!originalBlockState.isAir() && offerOrBreak(player, world, blockItemStack, placePos, replace)) {
                     continue;
                 }
                 if (state == null || tryPlaceFailed(ctx, state)) {
+                    NbtList lore = new NbtList();
+                    NbtCompound display = new NbtCompound();
+                    NbtString nbtString = NbtString.of(NbtString.escape("(+NBT)"));
+                    lore.add(nbtString);
+                    display.put("Lore", lore);
+                    blockItemStack.getOrCreateNbt().put("display", display);
                     player.getInventory().offerOrDrop(blockItemStack);
+                    failed = true;
                     continue;
                 }
-                place(stack, player, world, blockItemStack, placePos, state);
+                place(stack, player, world, blockItemStack, placePos, state, towards, copy);
+            }
+            if (failed) {
+                if (!world.isClient) {
+                    player.sendMessage(Text.literal("部分方块被实体阻挡"));
+                }
             }
             stack.getNbt().remove(BLOCKS);
             stack.getNbt().remove(DIRECTION);
@@ -232,9 +355,9 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
     }
 
     @NotNull
-    private static BlockRotation getOffsetRotation(Direction originalDir, Direction placeDir) {
+    private static BlockRotation getOffsetRotation(Direction originalDir, Direction placeDir, boolean position) {
         BlockRotation rotation = BlockRotation.NONE;
-        if (!originalDir.equals(Direction.UP) && !originalDir.equals(Direction.DOWN)) {
+        if (!originalDir.equals(Direction.UP) && !originalDir.equals(Direction.DOWN) && position) {
             if (originalDir.rotateYClockwise().equals(placeDir)) {
                 rotation = BlockRotation.CLOCKWISE_90;
             } else if (originalDir.rotateYCounterclockwise().equals(placeDir)) {

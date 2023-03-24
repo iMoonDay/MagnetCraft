@@ -38,8 +38,9 @@ public abstract class AbstractMagneticSuckerItem extends Item {
     public static final String BLOCK_ENTITY_TAG_KEY = "BlockEntityTag";
     public static final String BLOCK_STATE_TAG_KEY = "BlockStateTag";
     public static final String TAG = "tag";
-    public static final String POWER = "power";
     public static final String BLOCK = "Block";
+    public static final String FACING = "facing";
+    public static final String POWER = "power";
 
     public AbstractMagneticSuckerItem(Settings settings) {
         super(settings);
@@ -63,8 +64,8 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         if (!properties.isEmpty()) {
             NbtCompound tag = Optional.ofNullable(itemNbt.getCompound(TAG)).orElse(new NbtCompound());
             NbtCompound nbt = new NbtCompound();
-            properties.stream().filter(property -> property instanceof IntProperty && !POWER.equals(property.getName())).map(IntProperty.class::cast).forEach(property -> nbt.putInt(property.getName(), state.get(property)));
-            tag.put(BlockItem.BLOCK_STATE_TAG_KEY, nbt);
+            properties.forEach(property -> nbt.putString(property.getName(), state.get(property).toString()));
+            tag.put(BLOCK_STATE_TAG_KEY, nbt);
             itemNbt.put(TAG, tag);
         }
         return itemNbt;
@@ -112,8 +113,8 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         return true;
     }
 
-    protected ActionResult place(ItemStack stack, PlayerEntity player, World world, ItemStack blockItemStack, BlockPos placePos, BlockState state) {
-        state = placeFromNbt(placePos, world, blockItemStack, state);
+    protected ActionResult place(ItemStack stack, PlayerEntity player, World world, ItemStack blockItemStack, BlockPos placePos, BlockState state, boolean towards, boolean copy) {
+        state = placeFromNbt(placePos, world, blockItemStack, state, towards, copy);
         postPlacement(placePos, world, player, blockItemStack);
         state.getBlock().onPlaced(world, placePos, state, player, blockItemStack);
         if (player instanceof ServerPlayerEntity) {
@@ -134,7 +135,7 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         BlockItem.writeNbtToBlockEntity(world, player, pos, stack);
     }
 
-    protected BlockState placeFromNbt(BlockPos pos, World world, ItemStack stack, BlockState state) {
+    protected BlockState placeFromNbt(BlockPos pos, World world, ItemStack stack, BlockState state, boolean towards, boolean copy) {
         BlockState blockState = state;
         NbtCompound nbtCompound = stack.getNbt();
         if (nbtCompound != null) {
@@ -144,6 +145,21 @@ public abstract class AbstractMagneticSuckerItem extends Item {
                 Property<?> property = stateManager.getProperty(string);
                 if (property == null) {
                     continue;
+                }
+                String name = property.getName();
+                if (towards) {
+                    //玩家朝向
+                    if (FACING.equals(name)) {
+                        continue;
+                    }
+                }
+                if (!copy) {
+                    //基本复制
+                    if (!FACING.equals(name)) {
+                        if (!(property instanceof IntProperty) || POWER.equals(name)) {
+                            continue;
+                        }
+                    }
                 }
                 String string2 = Objects.requireNonNull(nbtCompound2.get(string)).asString();
                 blockState = with(blockState, property, string2);

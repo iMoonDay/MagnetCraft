@@ -37,7 +37,10 @@
       "magnetcraft:demagnetizer",
       "magnetcraft:portable_demagnetizer",
       "magnetcraft:advanced_grindstone",
-      "magnetcraft:vertical_repeater"
+      "magnetcraft:vertical_repeater",
+      "magnetcraft:magnetic_sucker_core",
+      "magnetcraft:small_magnetic_sucker",
+      "magnetcraft:large_magnetic_sucker"
     ]
   }
 }

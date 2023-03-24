@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.ImplementedInventory;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
@@ -104,7 +103,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                     default -> null;
                 };
                 ArrayList<Item> allowedItems = entity.inventory.stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
-                MagnetCraft.AttractMethods.attractItems(world, centerPos, dis, entity.filter, allowedItems);
+                world.attractItems(centerPos, dis, entity.filter, allowedItems);
                 if (direction != null) {
                     putItemEntityIn(world, pos, entity, direction);
                 } else {

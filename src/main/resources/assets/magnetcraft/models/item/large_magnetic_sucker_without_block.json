@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "magnetcraft:item/large_magnetic_sucker_without_block"
+  }
+}

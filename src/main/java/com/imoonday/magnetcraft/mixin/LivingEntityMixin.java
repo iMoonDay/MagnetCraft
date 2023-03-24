@@ -1,7 +1,5 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.MagnetCraft;
-import com.imoonday.magnetcraft.MagnetCraft.EnchantmentMethods;
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
@@ -16,6 +14,8 @@ import com.imoonday.magnetcraft.registries.common.FluidRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.*;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.damage.DamageTypes;
@@ -24,6 +24,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.TridentEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -36,13 +37,66 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 /**
  * @author iMoonDay
  */
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin {
+public class LivingEntityMixin extends EntityMixin{
+
+    @Override
+    public void addDamage(Hand hand, int damage, boolean unbreaking) {
+        LivingEntity user = (LivingEntity) (Object) this;
+        ItemStack stack = user.getStackInHand(hand);
+        if ((user instanceof PlayerEntity player && player.getAbilities().creativeMode && damage > 0) || !stack.isDamageable()) {
+            return;
+        }
+        int stackDamage = stack.getDamage();
+        int stackMaxDamage = stack.getMaxDamage();
+        int finalDamage = stackDamage + damage;
+        if (unbreaking) {
+            stack.damage(finalDamage > stackMaxDamage ? 0 : Math.max(damage, 0), user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
+        } else {
+            stack.setDamage(finalDamage > stackMaxDamage ? stackMaxDamage : Math.max(finalDamage, 0));
+        }
+    }
+
+    @Override
+    public boolean isBroken(Hand hand) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        if (hand == null) {
+            return false;
+        }
+        ItemStack stack = entity.getStackInHand(hand);
+        return stack.isDamageable() && stack.getDamage() >= stack.getMaxDamage();
+    }
+
+    @Override
+    public boolean hasEnchantment(EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        return entity.getEnchantmentLvl(equipmentSlot, enchantment) > 0;
+    }
+
+    @Override
+    public boolean hasEnchantment(Enchantment enchantment) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        return entity.getEnchantmentLvl(enchantment) > 0;
+    }
+
+    @Override
+    public int getEnchantmentLvl(EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        return EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(equipmentSlot));
+    }
+
+    @Override
+    public int getEnchantmentLvl(Enchantment enchantment) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        return Arrays.stream(EquipmentSlot.values()).mapToInt(slot -> EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(slot))).sum();
+
+    }
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
     public void tick(CallbackInfo info) {
@@ -73,7 +127,7 @@ public class LivingEntityMixin {
                 World world = player.world;
                 ItemStack stack;
                 stack = sourceEntity instanceof TridentEntity tridentEntity ? tridentEntity.asItemStack() : player.getMainHandStack();
-                boolean hasEnchantment = EnchantmentMethods.hasEnchantment(stack, EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
+                boolean hasEnchantment = stack.hasEnchantment(EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
                 if (hasEnchantment) {
                     world.getOtherEntities(null, entity.getBoundingBox(), targetEntity -> ((targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.age == 0)).forEach(targetEntity -> {
                         if (targetEntity instanceof ExperienceOrbEntity orb) {
@@ -139,9 +193,9 @@ public class LivingEntityMixin {
         boolean handPolar = mainhandPolar || offhandPolar;
         boolean handCreature = mainhandCreature || offhandCreature;
         boolean handMagnet = mainhandMagnet || offhandMagnet;
-        boolean hasEnch = EnchantmentMethods.hasEnchantment(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean mainhandHasEnch = EnchantmentMethods.hasEnchantment(mainhandStack, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
-        boolean offhandHasEnch = EnchantmentMethods.hasEnchantment(offhandStack, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean hasEnch = entity.hasEnchantment(EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean mainhandHasEnch = mainhandStack.hasEnchantment(EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        boolean offhandHasEnch = offhandStack.hasEnchantment(EnchantmentRegistries.ATTRACT_ENCHANTMENT);
         boolean mainhandMagnetHasEnch = mainhandMagnet && mainhandHasEnch;
         boolean offhandMagnetHasEnch = offhandMagnet && offhandHasEnch;
         boolean handMagnetHasEnch = mainhandMagnetHasEnch || offhandMagnetHasEnch;
@@ -152,7 +206,7 @@ public class LivingEntityMixin {
         boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
         boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
         boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
-        int enchLvl = EnchantmentMethods.getEnchantmentLvl(entity, EnchantmentRegistries.ATTRACT_ENCHANTMENT);
+        int enchLvl = entity.getEnchantmentLvl(EnchantmentRegistries.ATTRACT_ENCHANTMENT);
         int mainhandUsedTick = entity.getMainHandStack().getNbt() != null ? entity.getMainHandStack().getNbt().getInt("UsedTick") : 0;
         int offhandUsedTick = entity.getOffHandStack().getNbt() != null ? entity.getOffHandStack().getNbt().getInt("UsedTick") : 0;
         int tickPerDamage = value.secPerDamage * 20;
@@ -164,14 +218,14 @@ public class LivingEntityMixin {
             NbtCompound nbt = entity.getMainHandStack().getOrCreateNbt();
             nbt.putInt("UsedTick", mainhandUsedTick - tickPerDamage);
             entity.getMainHandStack().setNbt(nbt);
-            MagnetCraft.DamageMethods.addDamage(entity, Hand.MAIN_HAND, 1, true);
+            entity.addDamage(Hand.MAIN_HAND, 1, true);
             mainhandUsedTick -= tickPerDamage;
         }
         while (mainhandCreature && offhandUsedTick >= tickPerDamage) {
             NbtCompound nbt = entity.getOffHandStack().getOrCreateNbt();
             nbt.putInt("UsedTick", offhandUsedTick - tickPerDamage);
             entity.getMainHandStack().setNbt(nbt);
-            MagnetCraft.DamageMethods.addDamage(entity, Hand.OFF_HAND, 1, true);
+            entity.addDamage(Hand.OFF_HAND, 1, true);
             offhandUsedTick -= tickPerDamage;
         }
         if (entity instanceof PlayerEntity player && player.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
@@ -186,7 +240,7 @@ public class LivingEntityMixin {
                     int damage = mainhandStack.getDamage();
                     int maxDamage = mainhandStack.getMaxDamage();
                     if (random.nextBetween(1, maxDamage * 200) <= damage) {
-                        MagnetCraft.DamageMethods.addDamage(entity, Hand.MAIN_HAND, -maxDamage / 10, false);
+                        entity.addDamage(Hand.MAIN_HAND, -maxDamage / 10, false);
                         mainhandRepair = damage - mainhandStack.getDamage();
                         success = true;
                     }
@@ -195,7 +249,7 @@ public class LivingEntityMixin {
                     int damage = offhandStack.getDamage();
                     int maxDamage = offhandStack.getMaxDamage();
                     if (random.nextBetween(1, maxDamage * 200) <= damage) {
-                        MagnetCraft.DamageMethods.addDamage(entity, Hand.OFF_HAND, -maxDamage / 10, false);
+                        entity.addDamage(Hand.OFF_HAND, -maxDamage / 10, false);
                         offhandRepair = damage - offhandStack.getDamage();
                         success = true;
                     }
@@ -281,11 +335,11 @@ public class LivingEntityMixin {
                 message = ": " + creatureDis;
                 text = Text.translatable("text.magnetcraft.message.creature_attract").append(message);
             }
-            if (!player.world.isClient && (!EnchantmentMethods.hasEnchantment(feet, EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT) || !player.getMagneticLevitationMode() && player.getLevitationTick() <= 0)) {
+            if (!player.world.isClient && (!feet.hasEnchantment(EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT) || !player.getMagneticLevitationMode() && player.getLevitationTick() <= 0)) {
                 player.sendMessage(text, true);
             }
         }
-        if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && EnchantmentMethods.hasEnchantment(entity, EquipmentSlot.CHEST, EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {
+        if (entity.hasStatusEffect(EffectRegistries.UNATTRACT_EFFECT) && entity.hasEnchantment(EquipmentSlot.CHEST, EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT)) {
             entity.removeStatusEffect(EffectRegistries.UNATTRACT_EFFECT);
         }
     }

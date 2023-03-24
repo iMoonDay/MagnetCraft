@@ -1,6 +1,10 @@
 package com.imoonday.magnetcraft.api;
 
+import net.minecraft.enchantment.Enchantment;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
@@ -11,64 +15,124 @@ import java.util.UUID;
 @SuppressWarnings({"unused", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc"})
 public interface MagnetCraftEntity {
 
-    NbtCompound getAttractData();
+    default void tryAttract() {}
 
-    boolean clearAttractData();
+    default void setCooldown(ItemStack stack, int cooldown) {}
 
-    void setAttractDis(double dis);
+    default void addDamage(Hand hand, int damage, boolean unbreaking) {}
 
-    double getAttractDis();
+    default boolean isBroken(Hand hand) {
+        return false;
+    }
 
-    boolean isAttracting();
+    default boolean hasEnchantment(EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        return false;
+    }
 
-    void setAttracting(boolean attracting);
+    default boolean hasEnchantment(Enchantment enchantment) {
+        return false;
+    }
 
-    void setAttracting(boolean attracting, double dis);
+    default int getEnchantmentLvl(EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        return 0;
+    }
 
-    boolean getEnable();
+    default int getEnchantmentLvl(Enchantment enchantment) {
+        return 0;
+    }
 
-    void setEnable(boolean enable);
+    default void tryLevitation() {}
 
-    UUID getAttractOwner();
+    default NbtCompound getAttractData() {
+        return null;
+    }
 
-    void setAttractOwner(UUID uuid);
+    default boolean clearAttractData() {
+        return false;
+    }
 
-    boolean canAttract();
+    default void setAttractDis(double dis) {}
 
-    boolean isFollowing();
+    default double getAttractDis() {
+        return 0;
+    }
 
-    void setFollowing(boolean following);
+    default boolean isAttracting() {
+        return false;
+    }
 
-    boolean ignoreFallDamage();
+    default void setAttracting(boolean attracting) {}
 
-    void setIgnoreFallDamage(boolean ignore);
+    default void setAttracting(boolean attracting, double dis) {}
 
-    boolean getMagneticLevitationMode();
+    default boolean getEnable() {
+        return false;
+    }
 
-    void setMagneticLevitationMode(boolean mode);
+    default void setEnable(boolean enable) {}
 
-    int getLevitationTick();
+    default UUID getAttractOwner() {
+        return null;
+    }
 
-    void setLevitationTick(int tick);
+    default void setAttractOwner(UUID uuid) {}
 
-    boolean getAutomaticLevitation();
+    default boolean canAttract() {
+        return false;
+    }
 
-    void setAutomaticLevitation(boolean enable);
+    default boolean isFollowing() {
+        return false;
+    }
 
-    boolean isAdsorbedByEntity();
+    default void setFollowing(boolean following) {}
 
-    void setAdsorbedByEntity(boolean adsorbed);
+    default boolean ignoreFallDamage() {
+        return false;
+    }
 
-    boolean isAdsorbedByBlock();
+    default void setIgnoreFallDamage(boolean ignore) {}
 
-    void setAdsorbedByBlock(boolean adsorbed);
+    default boolean getMagneticLevitationMode() {
+        return false;
+    }
 
-    UUID getAdsorptionEntityId();
+    default void setMagneticLevitationMode(boolean mode) {}
 
-    void setAdsorptionEntityId(UUID uuid, boolean clear);
+    default int getLevitationTick() {
+        return 0;
+    }
 
-    BlockPos getAdsorptionBlockPos();
+    default void setLevitationTick(int tick) {}
 
-    void setAdsorptionBlockPos(BlockPos pos, boolean clear);
+    default boolean getAutomaticLevitation() {
+        return false;
+    }
+
+    default void setAutomaticLevitation(boolean enable) {}
+
+    default boolean isAdsorbedByEntity() {
+        return false;
+    }
+
+    default void setAdsorbedByEntity(boolean adsorbed) {}
+
+    default boolean isAdsorbedByBlock() {
+        return false;
+    }
+
+    default void setAdsorbedByBlock(boolean adsorbed) {}
+
+    default UUID getAdsorptionEntityId() {
+        return null;
+    }
+
+    default void setAdsorptionEntityId(UUID uuid, boolean clear) {}
+
+    default BlockPos getAdsorptionBlockPos() {
+        return null;
+    }
+
+    default void setAdsorptionBlockPos(BlockPos pos, boolean clear) {}
 
 }

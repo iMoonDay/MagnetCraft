@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.Redirect;
  * @author iMoonDay
  */
 @Mixin(AbstractMinecartEntity.class)
-public abstract class AbstractMinecartEntityMixin {
+public class AbstractMinecartEntityMixin {
 
     @Redirect(method = "moveOnRail", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockState;isOf(Lnet/minecraft/block/Block;)Z"))
     public boolean isPowered(BlockState instance, Block block) {

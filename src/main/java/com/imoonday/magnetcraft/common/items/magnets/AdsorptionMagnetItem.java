@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -25,6 +24,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.UUID;
@@ -42,7 +43,7 @@ public class AdsorptionMagnetItem extends Item {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.ADSORPTION_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.ADSORPTION_MAGNET_ITEM) ? 0.0F : MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ADSORPTION_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.ADSORPTION_MAGNET_ITEM) ? 0.0F : itemStack.isBroken() ? 0.0F : 1.0F);
     }
 
     @Override
@@ -70,29 +71,52 @@ public class AdsorptionMagnetItem extends Item {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (!world.isClient) {
-            if (user.isSneaking()) {
-                NbtCompound nbt = user.getStackInHand(hand).getNbt();
-                if (nbt != null && nbt.contains(CURRENT_ENTITY)) {
-                    nbt.remove(CURRENT_ENTITY);
-                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.8"));
-                }
-            } else {
-                int i = world.getOtherEntities(null, user.getBoundingBox().expand(30), entity -> (entity.isAdsorbedByBlock() || entity.isAdsorbedByEntity())).size();
-                user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.7", i));
-            }
+        return removeOrGet(world, user, hand);
+    }
+
+    @NotNull
+    private static TypedActionResult<ItemStack> removeOrGet(World world, PlayerEntity user, Hand hand) {
+        if (user.isSneaking()) {
+            return removeEntityUuid(user, hand);
+        } else {
+            getEntityCount(world, user);
         }
-        user.getInventory().markDirty();
-        return super.use(world, user, hand);
+        return TypedActionResult.success(user.getStackInHand(hand));
+    }
+
+    private static void getEntityCount(World world, PlayerEntity user) {
+        int i = world.getOtherEntities(null, user.getBoundingBox().expand(30), entity -> (entity.isAdsorbedByBlock() || entity.isAdsorbedByEntity())).size();
+        if (!user.world.isClient) {
+            user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.7", i));
+        }
+    }
+
+    private static TypedActionResult<ItemStack> removeEntityUuid(PlayerEntity user, Hand hand) {
+        ItemStack stack = user.getStackInHand(hand);
+        NbtCompound nbt = stack.getNbt();
+        if (nbt != null && nbt.contains(CURRENT_ENTITY)) {
+            nbt.remove(CURRENT_ENTITY);
+            if (!user.world.isClient) {
+                user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.8"));
+            }
+            user.getInventory().markDirty();
+            return TypedActionResult.success(stack);
+        }
+        return TypedActionResult.pass(stack);
     }
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        return setBlockPos(context);
+    }
+
+    @NotNull
+    private static ActionResult setBlockPos(ItemUsageContext context) {
         ItemStack stack = context.getStack();
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getBlockPos();
         Hand hand = context.getHand();
-        if (player == null || !player.isSneaking() || stack.getNbt() == null || !stack.getNbt().contains(CURRENT_ENTITY) || MagnetCraft.DamageMethods.isEmptyDamage(stack) || player.world.isClient) {
+        if (player == null || !player.isSneaking() || stack.getNbt() == null || !stack.getNbt().contains(CURRENT_ENTITY) || stack.isBroken() || player.world.isClient) {
             return ActionResult.PASS;
         }
         Entity entity = ((ServerWorld) player.world).getEntity(stack.getNbt().getUuid(CURRENT_ENTITY));
@@ -101,7 +125,7 @@ public class AdsorptionMagnetItem extends Item {
             int dis = (int) livingEntity.getPos().distanceTo(pos.toCenterPos());
             stack.getNbt().remove(CURRENT_ENTITY);
             int randomDamage = player.getRandom().nextBetween(1, Math.max(dis, 1));
-            IntStream.rangeClosed(1, randomDamage).forEach(i -> MagnetCraft.DamageMethods.addDamage(player, hand, 1, true));
+            IntStream.rangeClosed(1, randomDamage).forEach(i -> player.addDamage(hand, 1, true));
             player.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.6"));
             player.getInventory().markDirty();
             return ActionResult.SUCCESS;
@@ -111,56 +135,75 @@ public class AdsorptionMagnetItem extends Item {
 
     @Override
     public ActionResult useOnEntity(ItemStack stack, PlayerEntity user, LivingEntity entity, Hand hand) {
+        return setOrGet(user, entity, hand);
+    }
+
+    @NotNull
+    private static ActionResult setOrGet(PlayerEntity user, LivingEntity entity, Hand hand) {
         ItemStack stackInHand = user.getStackInHand(hand);
         if (user.isSneaking()) {
-            if (MagnetCraft.DamageMethods.isEmptyDamage(stackInHand)) {
-                return ActionResult.PASS;
+            ActionResult result = setOrRemove(user, entity, hand, stackInHand);
+            if (result != null) {
+                return result;
             }
-            if (!user.world.isClient) {
-                if ((stackInHand.getNbt() == null || !stackInHand.getNbt().contains(CURRENT_ENTITY) || stackInHand.getNbt().getUuid(CURRENT_ENTITY).equals(entity.getUuid())) && !(entity instanceof PlayerEntity)) {
-                    if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
-                        entity.setAdsorbedByEntity(false);
-                        entity.setAdsorbedByBlock(false);
-                        if (stackInHand.getNbt() != null && stackInHand.getNbt().contains(CURRENT_ENTITY)) {
-                            stackInHand.getNbt().remove(CURRENT_ENTITY);
-                        }
-                    }
-                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.5"));
-                    user.getInventory().markDirty();
-                    return ActionResult.SUCCESS;
-                }
-                Entity currentEntity = ((ServerWorld) user.world).getEntity(stackInHand.getNbt().getUuid(CURRENT_ENTITY));
-                if (currentEntity != null) {
-                    currentEntity.setAdsorptionEntityId(entity.getUuid(), false);
-                    int dis = (int) currentEntity.getPos().distanceTo(entity.getPos());
-                    if (!user.world.isClient) {
-                        stackInHand.getNbt().remove(CURRENT_ENTITY);
-                        int randomDamage = user.getRandom().nextBetween(1, Math.max(dis, 1));
-                        IntStream.rangeClosed(1, randomDamage).forEach(i -> MagnetCraft.DamageMethods.addDamage(user, hand, 1, true));
-                        user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.4"));
-                    }
-                    user.getInventory().markDirty();
-                } else {
-                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.3"));
-                }
-            }
-            user.getInventory().markDirty();
         } else {
-            if (!user.world.isClient) {
-                if (entity instanceof PlayerEntity) {
-                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.2"));
-                } else {
-                    UUID id = entity.getUuid();
-                    stackInHand.getOrCreateNbt().putUuid(CURRENT_ENTITY, id);
-                    user.getInventory().markDirty();
-                    entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20, 0, false, false, false));
-                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.1"));
-                }
-            }
-            user.getInventory().markDirty();
-            return ActionResult.SUCCESS;
+            return getEntityUuid(user, entity, stackInHand);
         }
         return ActionResult.PASS;
+    }
+
+    @NotNull
+    private static ActionResult getEntityUuid(PlayerEntity user, LivingEntity entity, ItemStack stackInHand) {
+        if (!user.world.isClient) {
+            if (entity instanceof PlayerEntity) {
+                user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.2"));
+            } else {
+                UUID id = entity.getUuid();
+                stackInHand.getOrCreateNbt().putUuid(CURRENT_ENTITY, id);
+                user.getInventory().markDirty();
+                entity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 20, 0, false, false, false));
+                user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.1"));
+            }
+        }
+        user.getInventory().markDirty();
+        return ActionResult.SUCCESS;
+    }
+
+    @Nullable
+    private static ActionResult setOrRemove(PlayerEntity user, LivingEntity entity, Hand hand, ItemStack stackInHand) {
+        if (stackInHand.isBroken()) {
+            return ActionResult.PASS;
+        }
+        if (!user.world.isClient) {
+            if ((stackInHand.getNbt() == null || !stackInHand.getNbt().contains(CURRENT_ENTITY) || stackInHand.getNbt().getUuid(CURRENT_ENTITY).equals(entity.getUuid())) && !(entity instanceof PlayerEntity)) {
+                if (entity.isAdsorbedByEntity() || entity.isAdsorbedByBlock()) {
+                    entity.setAdsorbedByEntity(false);
+                    entity.setAdsorbedByBlock(false);
+                    if (stackInHand.getNbt() != null && stackInHand.getNbt().contains(CURRENT_ENTITY)) {
+                        stackInHand.getNbt().remove(CURRENT_ENTITY);
+                    }
+                }
+                user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.5"));
+                user.getInventory().markDirty();
+                return ActionResult.SUCCESS;
+            }
+            Entity currentEntity = ((ServerWorld) user.world).getEntity(stackInHand.getNbt().getUuid(CURRENT_ENTITY));
+            if (currentEntity != null) {
+                currentEntity.setAdsorptionEntityId(entity.getUuid(), false);
+                int dis = (int) currentEntity.getPos().distanceTo(entity.getPos());
+                if (!user.world.isClient) {
+                    stackInHand.getNbt().remove(CURRENT_ENTITY);
+                    int randomDamage = user.getRandom().nextBetween(1, Math.max(dis, 1));
+                    IntStream.rangeClosed(1, randomDamage).forEach(i -> user.addDamage(hand, 1, true));
+                    user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.4"));
+                }
+                user.getInventory().markDirty();
+            } else {
+                user.sendMessage(Text.translatable("item.magnetcraft.adsorption_magnet.tooltip.3"));
+            }
+        }
+        user.getInventory().markDirty();
+        return null;
     }
 
     public static void tickCheck(ServerWorld world) {

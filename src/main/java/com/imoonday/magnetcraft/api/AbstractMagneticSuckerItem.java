@@ -1,16 +1,12 @@
 package com.imoonday.magnetcraft.api;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import net.minecraft.advancement.criterion.Criteria;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.*;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.BlockSoundGroup;
@@ -19,6 +15,7 @@ import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.state.property.Property;
 import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.UseAction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -41,9 +38,23 @@ public abstract class AbstractMagneticSuckerItem extends Item {
     public static final String BLOCK = "Block";
     public static final String FACING = "facing";
     public static final String POWER = "power";
+    public static final String POS = "Pos";
+
 
     public AbstractMagneticSuckerItem(Settings settings) {
         super(settings);
+    }
+
+    protected static ActionResult startUsing(ItemUsageContext context) {
+        ItemStack stack = context.getStack();
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+        BlockPos blockPos = context.getBlockPos();
+        if (player != null && (player.getAbilities().creativeMode || !stack.isBroken())) {
+            stack.getOrCreateNbt().putIntArray(POS, new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
+            player.setCurrentHand(hand);
+        }
+        return ActionResult.FAIL;
     }
 
     @Override
@@ -84,7 +95,7 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         world.playSound(player, pos, blockSoundGroup.getBreakSound(), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f);
         world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Emitter.of(player, state));
         if (!player.getAbilities().creativeMode) {
-            MagnetCraft.DamageMethods.addDamage(stack, player.getRandom(), 1, true);
+            stack.addDamage(player.getRandom(), 1, true);
         }
     }
 

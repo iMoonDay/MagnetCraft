@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.api.AbstractSwitchableItem;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.player.PlayerEntity;
@@ -29,8 +28,9 @@ public class PortableDemagnetizerItem extends AbstractSwitchableItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         enabledSwitch(world, user, hand);
-        MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 20);
-        return super.use(world, user, hand);
+        ItemStack stack = user.getStackInHand(hand);
+        user.setCooldown(stack, 20);
+        return TypedActionResult.success(stack);
     }
 
     @Override

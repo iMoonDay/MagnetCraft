@@ -2,7 +2,6 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
@@ -56,20 +55,23 @@ public class PolorMagnetItem extends AbstractFilterableItem {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
         boolean sneaking = user.isSneaking();
+        ItemStack stack = user.getStackInHand(hand);
         if (sneaking != reversal) {
-            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean(FILTERABLE)) {
+            if (stack.getOrCreateNbt().getBoolean(FILTERABLE)) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
                 }
             } else {
-                if (!sneakToSwitch) {
-                    return super.use(world, user, hand);
+                if (sneakToSwitch) {
+                    enabledSwitch(world, user, hand);
+                } else {
+                    return TypedActionResult.pass(stack);
                 }
-                enabledSwitch(world, user, hand);
             }
-            MagnetCraft.CooldownMethods.setCooldown(user, user.getStackInHand(hand), 30);
+            user.setCooldown(stack, 30);
+            return TypedActionResult.success(stack);
         }
-        return super.use(world, user, hand);
+        return TypedActionResult.pass(stack);
     }
 
     @Override

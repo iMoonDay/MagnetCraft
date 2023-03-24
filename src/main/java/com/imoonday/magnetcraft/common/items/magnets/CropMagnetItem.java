@@ -2,12 +2,12 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -20,6 +20,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -42,7 +43,7 @@ public class CropMagnetItem extends AbstractFilterableItem {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.CROP_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.CROP_MAGNET_ITEM) ? 0.0F : MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.CROP_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.CROP_MAGNET_ITEM) ? 0.0F : itemStack.isBroken() ? 0.0F : 1.0F);
     }
 
     @Override
@@ -68,6 +69,37 @@ public class CropMagnetItem extends AbstractFilterableItem {
     }
 
     @Override
+    public int getMaxUseTime(ItemStack stack) {
+        return 20;
+    }
+
+    @Override
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.BOW;
+    }
+
+    @Override
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        if (!(user instanceof PlayerEntity player)) {
+            return stack;
+        }
+        int levelEveryCount = ModConfig.getValue().removeFoodLevelEveryCount;
+        Hand hand = user.getActiveHand();
+        if (!user.isBroken(hand)) {
+            int crops = searchCrops(player, hand);
+            int removeFoodLevel = levelEveryCount != 0 ? crops / levelEveryCount + (crops % levelEveryCount == 0 ? 0 : 1) : 0;
+            boolean success = crops > 0;
+            if (success && !player.isCreative()) {
+                player.getHungerManager().setFoodLevel(player.getHungerManager().getFoodLevel() - removeFoodLevel);
+                player.setCooldown(stack, (1 + removeFoodLevel) * 5 * 20);
+            } else {
+                player.setCooldown(stack, 20);
+            }
+        }
+        return stack;
+    }
+
+    @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stackInHand = user.getStackInHand(hand);
         if (stackInHand.getOrCreateNbt().getBoolean(FILTERABLE) && user.isSneaky() && !user.getAbilities().flying) {
@@ -75,20 +107,12 @@ public class CropMagnetItem extends AbstractFilterableItem {
                 openScreen(user, hand, this);
             }
         } else {
-            int levelEveryCount = ModConfig.getValue().removeFoodLevelEveryCount;
-            if (!MagnetCraft.DamageMethods.isEmptyDamage(user, hand)) {
-                int crops = searchCrops(user, hand);
-                int removeFoodLevel = levelEveryCount != 0 ? crops / levelEveryCount + (crops % levelEveryCount == 0 ? 0 : 1) : 0;
-                boolean success = crops > 0;
-                if (success && !user.isCreative()) {
-                    user.getHungerManager().setFoodLevel(user.getHungerManager().getFoodLevel() - removeFoodLevel);
-                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, (1 + removeFoodLevel) * 5 * 20);
-                } else {
-                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 20);
-                }
+            if (user.getAbilities().creativeMode || !stackInHand.isBroken()) {
+                user.setCurrentHand(hand);
             }
+            return TypedActionResult.fail(stackInHand);
         }
-        return TypedActionResult.success(stackInHand, !MagnetCraft.DamageMethods.isEmptyDamage(stackInHand));
+        return TypedActionResult.success(stackInHand, !stackInHand.isBroken());
     }
 
     @Override
@@ -102,17 +126,17 @@ public class CropMagnetItem extends AbstractFilterableItem {
     public static int searchCrops(PlayerEntity player, Hand hand) {
         int count = 0;
         if (!player.world.isClient) {
-            MagnetCraft.DamageMethods.addDamage(player, hand, 1, false);
+            player.addDamage(hand, 1, false);
             for (int x = -15; x <= 15; x++) {
-                if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+                if (player.isBroken(hand)) {
                     break;
                 }
                 for (int y = 15; y >= -15; y--) {
-                    if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+                    if (player.isBroken(hand)) {
                         break;
                     }
                     for (int z = -15; z <= 15; z++) {
-                        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+                        if (player.isBroken(hand)) {
                             break;
                         }
                         BlockPos pos = player.getBlockPos().add(x, y, z);
@@ -145,27 +169,27 @@ public class CropMagnetItem extends AbstractFilterableItem {
                                 world.setBlockState(pos, cropBlock.withAge(0));
                             }
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         } else if ((block instanceof MelonBlock && canBreak(stack, Items.MELON_SEEDS)) || (block instanceof PumpkinBlock && canBreak(stack, Items.PUMPKIN_SEEDS))) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
                             world.breakBlock(pos, false, player);
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         } else if ((block instanceof CaveVinesHeadBlock || block instanceof CaveVinesBodyBlock) && state.get(BERRIES) && canBreak(stack, Items.GLOW_BERRIES)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
                             world.setBlockState(pos, state.with(BERRIES, false));
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         } else if ((block instanceof SugarCaneBlock && world.getBlockState(pos.down()).isOf(Blocks.SUGAR_CANE) && canBreak(stack, Items.SUGAR_CANE)) || (block instanceof BambooBlock && world.getBlockState(pos.down()).isOf(Blocks.BAMBOO) && canBreak(stack, Items.BAMBOO)) || (block instanceof CactusBlock && world.getBlockState(pos.down()).isOf(Blocks.CACTUS) && canBreak(stack, Items.CACTUS)) || (block instanceof KelpBlock && world.getBlockState(pos.down()).isOf(Blocks.KELP_PLANT)) && canBreak(stack, Items.KELP)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
                             world.breakBlock(pos, false, player);
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) > 1 && canBreak(stack, Items.SWEET_BERRIES)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
                             world.setBlockState(pos, state.with(AGE_3, 1));
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         } else if (block instanceof NetherWartBlock netherWartBlock && state.get(AGE_3) == 3 && canBreak(stack, Items.NETHER_WART)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
                             world.breakBlock(pos, false, player);
@@ -175,7 +199,7 @@ public class CropMagnetItem extends AbstractFilterableItem {
                                 world.setBlockState(pos, state.with(AGE_3, 0));
                             }
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         } else if (block instanceof CocoaBlock cocoaBlock && state.get(AGE_2) == 2 && canBreak(stack, Items.COCOA_BEANS)) {
                             Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
                             world.breakBlock(pos, false, player);
@@ -185,7 +209,7 @@ public class CropMagnetItem extends AbstractFilterableItem {
                                 world.setBlockState(pos, state.with(AGE_2, 0));
                             }
                             count++;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+                            player.addDamage(hand, 1, true);
                         }
                     }
                 }

@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -11,6 +10,7 @@ import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,10 +19,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
@@ -80,10 +77,34 @@ public class ElectromagnetItem extends AbstractFilterableItem {
     }
 
     @Override
+    public int getMaxUseTime(ItemStack stack) {
+        return 20;
+    }
+
+    @Override
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.BOW;
+    }
+
+    @Override
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        if (!(user instanceof PlayerEntity player)) {
+            return stack;
+        }
+        double dis = ModConfig.getValue().electromagnetTeleportMinDis;
+        if (!world.isClient && !player.isCreative()) {
+            stack.addDamage(user.getRandom(), 1, false);
+        }
+        Hand hand = user.getActiveHand();
+        teleportItems(world, player, dis, hand);
+        user.setCooldown(stack, 20);
+        return stack;
+    }
+
+    @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
-        double dis = ModConfig.getValue().electromagnetTeleportMinDis;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
@@ -100,20 +121,20 @@ public class ElectromagnetItem extends AbstractFilterableItem {
                 }
                 enabledSwitch(world, user, hand);
             }
-        } else if (!MagnetCraft.DamageMethods.isEmptyDamage(user, hand)) {
-            if (!world.isClient) {
-                MagnetCraft.DamageMethods.addDamage(user, hand, 1, false);
+        } else if (!user.isBroken(hand)) {
+            if (user.getAbilities().creativeMode || !stackInHand.isBroken()) {
+                user.setCurrentHand(hand);
             }
-            teleportItems(world, user, dis, hand);
+            return TypedActionResult.fail(stackInHand);
         }
-        MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 20);
-        return TypedActionResult.success(stackInHand, !MagnetCraft.DamageMethods.isEmptyDamage(stackInHand));
+        user.setCooldown(stackInHand, 20);
+        return TypedActionResult.success(stackInHand, !stackInHand.isBroken());
     }
 
     public static void teleportItems(World world, PlayerEntity player, double dis, Hand hand) {
         boolean message = ModConfig.getConfig().displayMessageFeedback;
         int magnetHandSpacing = ModConfig.getValue().magnetHandSpacing;
-        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+        if (player.isBroken(hand)) {
             return;
         }
         if (hand == Hand.MAIN_HAND) {
@@ -122,7 +143,7 @@ public class ElectromagnetItem extends AbstractFilterableItem {
         double finalDis = dis;
         int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).size();
         player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).forEach(targetEntity -> {
-            MagnetCraft.DamageMethods.addDamage(player, hand, 1, true);
+            player.addDamage(hand, 1, true);
             if (targetEntity instanceof ExperienceOrbEntity entity) {
                 int amount = entity.getExperienceAmount();
                 player.addExperience(amount);

@@ -1,10 +1,11 @@
 package com.imoonday.magnetcraft.common.items;
 
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.api.AbstractMagneticSuckerItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -49,14 +50,22 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
     public static final String TOWARDS = "Towards";
     public static final String COPY = "Copy";
     public static final String[] NBTS = {CURRENT_SELECT, EXTEND, REPLACE, POSITION, TOWARDS, COPY};
+    public static final String LORE = "Lore";
+    public static final String DISPLAY = "display";
+    public static final String NBT = "(+NBT)";
 
     public LargeMagneticSuckerItem(Settings settings) {
         super(settings);
     }
 
+    public static void registerClient() {
+        ModelPredicateProviderRegistry.register(ItemRegistries.LARGE_MAGNETIC_SUCKER_ITEM, new Identifier("contains"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains(BLOCKS) ? 0.0F : 1.0F);
+    }
+
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         if (stack.getNbt() != null) {
+            tooltip.add(Text.translatable("item.magnetcraft.large_magnetic_sucker.settings").formatted(Formatting.YELLOW).formatted(Formatting.BOLD));
             int select = -1;
             MutableText selectedText = Text.empty();
             if (stack.getNbt().contains(CURRENT_SELECT)) {
@@ -65,7 +74,8 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
             }
             if (stack.getNbt().contains(EXTEND)) {
                 int extend = stack.getOrCreateNbt().getInt(EXTEND);
-                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.radius", ++extend);
+                int scope = (++extend) * 2 - 1;
+                MutableText text = Text.translatable("item.magnetcraft.large_magnetic_sucker.scope", scope);
                 if (select == 0) {
                     text.append(selectedText);
                 }
@@ -108,6 +118,7 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
                 tooltip.add(text);
             }
             if (stack.getNbt().contains(BLOCKS)) {
+                tooltip.add(Text.translatable("item.magnetcraft.large_magnetic_sucker.blocks").formatted(Formatting.YELLOW).formatted(Formatting.BOLD));
                 stack.getNbt().getList(BLOCKS, NbtElement.COMPOUND_TYPE).stream().map(NbtCompound.class::cast).map(nbtCompound -> ItemStack.fromNbt(nbtCompound.getCompound(BLOCK))).map(ItemStack::getName).forEach(text -> tooltip.add(text.copyContentOnly().formatted(Formatting.GRAY).formatted(Formatting.BOLD)));
             }
         }
@@ -219,8 +230,9 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
                         extend = 0;
                     }
                     stack.getOrCreateNbt().putInt(EXTEND, extend);
+                    int scope = (++extend) * 2 - 1;
                     if (!world.isClient) {
-                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.radius", ++extend), true);
+                        user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.scope", scope), true);
                     }
                 }
                 case 1 -> {
@@ -262,7 +274,7 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
             }
             stack.getOrCreateNbt().putInt(CURRENT_SELECT, select);
             String mode = switch (select) {
-                case 0 -> "radius";
+                case 0 -> "scope";
                 case 1 -> "replace";
                 case 2 -> "position";
                 case 3 -> "towards";
@@ -270,7 +282,7 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
                 default -> throw new IllegalStateException("Unexpected value: " + select);
             };
             Text selected = Text.translatable("item.magnetcraft.large_magnetic_sucker." + mode);
-            String name = selected.getString().replace(": %s", "");
+            String name = selected.getString().replaceAll(":.*", "");
             if (!world.isClient) {
                 user.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.current_select", name), true);
             }
@@ -280,6 +292,16 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     @Override
     public ActionResult useOnBlock(ItemUsageContext context) {
+        return placeOrUse(context);
+    }
+
+    private ActionResult placeOrUse(ItemUsageContext context) {
+        ItemStack stack = context.getStack();
+        return stack.getNbt() != null && stack.getNbt().contains(BLOCKS) ? placeBlocks(context) : startUsing(context);
+    }
+
+    @NotNull
+    private ActionResult placeBlocks(ItemUsageContext context) {
         ItemStack stack = context.getStack();
         PlayerEntity player = context.getPlayer();
         World world = context.getWorld();
@@ -287,67 +309,64 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
         BlockPos blockPos = context.getBlockPos();
         Direction side = context.getSide();
         Vec3d hitPos = context.getHitPos();
-        if (player == null) {
+        if (stack.getNbt() == null || player == null) {
             return ActionResult.FAIL;
         }
-        if (stack.getNbt() != null && stack.getNbt().contains(BLOCKS)) {
-            List<NbtCompound> blocks = stack.getNbt().getList(BLOCKS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).toList();
-            boolean replace = stack.getOrCreateNbt().getBoolean(REPLACE);
-            boolean position = stack.getOrCreateNbt().getBoolean(POSITION);
-            boolean towards = stack.getOrCreateNbt().getBoolean(TOWARDS);
-            boolean copy = stack.getOrCreateNbt().getBoolean(COPY);
-            boolean failed = false;
-            for (NbtCompound nbt : blocks) {
-                Vec3i offset = new Vec3i(nbt.getInt(OFFSET_X), 0, nbt.getInt(OFFSET_Z));
-                Direction originalDir = Direction.byId(stack.getOrCreateNbt().getInt(DIRECTION));
-                Direction placeDir = player.getHorizontalFacing();
-                BlockRotation rotation = getOffsetRotation(originalDir, placeDir, position);
-                ItemStack blockItemStack = ItemStack.fromNbt(nbt.getCompound(BLOCK));
-                Block blockFromItem = Block.getBlockFromItem(blockItemStack.getItem());
-                BlockPos offsetPos = BlockPos.ORIGIN.add(offset).rotate(rotation);
-                BlockPos placePos = blockPos.offset(side).add(offsetPos);
-                Vec3d newHitPos = hitPos.offset(side, 1).add(Vec3d.of(offsetPos));
-                BlockHitResult hit = new BlockHitResult(newHitPos, Direction.UP, placePos.down(), false);
-                ItemUsageContext newContext = new ItemUsageContext(world, player, hand, blockItemStack, hit);
-                ItemPlacementContext ctx = new ItemPlacementContext(newContext);
-                BlockState state = getPlacementState(blockFromItem, ctx);
-                BlockState originalBlockState = world.getBlockState(placePos);
-                if (!originalBlockState.isAir() && offerOrBreak(player, world, blockItemStack, placePos, replace)) {
-                    continue;
-                }
-                if (state == null || tryPlaceFailed(ctx, state)) {
-                    NbtList lore = new NbtList();
-                    NbtCompound display = new NbtCompound();
-                    NbtString nbtString = NbtString.of(NbtString.escape("(+NBT)"));
-                    lore.add(nbtString);
-                    display.put("Lore", lore);
-                    blockItemStack.getOrCreateNbt().put("display", display);
-                    player.getInventory().offerOrDrop(blockItemStack);
-                    failed = true;
-                    continue;
-                }
-                place(stack, player, world, blockItemStack, placePos, state, towards, copy);
+        List<NbtCompound> blocks = stack.getNbt().getList(BLOCKS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).toList();
+        boolean replace = stack.getOrCreateNbt().getBoolean(REPLACE);
+        boolean position = stack.getOrCreateNbt().getBoolean(POSITION);
+        boolean towards = stack.getOrCreateNbt().getBoolean(TOWARDS);
+        boolean copy = stack.getOrCreateNbt().getBoolean(COPY);
+        int failedCount = 0;
+        for (NbtCompound nbt : blocks) {
+            Vec3i offset = new Vec3i(nbt.getInt(OFFSET_X), 0, nbt.getInt(OFFSET_Z));
+            Direction originalDir = Direction.byId(stack.getOrCreateNbt().getInt(DIRECTION));
+            Direction placeDir = player.getHorizontalFacing();
+            BlockRotation rotation = getOffsetRotation(originalDir, placeDir, position);
+            ItemStack blockItemStack = ItemStack.fromNbt(nbt.getCompound(BLOCK));
+            Block blockFromItem = Block.getBlockFromItem(blockItemStack.getItem());
+            BlockPos offsetPos = BlockPos.ORIGIN.add(offset).rotate(rotation);
+            BlockPos placePos = blockPos.offset(side).add(offsetPos);
+            Vec3d newHitPos = hitPos.offset(side, 1).add(Vec3d.of(offsetPos));
+            BlockHitResult hit = new BlockHitResult(newHitPos, Direction.UP, placePos.down(), false);
+            ItemUsageContext newContext = new ItemUsageContext(world, player, hand, blockItemStack, hit);
+            ItemPlacementContext ctx = new ItemPlacementContext(newContext);
+            BlockState state = getPlacementState(blockFromItem, ctx);
+            BlockState originalBlockState = world.getBlockState(placePos);
+            if (!originalBlockState.isAir() && offerOrBreak(player, world, blockItemStack, placePos, replace)) {
+                failedCount++;
+                continue;
             }
-            if (failed) {
-                if (!world.isClient) {
-                    player.sendMessage(Text.literal("部分方块被实体阻挡"));
-                }
+            if (state == null || tryPlaceFailed(ctx, state)) {
+                player.getInventory().offerOrDrop(withNbtLore(blockItemStack));
+                failedCount++;
+                continue;
             }
-            stack.getNbt().remove(BLOCKS);
-            stack.getNbt().remove(DIRECTION);
-            return ActionResult.SUCCESS;
-        } else {
-            if (player.getAbilities().creativeMode || !MagnetCraft.DamageMethods.isEmptyDamage(stack)) {
-                stack.getOrCreateNbt().putIntArray(POS, new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
-                player.setCurrentHand(hand);
+            place(stack, player, world, blockItemStack, placePos, state, towards, copy);
+        }
+        if (failedCount > 0) {
+            if (!world.isClient) {
+                player.sendMessage(Text.translatable("item.magnetcraft.large_magnetic_sucker.blocked", failedCount));
             }
         }
-        return ActionResult.FAIL;
+        stack.getNbt().remove(BLOCKS);
+        stack.getNbt().remove(DIRECTION);
+        return ActionResult.SUCCESS;
+    }
+
+    private static ItemStack withNbtLore(ItemStack blockItemStack) {
+        NbtList lore = new NbtList();
+        NbtCompound display = new NbtCompound();
+        NbtString nbtString = NbtString.of(NbtString.escape(NBT));
+        lore.add(nbtString);
+        display.put(LORE, lore);
+        blockItemStack.getOrCreateNbt().put(DISPLAY, display);
+        return blockItemStack;
     }
 
     private static boolean offerOrBreak(PlayerEntity player, World world, ItemStack blockItemStack, BlockPos placePos, boolean replace) {
         if (cannotBreak(player, world, placePos) || !replace) {
-            player.getInventory().offerOrDrop(blockItemStack);
+            player.getInventory().offerOrDrop(withNbtLore(blockItemStack));
             return true;
         }
         world.breakBlock(placePos, true, player);

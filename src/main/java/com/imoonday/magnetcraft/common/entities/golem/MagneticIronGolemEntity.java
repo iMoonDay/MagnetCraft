@@ -1,13 +1,12 @@
 package com.imoonday.magnetcraft.common.entities.golem;
 
-import com.imoonday.magnetcraft.api.MagnetCraftEntity;
+import com.imoonday.magnetcraft.api.ImplementedInventory;
 import com.imoonday.magnetcraft.common.blocks.LodestoneBlock;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import com.imoonday.magnetcraft.screen.handler.MagneticIronGolemScreenHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.EntityType;
@@ -21,17 +20,16 @@ import net.minecraft.entity.mob.MobEntity;
 import net.minecraft.entity.passive.IronGolemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.fluid.Fluids;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.inventory.Inventories;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
+import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.SimpleNamedScreenHandlerFactory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.SpawnHelper;
@@ -40,19 +38,18 @@ import net.minecraft.world.WorldView;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
-import java.util.stream.IntStream;
 
 /**
  * @author iMoonDay
  */
-@SuppressWarnings("RedundantCast")
-public class MagneticIronGolemEntity extends IronGolemEntity {
+@SuppressWarnings("AlibabaUndefineMagicConstant")
+public class MagneticIronGolemEntity extends IronGolemEntity implements ImplementedInventory {
 
     protected static final TrackedData<Byte> MAGNETIC_IRON_GOLEM_FLAGS = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Boolean> HAS_LODESTONE = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-    public static final String INVENTORY = "Inventory";
     public static final String HAS_LODESTONE_TAG = "HasLodestone";
-    private final Inventory inventory = new SimpleInventory(27);
+    public static final String ITEMS = "Items";
+    private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(27, ItemStack.EMPTY);
 
     public MagneticIronGolemEntity(EntityType<? extends IronGolemEntity> entityType, World world) {
         super(entityType, world);
@@ -64,12 +61,12 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
 
     @Override
     public boolean isAttracting() {
-        return (this.isHasLodestone() || this.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT)) && ((MagnetCraftEntity) this).canAttract();
+        return (this.isHasLodestone() || this.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT)) && this.canAttract();
     }
 
     @Override
     public double getAttractDis() {
-        return this.isHasLodestone() && ((MagnetCraftEntity) this).canAttract() ? ModConfig.getGolemValue().attractDis : this.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT) ? ModConfig.getConfig().value.attractDefaultDis + Objects.requireNonNull(this.getStatusEffect(EffectRegistries.ATTRACT_EFFECT)).getAmplifier() * ModConfig.getConfig().value.disPerAmplifier : 0;
+        return this.isHasLodestone() && this.canAttract() ? ModConfig.getGolemValue().attractDis : this.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT) ? ModConfig.getConfig().value.attractDefaultDis + Objects.requireNonNull(this.getStatusEffect(EffectRegistries.ATTRACT_EFFECT)).getAmplifier() * ModConfig.getConfig().value.disPerAmplifier : 0;
     }
 
     public void setHasLodestone(boolean hasLodestone) {
@@ -85,14 +82,10 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         return this;
     }
 
-    public Inventory getInventory() {
-        return this.inventory;
-    }
-
     @Override
     protected void dropInventory() {
         super.dropInventory();
-        IntStream.range(0, this.inventory.size()).mapToObj(this.inventory::getStack).forEach(this::dropStack);
+        this.getItems().forEach(this::dropStack);
         if (this.isHasLodestone()) {
             Random random = this.random;
             int percent = ModConfig.getGolemValue().lodestoneDropProbability;
@@ -110,17 +103,15 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
-        NbtList inventory = new NbtList();
-        IntStream.range(0, this.inventory.size()).mapToObj(i -> this.inventory.getStack(i).writeNbt(new NbtCompound())).forEach(inventory::add);
-        nbt.put(INVENTORY, inventory);
+        Inventories.writeNbt(nbt, this.inventory);
         nbt.putBoolean(HAS_LODESTONE_TAG, this.isHasLodestone());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if (nbt.contains(INVENTORY)) {
-            IntStream.range(0, nbt.getList(INVENTORY, NbtElement.COMPOUND_TYPE).size()).forEach(i -> this.inventory.setStack(i, ItemStack.fromNbt((NbtCompound) nbt.getList(INVENTORY, NbtElement.COMPOUND_TYPE).get(i))));
+        if (nbt.contains(ITEMS)) {
+            Inventories.readNbt(nbt, this.inventory);
         }
         if (nbt.contains(HAS_LODESTONE_TAG)) {
             this.setHasLodestone(nbt.getBoolean(HAS_LODESTONE_TAG));
@@ -150,8 +141,8 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         boolean overflow = false;
         int overflowCount = 0;
         int slot = -1;
-        for (int i = 0; i < inventory.size(); i++) {
-            ItemStack inventoryStack = inventory.getStack(i);
+        for (int i = 0; i < this.size(); i++) {
+            ItemStack inventoryStack = this.getStack(i);
             hasEmptySlot = inventoryStack.isEmpty();
             hasSameStack = ItemStack.canCombine(stack, inventoryStack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
             overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
@@ -164,19 +155,18 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
             }
         }
         if (hasEmptySlot) {
-            this.inventory.setStack(slot, stack);
+            this.setStack(slot, stack);
             entity.kill();
         } else if (hasSameStack) {
             if (overflow) {
-                this.inventory.setStack(slot, stack.copy().copyWithCount(stack.getMaxCount()));
+                this.setStack(slot, stack.copy().copyWithCount(stack.getMaxCount()));
                 stack.setCount(overflowCount);
             } else {
-                stack.increment(this.inventory.getStack(slot).getCount());
-                this.inventory.setStack(slot, stack);
+                stack.increment(this.getStack(slot).getCount());
+                this.setStack(slot, stack);
                 entity.kill();
             }
         }
-        this.inventory.markDirty();
     }
 
     @Override
@@ -208,9 +198,8 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
             }
             return ActionResult.success(this.world.isClient);
         } else if (player.world != null && !player.world.isClient && this.dataTracker.get(HAS_LODESTONE)) {
-            player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, player1) -> new MagneticIronGolemScreenHandler(syncId, inv, this.inventory), MagneticIronGolemEntity.this.getDisplayName()));
+            player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, player1) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inv, this), MagneticIronGolemEntity.this.getDisplayName()));
         }
-        this.inventory.markDirty();
         return ActionResult.success(this.world.isClient && this.dataTracker.get(HAS_LODESTONE));
     }
 
@@ -255,4 +244,8 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         }
     }
 
+    @Override
+    public DefaultedList<ItemStack> getItems() {
+        return this.inventory;
+    }
 }

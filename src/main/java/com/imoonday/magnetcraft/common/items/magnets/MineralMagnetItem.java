@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.screen.handler.MineralMagnetScreenHandler;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.block.Block;
@@ -11,6 +10,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.Item;
@@ -25,10 +25,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
@@ -64,7 +61,7 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(MINERAL_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(MINERAL_MAGNET_ITEM) ? 0.0F : MagnetCraft.DamageMethods.isEmptyDamage(itemStack) ? 0.0F : 1.0F);
+        ModelPredicateProviderRegistry.register(MINERAL_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(MINERAL_MAGNET_ITEM) ? 0.0F : itemStack.isBroken() ? 0.0F : 1.0F);
     }
 
     @Override
@@ -108,6 +105,30 @@ public class MineralMagnetItem extends Item {
     }
 
     @Override
+    public int getMaxUseTime(ItemStack stack) {
+        return 20;
+    }
+
+    @Override
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.BOW;
+    }
+
+    @Override
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        if (!(user instanceof PlayerEntity player)) {
+            return stack;
+        }
+        Hand hand = user.getActiveHand();
+        if (!user.isBroken(hand)) {
+            int value = searchMineral(player, hand);
+            boolean success = value > 0;
+            user.setCooldown(stack, success && !player.isCreative() ? value * 20 : 20);
+        }
+        return stack;
+    }
+
+    @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stackInHand = user.getStackInHand(hand);
         if (stackInHand.getOrCreateNbt().getBoolean(FILTERABLE) && user.isSneaky() && !user.getAbilities().flying) {
@@ -131,17 +152,12 @@ public class MineralMagnetItem extends Item {
                 });
             }
         } else {
-            if (!MagnetCraft.DamageMethods.isEmptyDamage(user, hand)) {
-                int value = searchMineral(user, hand);
-                boolean success = value > 0;
-                if (success && !user.isCreative()) {
-                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, value * 20);
-                } else {
-                    MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 20);
-                }
+            if (user.getAbilities().creativeMode || !stackInHand.isBroken()) {
+                user.setCurrentHand(hand);
             }
+            return TypedActionResult.fail(stackInHand);
         }
-        return TypedActionResult.success(stackInHand,!MagnetCraft.DamageMethods.isEmptyDamage(stackInHand));
+        return TypedActionResult.success(stackInHand,!stackInHand.isBroken());
     }
 
     @Override
@@ -172,23 +188,23 @@ public class MineralMagnetItem extends Item {
             int others = 0;
             int value;
             boolean isEmptyDamage = false;
-            MagnetCraft.DamageMethods.addDamage(player, hand, 1, false);
+            player.addDamage(hand, 1, false);
             if (player.experienceLevel < requiredExperienceLevel && !player.isCreative()) {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
             }
             for (int x = -10; x <= 10; x++) {
-                if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+                if (player.isBroken(hand)) {
                     isEmptyDamage = true;
                     break;
                 }
                 for (int y = -10; y <= 10; y++) {
-                    if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+                    if (player.isBroken(hand)) {
                         isEmptyDamage = true;
                         break;
                     }
                     for (int z = -10; z <= 10; z++) {
-                        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+                        if (player.isBroken(hand)) {
                             isEmptyDamage = true;
                             break;
                         }
@@ -241,7 +257,7 @@ public class MineralMagnetItem extends Item {
                             }
                             total++;
                             totalValue += value;
-                            MagnetCraft.DamageMethods.addDamage(player, hand, value, true);
+                            player.addDamage(hand, value, true);
                         }
                     }
                 }

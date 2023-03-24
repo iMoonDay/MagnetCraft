@@ -1,8 +1,10 @@
 package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
+import com.imoonday.magnetcraft.common.items.LargeMagneticSuckerItem;
 import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
+import com.imoonday.magnetcraft.common.items.SmallMagneticSuckerItem;
 import com.imoonday.magnetcraft.common.items.magnets.*;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRendererRegistries;
@@ -36,5 +38,7 @@ public class MagnetCraftClient implements ClientModInitializer {
         MagneticFluid.registerClient();
         EntityRendererRegistries.registerClient();
         AdsorptionMagnetItem.registerClient();
+        SmallMagneticSuckerItem.registerClient();
+        LargeMagneticSuckerItem.registerClient();
     }
 }

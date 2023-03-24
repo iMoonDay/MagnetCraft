@@ -88,15 +88,16 @@ public abstract class AbstractFilterableItem extends AbstractSwitchableItem impl
         return inventory;
     }
 
+    public static void initialize(ItemStack stack, AbstractFilterableItem item) {
+        item.inventory.clear();
+        NbtList list = stack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
+        IntStream.range(0, list.size()).forEach(i -> item.inventory.set(i, ItemStack.fromNbt(list.getCompound(i))));
+    }
+
     public void openScreen(PlayerEntity player, Hand hand, AbstractFilterableItem filterableMagnetItem) {
-        filterableMagnetItem.inventory.clear();
         ItemStack stack = player.getStackInHand(hand);
         int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : -1;
-        NbtList list = stack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
-        for (int i = 0; i < list.size(); i++) {
-            ItemStack itemstackFromNbt = ItemStack.fromNbt(list.getCompound(i));
-            filterableMagnetItem.inventory.set(i, itemstackFromNbt);
-        }
+        initialize(stack, filterableMagnetItem);
         if (player.world != null && !player.world.isClient) {
             player.openHandledScreen(new ExtendedScreenHandlerFactory() {
                 @Override

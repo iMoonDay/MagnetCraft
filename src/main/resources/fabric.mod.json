@@ -35,6 +35,12 @@
     "loom:injected_interfaces": {
       "net/minecraft/class_1297": [
         "com/imoonday/magnetcraft/api/MagnetCraftEntity"
+      ],
+      "net/minecraft/class_1799": [
+        "com/imoonday/magnetcraft/api/MagnetCraftItemStack"
+      ],
+      "net/minecraft/class_1937": [
+        "com/imoonday/magnetcraft/api/MagnetCraftWorld"
       ]
     }
   }

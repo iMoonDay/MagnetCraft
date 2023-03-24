@@ -1,6 +1,5 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
-import com.imoonday.magnetcraft.MagnetCraft.EnchantmentMethods;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
@@ -27,7 +26,7 @@ public class DemagnetizerEntity extends BlockEntity {
 
     public static void tick(World world, BlockPos pos) {
         if (world.isReceivingRedstonePower(pos)) {
-            world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(world.getReceivedRedstonePower(pos) * 2), entity -> (entity instanceof LivingEntity livingEntity && !entity.isSpectator() && !EnchantmentMethods.hasEnchantment(livingEntity.getEquippedStack(EquipmentSlot.CHEST), EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT))).stream().map(entity -> (LivingEntity) entity).forEach(DemagnetizerEntity::addUnattractEffect);
+            world.getOtherEntities(null, Box.from(new BlockBox(pos)).expand(world.getReceivedRedstonePower(pos) * 2), entity -> (entity instanceof LivingEntity livingEntity && !entity.isSpectator() && !livingEntity.getEquippedStack(EquipmentSlot.CHEST).hasEnchantment(EnchantmentRegistries.DEGAUSSING_PROTECTION_ENCHANTMENT))).stream().map(entity -> (LivingEntity) entity).forEach(DemagnetizerEntity::addUnattractEffect);
         }
     }
 

@@ -2,17 +2,14 @@ package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
-import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -53,10 +50,31 @@ public class PermanentMagnetItem extends AbstractFilterableItem {
     }
 
     @Override
+    public int getMaxUseTime(ItemStack stack) {
+        return 20;
+    }
+
+    @Override
+    public UseAction getUseAction(ItemStack stack) {
+        return UseAction.BOW;
+    }
+
+    @Override
+    public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
+        if (!(user instanceof PlayerEntity player)) {
+            return stack;
+        }
+        double dis = ModConfig.getValue().permanentMagnetTeleportMinDis;
+        Hand hand = user.getActiveHand();
+        ElectromagnetItem.teleportItems(world, player, dis, hand);
+        user.setCooldown(stack, 10);
+        return stack;
+    }
+
+    @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
-        double dis = ModConfig.getValue().permanentMagnetTeleportMinDis;
         boolean sneaking = user.isSneaking();
         if (sneaking && user.getAbilities().flying) {
             sneaking = false;
@@ -68,15 +86,19 @@ public class PermanentMagnetItem extends AbstractFilterableItem {
                     openScreen(user, hand, this);
                 }
             } else {
-                if (!sneakToSwitch) {
+                if (sneakToSwitch) {
+                    enabledSwitch(world, user, hand);
+                } else {
                     return super.use(world, user, hand);
                 }
-                enabledSwitch(world, user, hand);
             }
         } else {
-            ElectromagnetItem.teleportItems(world, user, dis, hand);
+            if (user.getAbilities().creativeMode || !stackInHand.isBroken()) {
+                user.setCurrentHand(hand);
+            }
+            return TypedActionResult.fail(stackInHand);
         }
-        MagnetCraft.CooldownMethods.setCooldown(user, stackInHand, 10);
+        user.setCooldown(stackInHand, 10);
         return TypedActionResult.success(stackInHand);
     }
 

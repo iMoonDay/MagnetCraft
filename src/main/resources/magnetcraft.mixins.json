@@ -13,10 +13,12 @@
     "EntityMixin",
     "EntityTypeMixin",
     "ItemEntityMixin",
+    "ItemStackMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
     "TridentEntityMixin",
-    "VillagerEntityMixin"
+    "VillagerEntityMixin",
+    "WorldMixin"
   ],
   "injectors": {
     "defaultRequire": 1

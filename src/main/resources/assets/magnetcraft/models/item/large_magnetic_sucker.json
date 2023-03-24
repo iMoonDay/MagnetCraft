@@ -1,6 +1,16 @@
 {
-  "parent": "minecraft:item/generated",
-  "textures": {
-    "layer0": "magnetcraft:item/large_magnetic_sucker"
-  }
+  "overrides": [
+    {
+      "predicate": {
+        "contains": 0
+      },
+      "model": "magnetcraft:item/large_magnetic_sucker_without_block"
+    },
+    {
+      "predicate": {
+        "contains": 1
+      },
+      "model": "magnetcraft:item/large_magnetic_sucker_with_block"
+    }
+  ]
 }

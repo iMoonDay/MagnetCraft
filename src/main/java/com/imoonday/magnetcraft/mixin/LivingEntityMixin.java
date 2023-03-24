@@ -38,6 +38,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.Objects;
 
+/**
+ * @author iMoonDay
+ */
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin {
 
@@ -46,8 +49,9 @@ public class LivingEntityMixin {
         LivingEntity entity = (LivingEntity) (Object) this;
         if (entity != null) {
             World world = ((LivingEntity) (Object) this).world;
-            if (world == null) return;
-            if (entity.isPlayer() && entity.isSpectator()) return;
+            if (world == null || entity.isPlayer() && entity.isSpectator()) {
+                return;
+            }
             tick(entity);
             MagneticFluid.tick(entity);
             CreatureMagnetItem.followingCheck(entity);

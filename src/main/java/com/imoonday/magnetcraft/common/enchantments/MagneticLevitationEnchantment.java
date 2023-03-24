@@ -16,6 +16,9 @@ import java.util.stream.DoubleStream;
 
 import static com.imoonday.magnetcraft.registries.common.EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT;
 
+/**
+ * @author iMoonDay
+ */
 public class MagneticLevitationEnchantment extends Enchantment {
 
     public MagneticLevitationEnchantment() {
@@ -60,7 +63,8 @@ public class MagneticLevitationEnchantment extends Enchantment {
             int i2 = Math.max(0, (int) Math.max(maxSlot - percent + 1, 0));
             displayTime.append("▓".repeat(i1)).append("░".repeat(i1 + i2 > maxSlot ? --i2 : i2));
         }
-        if (!player.isOnGround() && (player.jumping || auto)) {
+        boolean jumping = player.jumping || auto;
+        if (!player.isOnGround() && jumping) {
             double heightMultiplier = MagneticIronArmorItem.isInMagneticIronSuit(player) ? 1.5 : NetheriteMagneticIronArmorItem.isInNetheriteMagneticIronSuit(player) ? 2.0 : 1.0;
             double height = (1.5 + (double) lvl / 2.0) * heightMultiplier + 0.1;
             player.setNoGravity(true);

@@ -42,11 +42,16 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("RedundantCast")
 public class MagneticIronGolemEntity extends IronGolemEntity {
 
     protected static final TrackedData<Byte> MAGNETIC_IRON_GOLEM_FLAGS = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BYTE);
     private static final TrackedData<Boolean> HAS_LODESTONE = DataTracker.registerData(MagneticIronGolemEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public static final String INVENTORY = "Inventory";
+    public static final String HAS_LODESTONE_TAG = "HasLodestone";
     private final Inventory inventory = new SimpleInventory(27);
 
     public MagneticIronGolemEntity(EntityType<? extends IronGolemEntity> entityType, World world) {
@@ -107,18 +112,18 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
         super.writeCustomDataToNbt(nbt);
         NbtList inventory = new NbtList();
         IntStream.range(0, this.inventory.size()).mapToObj(i -> this.inventory.getStack(i).writeNbt(new NbtCompound())).forEach(inventory::add);
-        nbt.put("Inventory", inventory);
-        nbt.putBoolean("HasLodestone", this.isHasLodestone());
+        nbt.put(INVENTORY, inventory);
+        nbt.putBoolean(HAS_LODESTONE_TAG, this.isHasLodestone());
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
-        if (nbt.contains("Inventory")) {
-            IntStream.range(0, nbt.getList("Inventory", NbtElement.COMPOUND_TYPE).size()).forEach(i -> this.inventory.setStack(i, ItemStack.fromNbt((NbtCompound) nbt.getList("Inventory", NbtElement.COMPOUND_TYPE).get(i))));
+        if (nbt.contains(INVENTORY)) {
+            IntStream.range(0, nbt.getList(INVENTORY, NbtElement.COMPOUND_TYPE).size()).forEach(i -> this.inventory.setStack(i, ItemStack.fromNbt((NbtCompound) nbt.getList(INVENTORY, NbtElement.COMPOUND_TYPE).get(i))));
         }
-        if (nbt.contains("HasLodestone")) {
-            this.setHasLodestone(nbt.getBoolean("HasLodestone"));
+        if (nbt.contains(HAS_LODESTONE_TAG)) {
+            this.setHasLodestone(nbt.getBoolean(HAS_LODESTONE_TAG));
         }
     }
 
@@ -218,8 +223,9 @@ public class MagneticIronGolemEntity extends IronGolemEntity {
             for (int i = 1; i < 3; ++i) {
                 BlockState blockState2;
                 BlockPos blockPos3 = blockPos.up(i);
-                if (SpawnHelper.isClearForSpawn(world, blockPos3, blockState2 = world.getBlockState(blockPos3), blockState2.getFluidState(), EntityRegistries.MAGNETIC_IRON_GOLEM))
+                if (SpawnHelper.isClearForSpawn(world, blockPos3, blockState2 = world.getBlockState(blockPos3), blockState2.getFluidState(), EntityRegistries.MAGNETIC_IRON_GOLEM)) {
                     continue;
+                }
                 return false;
             }
             return SpawnHelper.isClearForSpawn(world, blockPos, world.getBlockState(blockPos), Fluids.EMPTY.getDefaultState(), EntityRegistries.MAGNETIC_IRON_GOLEM) && world.doesNotIntersectEntities(this);

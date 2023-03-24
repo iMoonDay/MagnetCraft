@@ -18,6 +18,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 import net.minecraft.world.tick.TickPriority;
 
+/**
+ * @author iMoonDay
+ */
 public class CircularRepeaterBlock extends RepeaterBlock {
 
     private static final IntProperty TICK = IntProperty.of("tick", 0, 20);

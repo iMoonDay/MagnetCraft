@@ -15,8 +15,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * @author iMoonDay
+ */
 public class MagneticIronArmorItem extends ArmorItem {
 
+
+    public static final String USED_TICK = "UsedTick";
 
     public MagneticIronArmorItem(ArmorMaterial material, Type type, Settings settings) {
         super(material, type, settings);
@@ -26,8 +31,8 @@ public class MagneticIronArmorItem extends ArmorItem {
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         tooltip.add(Text.translatable("item.magnetcraft.magnetic_armor.tooltip", ModConfig.getValue().magnetSetMultiplier)
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-        if (stack.getNbt() != null && stack.getNbt().contains("UsedTick")) {
-            int usedTick = stack.getOrCreateNbt().getInt("UsedTick");
+        if (stack.getNbt() != null && stack.getNbt().contains(USED_TICK)) {
+            int usedTick = stack.getOrCreateNbt().getInt(USED_TICK);
             tooltip.add(Text.translatable("enchantment.magnetcraft.magnetic_levitation.tooltop", usedTick / 12)
                     .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         }

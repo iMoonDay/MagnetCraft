@@ -12,6 +12,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * @author iMoonDay
+ */
 @Mixin(TridentEntity.class)
 public class TridentEntityMixin extends EntityMixin {
 
@@ -23,7 +26,9 @@ public class TridentEntityMixin extends EntityMixin {
         TridentEntity entity = (TridentEntity) (Object) this;
         if (entity != null) {
             World world = ((TridentEntity) (Object) this).world;
-            if (world == null) return;
+            if (world == null) {
+                return;
+            }
             ModConfig config = ModConfig.getConfig();
             ItemStack stack = this.tridentStack;
             int enchLvl = EnchantmentHelper.getLevel(EnchantmentRegistries.ATTRACT_ENCHANTMENT, stack);

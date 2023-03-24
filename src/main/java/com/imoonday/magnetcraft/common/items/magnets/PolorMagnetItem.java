@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.api.FilterableItem;
+import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -18,14 +18,20 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-public class PolorMagnetItem extends FilterableItem {
+/**
+ * @author iMoonDay
+ */
+public class PolorMagnetItem extends AbstractFilterableItem {
+
+    public static final String ENABLE = "Enable";
+    public static final String FILTERABLE = "Filterable";
 
     public PolorMagnetItem(Settings settings) {
         super(settings);
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.POLAR_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable") ? 0.0F : itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.POLAR_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains(ENABLE) ? 0.0F : itemStack.getOrCreateNbt().getBoolean(ENABLE) ? 1.0F : 0.0F);
     }
 
     @Override
@@ -50,8 +56,8 @@ public class PolorMagnetItem extends FilterableItem {
         boolean sneakToSwitch = ModConfig.getConfig().enableSneakToSwitch;
         boolean reversal = ModConfig.getConfig().rightClickReversal;
         boolean sneaking = user.isSneaking();
-        if ((sneaking && !reversal) || (!sneaking && reversal)) {
-            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+        if (sneaking != reversal) {
+            if (user.getStackInHand(hand).getOrCreateNbt().getBoolean(FILTERABLE)) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
                 }

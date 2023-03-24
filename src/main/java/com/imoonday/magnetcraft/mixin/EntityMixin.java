@@ -19,6 +19,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.UUID;
 
+/**
+ * @author iMoonDay
+ */
 @Mixin(Entity.class)
 public class EntityMixin implements MagnetCraftEntity {
 

@@ -11,7 +11,11 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
+/**
+ * @author iMoonDay
+ */
 public class MaglevPoweredRailBlock extends PoweredRailBlock {
+
     public MaglevPoweredRailBlock(Settings settings) {
         super(settings);
     }

@@ -15,6 +15,10 @@ import java.awt.*;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
+@SuppressWarnings("AlibabaUndefineMagicConstant")
 public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/lodestone.png");
@@ -70,11 +74,7 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
         boolean onLeftClick = mouseX >= x + 132 && mouseX <= x + 132 + 8 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onRightClick = mouseX >= x + 133 + 16 + 8 && mouseX <= x + 133 + 16 + 16 && mouseY >= y + 17 && mouseY <= y + 17 + 16;
         boolean onFilter = mouseX >= x + 110 && mouseX <= x + 110 + 8 && mouseY >= y + 20 && mouseY <= y + 20 + 8;
-        if (onRedstone) {
-            drawTexture(matrices, x + 11, y + 20, 8, redstone ? 166 + 8 : 166, 8, 8);
-        } else {
-            drawTexture(matrices, x + 11, y + 20, 0, redstone ? 166 + 8 : 166, 8, 8);
-        }
+        drawTexture(matrices, x + 11, y + 20, onRedstone ? 8 : 0, redstone ? 166 + 8 : 166, 8, 8);
         if (onLeftClick) {
             drawTexture(matrices, x + 132, y + 17, 48, 166, 16, 16);
             drawTexture(matrices, x + 133 + 16, y + 17, 16 + 16, 166, 16, 16);
@@ -85,11 +85,7 @@ public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
             drawTexture(matrices, x + 132, y + 17, 16, 166, 16, 16);
             drawTexture(matrices, x + 133 + 16, y + 17, 16 + 16, 166, 16, 16);
         }
-        if (onFilter) {
-            drawTexture(matrices, x + 110, y + 20, 8, filter ? 166 + 8 : 166, 8, 8);
-        } else {
-            drawTexture(matrices, x + 110, y + 20, 0, filter ? 166 + 8 : 166, 8, 8);
-        }
+        drawTexture(matrices, x + 110, y + 20, onFilter ? 8 : 0, filter ? 166 + 8 : 166, 8, 8);
         textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.redstone_mode"), x + 11 + 10, y + 20, Color.black.getRGB());
         textRenderer.draw(matrices, Text.translatable("text.magnetcraft.message.direction." + this.handler.getDirection()), x + 11, y + 10, Color.black.getRGB());
         int filterX = x + 110 + 4 - textRenderer.getWidth(Text.translatable("text.magnetcraft.message.filter")) / 2;

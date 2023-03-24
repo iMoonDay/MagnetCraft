@@ -11,6 +11,9 @@ import net.minecraft.util.Identifier;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 public class MagneticIronGolemScreen extends HandledScreen<MagneticIronGolemScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/inventory.png");

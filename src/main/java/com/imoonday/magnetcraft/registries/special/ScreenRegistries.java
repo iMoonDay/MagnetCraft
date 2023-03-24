@@ -8,6 +8,9 @@ import net.minecraft.screen.ScreenHandlerType;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 public class ScreenRegistries {
 
     public static final ScreenHandlerType<LodestoneScreenHandler> LODESTONE_SCREEN_HANDLER;

@@ -12,37 +12,43 @@ import org.lwjgl.glfw.GLFW;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
+/**
+ * @author iMoonDay
+ */
 public class KeyBindingRegistries {
+
+    public static final String CATEGORY = "key.category.magnetcraft";
+
     public static void registerClient() {
         KeyBinding attractEnchantmentsSwitch = KeyBindingHelper.registerKeyBinding(
                 new KeyBinding("key.magnetcraft.controller",
                         InputUtil.Type.KEYSYM,
                         GLFW.GLFW_KEY_R,
-                        "key.category.magnetcraft"));
+                        CATEGORY));
 
         KeyBinding addOrRemoveBlacklist = KeyBindingHelper.registerKeyBinding(
                 new KeyBinding("key.magnetcraft.blacklist",
                         InputUtil.Type.KEYSYM,
                         GLFW.GLFW_KEY_MINUS,
-                        "key.category.magnetcraft"));
+                        CATEGORY));
 
         KeyBinding addOrRemoveWhitelist = KeyBindingHelper.registerKeyBinding(
                 new KeyBinding("key.magnetcraft.whitelist",
                         InputUtil.Type.KEYSYM,
                         GLFW.GLFW_KEY_EQUAL,
-                        "key.category.magnetcraft"));
+                        CATEGORY));
 
         KeyBinding changeMagneticLevitationMode = KeyBindingHelper.registerKeyBinding(
                 new KeyBinding("key.magnetcraft.magnetic_levitation_mode",
                         InputUtil.Type.KEYSYM,
                         GLFW.GLFW_KEY_LEFT_ALT,
-                        "key.category.magnetcraft"));
+                        CATEGORY));
 
         KeyBinding changeAutomaticLevitation = KeyBindingHelper.registerKeyBinding(
                 new KeyBinding("key.magnetcraft.automaticLevitation",
                         InputUtil.Type.KEYSYM,
                         GLFW.GLFW_KEY_RIGHT_ALT,
-                        "key.category.magnetcraft"));
+                        CATEGORY));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             ClientPlayerEntity player = client.player;

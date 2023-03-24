@@ -5,7 +5,11 @@ import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.*;
 
+/**
+ * @author iMoonDay
+ */
 public class AutomaticLootingEnchantment extends Enchantment {
+
     public AutomaticLootingEnchantment() {
         super(Rarity.VERY_RARE, EnchantmentTarget.WEAPON, new EquipmentSlot[]{EquipmentSlot.MAINHAND});
     }

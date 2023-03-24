@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.items;
 
-import com.imoonday.magnetcraft.api.FilterableItem;
+import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
@@ -23,14 +23,20 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MagnetControllerItem extends FilterableItem {
+/**
+ * @author iMoonDay
+ */
+public class MagnetControllerItem extends AbstractFilterableItem {
+
+    public static final String ENABLE = "Enable";
+    public static final String FILTERABLE = "Filterable";
 
     public MagnetControllerItem(Settings settings) {
         super(settings);
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable") ? 0.0F : itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.MAGNET_CONTROLLER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains(ENABLE) ? 0.0F : itemStack.getOrCreateNbt().getBoolean(ENABLE) ? 1.0F : 0.0F);
     }
 
     @Override
@@ -49,7 +55,7 @@ public class MagnetControllerItem extends FilterableItem {
 
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean("Filterable")) {
+        if (user.getStackInHand(hand).getOrCreateNbt().getBoolean(FILTERABLE)) {
             if (!user.isSneaky()) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
@@ -117,7 +123,7 @@ public class MagnetControllerItem extends FilterableItem {
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity user, int slot, boolean selected) {
         if (!world.isClient) {
-            stack.getOrCreateNbt().putBoolean("Enable", user.getEnable());
+            stack.getOrCreateNbt().putBoolean(ENABLE, user.getEnable());
         }
         if (user instanceof PlayerEntity player) {
             player.getInventory().markDirty();

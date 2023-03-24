@@ -14,6 +14,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * @author iMoonDay
+ */
 public class AdvancedGrindstoneBlock extends GrindstoneBlock {
 
     private static final Text TITLE = Text.translatable("container.magnetcraft.advanced_grindstone_title");

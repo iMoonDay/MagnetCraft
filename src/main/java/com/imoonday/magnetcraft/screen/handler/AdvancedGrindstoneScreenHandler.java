@@ -21,7 +21,10 @@ import net.minecraft.sound.SoundEvents;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("ConstantValue")
+/**
+ * @author iMoonDay
+ */
+@SuppressWarnings({"ConstantValue", "AlibabaUndefineMagicConstant", "AlibabaAvoidComplexCondition"})
 public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
 
     private final Inventory result = new CraftingResultInventory();
@@ -124,7 +127,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
             }
             Enchantment enchantment = enchantments.keySet().stream().toList().get(index);
             int level = enchantments.get(enchantment);
-            Map<Enchantment, Integer> newEnchantment = new HashMap<>();
+            Map<Enchantment, Integer> newEnchantment = new HashMap<>(20);
             newEnchantment.put(enchantment, level);
             EnchantmentHelper.set(newEnchantment, enchantedBookStack);
             this.result.setStack(0, enchantedBookStack);
@@ -146,6 +149,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
         return AdvancedGrindstoneScreenHandler.canUse(this.context, player, BlockRegistries.ADVANCED_GRINDSTONE_BLOCK);
     }
 
+    @SuppressWarnings("AlibabaSwitchStatement")
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
         if (id < 0 || id > 1) {
@@ -158,7 +162,6 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
                 } else {
                     this.index--;
                 }
-
             }
             case 1 -> {
                 if (index + 1 > maxIndex) {

@@ -34,8 +34,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+/**
+ * @author iMoonDay
+ */
 public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
 
+    public static final String REDSTONE = "redstone";
+    public static final String DIS = "dis";
+    public static final String DIRECTION = "direction";
+    public static final String FILTER = "filter";
+    public static final String ENABLE = "enable";
     private boolean redstone;
     private double dis;
     private int direction;
@@ -46,16 +54,13 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
     protected final PropertyDelegate propertyDelegate = new PropertyDelegate() {
         @Override
         public int get(int index) {
-            if (index == 0) {
-                return redstone ? 1 : 0;
-            } else if (index == 1) {
-                return (int) dis;
-            } else if (index == 2) {
-                return direction;
-            } else if (index == 3) {
-                return filter ? 1 : 0;
-            }
-            return 0;
+            return switch (index) {
+                case 0 -> redstone ? 1 : 0;
+                case 1 -> (int) dis;
+                case 2 -> direction;
+                case 3 -> filter ? 1 : 0;
+                default -> 0;
+            };
         }
 
         @Override
@@ -112,30 +117,30 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
     @Override
     public void writeNbt(NbtCompound nbt) {
         int disPerPower = ModConfig.getValue().disPerPower;
-        nbt.putBoolean("redstone", redstone);
-        nbt.putDouble("dis", redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : dis);
-        dis = nbt.getDouble("dis");
+        nbt.putBoolean(REDSTONE, redstone);
+        nbt.putDouble(DIS, redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : dis);
+        dis = nbt.getDouble(DIS);
         enable = redstone ? world != null && world.isReceivingRedstonePower(pos) : dis > 1;
-        nbt.putBoolean("enable", enable);
-        nbt.putInt("direction", direction);
-        nbt.putBoolean("filter", filter);
+        nbt.putBoolean(ENABLE, enable);
+        nbt.putInt(DIRECTION, direction);
+        nbt.putBoolean(FILTER, filter);
         Inventories.writeNbt(nbt, inventory);
     }
 
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);
-        if (nbt.contains("redstone")) {
-            redstone = nbt.getBoolean("redstone");
+        if (nbt.contains(REDSTONE)) {
+            redstone = nbt.getBoolean(REDSTONE);
         }
-        if (nbt.contains("dis")) {
-            dis = nbt.getDouble("dis");
+        if (nbt.contains(DIS)) {
+            dis = nbt.getDouble(DIS);
         }
-        if (nbt.contains("direction")) {
-            direction = nbt.getInt("direction");
+        if (nbt.contains(DIRECTION)) {
+            direction = nbt.getInt(DIRECTION);
         }
-        if (nbt.contains("filter")) {
-            filter = nbt.getBoolean("filter");
+        if (nbt.contains(FILTER)) {
+            filter = nbt.getBoolean(FILTER);
         }
     }
 
@@ -157,7 +162,6 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
 
     @Override
     public Text getDisplayName() {
-//        return Text.translatable(getCachedState().getBlock().getTranslationKey());
         return Text.empty();
     }
 

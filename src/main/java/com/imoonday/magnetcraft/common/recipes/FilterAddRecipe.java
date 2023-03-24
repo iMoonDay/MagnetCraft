@@ -16,7 +16,13 @@ import static com.imoonday.magnetcraft.registries.special.RecipeRegistries.*;
 import static com.imoonday.magnetcraft.common.tags.ItemTags.FILTERABLE_MAGNETS;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.FILTER_MODULE_ITEM;
 
+/**
+ * @author iMoonDay
+ */
 public class FilterAddRecipe extends SpecialCraftingRecipe {
+
+    public static final String FILTERABLE = "Filterable";
+
     public FilterAddRecipe(Identifier id, CraftingRecipeCategory category) {
         super(id, category);
     }
@@ -64,7 +70,7 @@ public class FilterAddRecipe extends SpecialCraftingRecipe {
             }
         }
         if (hasMagnet && hasFilterModule && magnetStack != ItemStack.EMPTY) {
-            magnetStack.getOrCreateNbt().putBoolean("Filterable", true);
+            magnetStack.getOrCreateNbt().putBoolean(FILTERABLE, true);
             return magnetStack;
         }
         return ItemStack.EMPTY;
@@ -85,7 +91,9 @@ public class FilterAddRecipe extends SpecialCraftingRecipe {
         for (int i = 0; i < defaultedList.size(); ++i) {
             ItemStack stack = inventory.getStack(i);
             Item item = stack.getItem();
-            if (!item.hasRecipeRemainder() || stack.isIn(tags)) continue;
+            if (!item.hasRecipeRemainder() || stack.isIn(tags)) {
+                continue;
+            }
             defaultedList.set(i, new ItemStack(item.getRecipeRemainder()));
         }
         return defaultedList;

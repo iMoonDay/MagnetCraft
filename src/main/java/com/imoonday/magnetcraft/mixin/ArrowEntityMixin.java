@@ -11,8 +11,11 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * @author iMoonDay
+ */
 @Mixin(ArrowEntity.class)
-public abstract class ArrowEntityMixin extends EntityMixin {
+public class ArrowEntityMixin extends EntityMixin {
 
     @Shadow
     private Potion potion;
@@ -22,7 +25,9 @@ public abstract class ArrowEntityMixin extends EntityMixin {
         ArrowEntity entity = (ArrowEntity) (Object) this;
         if (entity != null) {
             World world = ((ArrowEntity) (Object) this).world;
-            if (world == null) return;
+            if (world == null) {
+                return;
+            }
             boolean isAttracting = this.potion == PotionRegistries.ATTRACT_POTION;
             double dis = ModConfig.getValue().arrowAttractDis;
             if (isAttracting && this.canAttract()) {

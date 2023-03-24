@@ -32,10 +32,21 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * @author iMoonDay
+ */
 public class MagnetCraft implements ModInitializer {
 
     public static final String MOD_ID = "magnetcraft";
     public static final Logger LOGGER = LoggerFactory.getLogger("MagnetCraft");
+
+    public static final String FILTERABLE = "Filterable";
+    public static final String FILTER = "Filter";
+    public static final String COMPARE_DAMAGE = "CompareDamage";
+    public static final String DAMAGE = "Damage";
+    public static final String COMPARE_NBT = "CompareNbt";
+    public static final String TAG = "tag";
+    public static final String WHITELIST = "Whitelist";
 
     @Override
     public void onInitialize() {
@@ -51,7 +62,6 @@ public class MagnetCraft implements ModInitializer {
         CustomStatRegistries.register();
         CommandRegistries.register();
         ScreenRegistries.register();
-//        EventRegistries.register();
         RecipeRegistries.register();
         EntityRegistries.register();
     }
@@ -85,13 +95,13 @@ public class MagnetCraft implements ModInitializer {
                     boolean offhandStackListPass = true;
                     boolean controllerListPass = true;
                     if (entity instanceof LivingEntity livingEntity) {
-                        if (livingEntity.getMainHandStack().getNbt() != null && livingEntity.getMainHandStack().getNbt().contains("Filterable")) {
+                        if (livingEntity.getMainHandStack().getNbt() != null && livingEntity.getMainHandStack().getNbt().contains(FILTERABLE)) {
                             mainhandStackListPass = isSameStack(livingEntity.getMainHandStack(), itemEntity);
                         }
-                        if (livingEntity.getOffHandStack().getNbt() != null && livingEntity.getOffHandStack().getNbt().contains("Filterable")) {
+                        if (livingEntity.getOffHandStack().getNbt() != null && livingEntity.getOffHandStack().getNbt().contains(FILTERABLE)) {
                             offhandStackListPass = isSameStack(livingEntity.getOffHandStack(), itemEntity);
                         }
-                        if (entity instanceof PlayerEntity player && player.getInventory().containsAny(stack -> ((stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) && stack.getNbt() != null && stack.getNbt().contains("Filterable") && !isSameStack(stack, itemEntity)) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) && stack.getNbt() != null && stack.getNbt().getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).filter(nbtCompound -> nbtCompound.getString("id").equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString())).peek(nbtCompound -> nbtCompound.remove("Slot")).map(ItemStack::fromNbt).anyMatch(stack1 -> stack1.getNbt() != null && stack1.getNbt().contains("Filterable") && !isSameStack(stack1, itemEntity)))))) {
+                        if (entity instanceof PlayerEntity player && player.getInventory().containsAny(stack -> ((stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) && stack.getNbt() != null && stack.getNbt().contains(FILTERABLE) && !isSameStack(stack, itemEntity)) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) && stack.getNbt() != null && stack.getNbt().getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).filter(nbtCompound -> nbtCompound.getString("id").equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString())).peek(nbtCompound -> nbtCompound.remove("Slot")).map(ItemStack::fromNbt).anyMatch(stack1 -> stack1.getNbt() != null && stack1.getNbt().contains(FILTERABLE) && !isSameStack(stack1, itemEntity)))))) {
                             controllerListPass = false;
                         }
                     }
@@ -149,35 +159,35 @@ public class MagnetCraft implements ModInitializer {
         }
 
         private static boolean isSameStack(ItemStack stack, ItemEntity entity) {
-            if (stack == null || stack.getNbt() == null || !stack.getNbt().getBoolean("Filterable")) {
+            if (stack == null || stack.getNbt() == null || !stack.getNbt().getBoolean(FILTERABLE)) {
                 return true;
             }
             boolean stackDamagePass = true;
             boolean stackNbtPass = true;
-            NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
+            NbtList list = stack.getNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
             String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
             boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item));
-            if (stack.getNbt().getBoolean("CompareDamage") && inList) {
+            if (stack.getNbt().getBoolean(COMPARE_DAMAGE) && inList) {
                 stackDamagePass = list.stream()
                         .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
                         .map(nbtElement -> (NbtCompound) nbtElement)
-                        .anyMatch(NbtCompound -> NbtCompound.getInt("Damage") == entity.getStack().getDamage());
+                        .anyMatch(NbtCompound -> NbtCompound.getInt(DAMAGE) == entity.getStack().getDamage());
             }
-            if (stack.getNbt().getBoolean("CompareNbt") && inList) {
+            if (stack.getNbt().getBoolean(COMPARE_NBT) && inList) {
                 NbtCompound nbt = entity.getStack().getNbt();
                 NbtCompound nbtWithoutDamage = new NbtCompound();
                 if (nbt != null) {
                     nbtWithoutDamage = nbt.copy();
-                    nbtWithoutDamage.remove("Damage");
+                    nbtWithoutDamage.remove(DAMAGE);
                 }
                 NbtCompound finalNbt = nbtWithoutDamage;
                 stackNbtPass = list.stream()
                         .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString("id").equals(item))
                         .map(nbtElement -> (NbtCompound) nbtElement)
-                        .peek(NbtCompound -> NbtCompound.getCompound("tag").remove("Damage"))
-                        .anyMatch(NbtCompound -> NbtCompound.getCompound("tag").equals(finalNbt));
+                        .peek(NbtCompound -> NbtCompound.getCompound(TAG).remove(DAMAGE))
+                        .anyMatch(NbtCompound -> NbtCompound.getCompound(TAG).equals(finalNbt));
             }
-            boolean isWhitelist = stack.getNbt().getBoolean("Whitelist");
+            boolean isWhitelist = stack.getNbt().getBoolean(WHITELIST);
             return (!isWhitelist || inList && stackDamagePass && stackNbtPass) && (isWhitelist || !inList || !stackDamagePass || !stackNbtPass);
         }
 

@@ -15,8 +15,14 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
-public abstract class SwitchableItem extends Item {
-    public SwitchableItem(Settings settings) {
+/**
+ * @author iMoonDay
+ */
+public abstract class AbstractSwitchableItem extends Item {
+
+    public static final String ENABLE = "Enable";
+
+    public AbstractSwitchableItem(Settings settings) {
         super(settings);
     }
 
@@ -61,8 +67,8 @@ public abstract class SwitchableItem extends Item {
         if (!enableSneakToSwitch) {
             return;
         }
-        boolean enabled = stack.getOrCreateNbt().getBoolean("Enable");
-        stack.getOrCreateNbt().putBoolean("Enable", !enabled);
+        boolean enabled = stack.getOrCreateNbt().getBoolean(ENABLE);
+        stack.getOrCreateNbt().putBoolean(ENABLE, !enabled);
         enabled = !enabled;
         if (enabled) {
             message = isMainhand ? Text.translatable("text.magnetcraft.message.mainhand_on") : Text.translatable("text.magnetcraft.message.offhand_on");
@@ -83,13 +89,13 @@ public abstract class SwitchableItem extends Item {
     }
 
     public static void enabledCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("Enable")) {
+        if (stack.getNbt() == null || !stack.getNbt().contains(ENABLE)) {
             enabledSet(stack);
         }
     }
 
     public static void enabledSet(ItemStack stack) {
-        stack.getOrCreateNbt().putBoolean("Enable", true);
+        stack.getOrCreateNbt().putBoolean(ENABLE, true);
     }
 
 }

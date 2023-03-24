@@ -6,8 +6,10 @@ import net.minecraft.block.ButtonBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
+/**
+ * @author iMoonDay
+ */
 public class MaglevButtonBlock extends ButtonBlock {
-
 
     public MaglevButtonBlock(Settings settings, BlockSetType blockSetType, int pressTicks, boolean wooden) {
         super(settings, blockSetType, pressTicks, wooden);

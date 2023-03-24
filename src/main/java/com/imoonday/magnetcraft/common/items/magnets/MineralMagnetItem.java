@@ -39,8 +39,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static com.imoonday.magnetcraft.api.FilterableItem.shulkerBoxCheck;
-import static com.imoonday.magnetcraft.api.FilterableItem.shulkerBoxSet;
+import static com.imoonday.magnetcraft.api.AbstractFilterableItem.shulkerBoxCheck;
+import static com.imoonday.magnetcraft.api.AbstractFilterableItem.shulkerBoxSet;
 import static com.imoonday.magnetcraft.common.items.magnets.ElectromagnetItem.tryInsertIntoShulkerBox;
 import static com.imoonday.magnetcraft.common.tags.BlockTags.MAGNETITE_ORES;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
@@ -49,7 +49,15 @@ import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags.QU
 import static net.minecraft.item.Items.*;
 import static net.minecraft.registry.tag.BlockTags.*;
 
+/**
+ * @author iMoonDay
+ */
 public class MineralMagnetItem extends Item {
+
+    public static final String CORES = "Cores";
+    public static final String FILTERABLE = "Filterable";
+    public static final String ID = "id";
+    public static final String ENABLE = "enable";
 
     public MineralMagnetItem(Settings settings) {
         super(settings);
@@ -61,7 +69,7 @@ public class MineralMagnetItem extends Item {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        ArrayList<String> list = IntStream.range(0, stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).size()).filter(i -> stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getBoolean("enable")).mapToObj(i -> stack.getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).getCompound(i).getString("id")).collect(Collectors.toCollection(ArrayList::new));
+        ArrayList<String> list = IntStream.range(0, stack.getOrCreateNbt().getList(CORES, NbtElement.COMPOUND_TYPE).size()).filter(i -> stack.getOrCreateNbt().getList(CORES, NbtString.COMPOUND_TYPE).getCompound(i).getBoolean(ENABLE)).mapToObj(i -> stack.getOrCreateNbt().getList(CORES, NbtString.COMPOUND_TYPE).getCompound(i).getString(ID)).collect(Collectors.toCollection(ArrayList::new));
         if (list.isEmpty()) {
             tooltip.add(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.1").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         } else {
@@ -72,7 +80,7 @@ public class MineralMagnetItem extends Item {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("Filterable", true);
+        stack.getOrCreateNbt().putBoolean(FILTERABLE, true);
         coresSet(stack);
         shulkerBoxSet(stack);
         return stack;
@@ -102,7 +110,7 @@ public class MineralMagnetItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stackInHand = user.getStackInHand(hand);
-        if (stackInHand.getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
+        if (stackInHand.getOrCreateNbt().getBoolean(FILTERABLE) && user.isSneaky() && !user.getAbilities().flying) {
             if (!user.world.isClient) {
                 int slot = hand == Hand.MAIN_HAND ? user.getInventory().selectedSlot : -1;
                 user.openHandledScreen(new ExtendedScreenHandlerFactory() {
@@ -189,7 +197,7 @@ public class MineralMagnetItem extends Item {
                         ServerWorld world = (ServerWorld) player.world;
                         BlockEntity blockEntity = world.getBlockEntity(pos);
                         List<ItemStack> droppedStacks = Block.getDroppedStacks(state, world, pos, blockEntity, player, IRON_PICKAXE.getDefaultStack());
-                        boolean nbtPass = droppedStacks.stream().anyMatch(stack -> (player.getStackInHand(hand).getOrCreateNbt().getList("Cores", NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(Registries.ITEM.getId(stack.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean("enable"))));
+                        boolean nbtPass = droppedStacks.stream().anyMatch(stack -> (player.getStackInHand(hand).getOrCreateNbt().getList(CORES, NbtString.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString(ID).equals(Registries.ITEM.getId(stack.getItem()).toString()) && ((NbtCompound) nbtElement).getBoolean(ENABLE))));
                         if (state.isIn(ORES) && nbtPass) {
                             droppedStacks.forEach(stack -> tryInsertIntoShulkerBox(player, hand, stack));
                             world.breakBlock(pos, false, player);
@@ -283,11 +291,11 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void coresCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("Cores", NbtElement.LIST_TYPE)) {
+        if (stack.getNbt() == null || !stack.getNbt().contains(CORES, NbtElement.LIST_TYPE)) {
             coresSet(stack);
         }
-        if (!stack.getOrCreateNbt().contains("Filterable")) {
-            stack.getOrCreateNbt().putBoolean("Filterable", false);
+        if (!stack.getOrCreateNbt().contains(FILTERABLE)) {
+            stack.getOrCreateNbt().putBoolean(FILTERABLE, false);
         }
     }
 
@@ -297,16 +305,16 @@ public class MineralMagnetItem extends Item {
     }
 
     public static void coresSet(ItemStack stack, Item[] items) {
-        NbtList list = stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList(CORES, NbtElement.COMPOUND_TYPE);
         String[] names = new String[items.length];
         for (int i = 0; i < items.length; i++) {
             names[i] = Registries.ITEM.getId(items[i]).toString();
             NbtCompound nbt = new NbtCompound();
-            nbt.putString("id", names[i]);
-            nbt.putBoolean("enable", true);
+            nbt.putString(ID, names[i]);
+            nbt.putBoolean(ENABLE, true);
             boolean exist = false;
             for (int j = 0; j < list.size(); j++) {
-                exist = list.getCompound(j).getString("id").equals(names[i]);
+                exist = list.getCompound(j).getString(ID).equals(names[i]);
                 if (exist) {
                     break;
                 }
@@ -315,25 +323,25 @@ public class MineralMagnetItem extends Item {
                 list.add(nbt);
             }
         }
-        stack.getOrCreateNbt().put("Cores", list);
+        stack.getOrCreateNbt().put(CORES, list);
     }
 
     public static ItemStack getAllCoresStack() {
         ItemStack stack = new ItemStack(MINERAL_MAGNET_ITEM);
         Item[] items = new Item[]{COAL, RAW_IRON, RAW_GOLD, GOLD_NUGGET, DIAMOND, REDSTONE, RAW_COPPER, EMERALD, LAPIS_LAZULI, QUARTZ, RAW_MAGNET_ITEM};
         coresSet(stack, items);
-        stack.getOrCreateNbt().putBoolean("Filterable", true);
+        stack.getOrCreateNbt().putBoolean(FILTERABLE, true);
         return stack;
     }
 
     public static void changeCoreEnable(ItemStack stack, String id) {
-        if (stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(id))) {
-            stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).stream().filter(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString("id").equals(id)).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean("enable", !((NbtCompound) nbtElement).getBoolean("enable")));
+        if (stack.getOrCreateNbt().getList(CORES, NbtElement.COMPOUND_TYPE).stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString(ID).equals(id))) {
+            stack.getOrCreateNbt().getList(CORES, NbtElement.COMPOUND_TYPE).stream().filter(nbtElement -> nbtElement instanceof NbtCompound && ((NbtCompound) nbtElement).getString(ID).equals(id)).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean(ENABLE, !((NbtCompound) nbtElement).getBoolean(ENABLE)));
         }
     }
 
     public static void changeAllCoreEnable(ItemStack stack, boolean enable) {
-        stack.getOrCreateNbt().getList("Cores", NbtElement.COMPOUND_TYPE).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean("enable", enable));
+        stack.getOrCreateNbt().getList(CORES, NbtElement.COMPOUND_TYPE).forEach(nbtElement -> ((NbtCompound) nbtElement).putBoolean(ENABLE, enable));
     }
 
     @Override

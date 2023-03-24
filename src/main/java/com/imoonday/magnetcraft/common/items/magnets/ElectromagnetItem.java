@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.MagnetCraft;
-import com.imoonday.magnetcraft.api.FilterableItem;
+import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
@@ -30,14 +30,29 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
-public class ElectromagnetItem extends FilterableItem {
+/**
+ * @author iMoonDay
+ */
+public class ElectromagnetItem extends AbstractFilterableItem {
+
+    public static final String ENABLE = "Enable";
+    public static final String FILTERABLE = "Filterable";
+    public static final String SHULKER_BOX = "ShulkerBox";
+    public static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
+    public static final String TAG = "tag";
+    public static final String SLOT = "Slot";
+    public static final String ITEMS = "Items";
+    public static final String COUNT = "Count";
+    public static final String ID = "id";
+    public static final String SHULKER_BOX_ID = "minecraft:shulker_box";
+    public static final String AIR_ID = "minecraft:air";
 
     public ElectromagnetItem(Settings settings) {
         super(settings);
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable") ? 0.0F : itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains(ENABLE) ? 0.0F : itemStack.getOrCreateNbt().getBoolean(ENABLE) ? 1.0F : 0.0F);
     }
 
     @Override
@@ -74,8 +89,8 @@ public class ElectromagnetItem extends FilterableItem {
             sneaking = false;
         }
         ItemStack stackInHand = user.getStackInHand(hand);
-        if ((sneaking && !reversal) || (!sneaking && reversal)) {
-            if (stackInHand.getOrCreateNbt().getBoolean("Filterable")) {
+        if (sneaking != reversal) {
+            if (stackInHand.getOrCreateNbt().getBoolean(FILTERABLE)) {
                 if (!user.world.isClient) {
                     openScreen(user, hand, this);
                 }
@@ -98,8 +113,12 @@ public class ElectromagnetItem extends FilterableItem {
     public static void teleportItems(World world, PlayerEntity player, double dis, Hand hand) {
         boolean message = ModConfig.getConfig().displayMessageFeedback;
         int magnetHandSpacing = ModConfig.getValue().magnetHandSpacing;
-        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) return;
-        if (hand == Hand.MAIN_HAND) dis += magnetHandSpacing;
+        if (MagnetCraft.DamageMethods.isEmptyDamage(player, hand)) {
+            return;
+        }
+        if (hand == Hand.MAIN_HAND) {
+            dis += magnetHandSpacing;
+        }
         double finalDis = dis;
         int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).size();
         player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).forEach(targetEntity -> {
@@ -137,7 +156,7 @@ public class ElectromagnetItem extends FilterableItem {
         }
         ItemStack stackInHand = player.getStackInHand(hand);
         NbtCompound handStackNbt = stackInHand.getOrCreateNbt();
-        List<NbtElement> shulkerBoxList = handStackNbt.getList("ShulkerBox", NbtElement.COMPOUND_TYPE).stream().filter(nbtElement -> nbtElement instanceof NbtCompound boxNbt && !boxNbt.getString("id").equals("minecraft:air")).toList();
+        List<NbtElement> shulkerBoxList = handStackNbt.getList(SHULKER_BOX, NbtElement.COMPOUND_TYPE).stream().filter(nbtElement -> nbtElement instanceof NbtCompound boxNbt && !AIR_ID.equals(boxNbt.getString(ID))).toList();
         if (shulkerBoxList.isEmpty()) {
             player.getInventory().offerOrDrop(insertStack);
             return;
@@ -151,66 +170,66 @@ public class ElectromagnetItem extends FilterableItem {
             NbtCompound shulkerBoxNbt = (NbtCompound) shulkerBox;
             ItemStack shulkerBoxStack = ItemStack.fromNbt(shulkerBoxNbt);
             if (Block.getBlockFromItem(shulkerBoxStack.getItem()) instanceof ShulkerBoxBlock) {
-                NbtList items = shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).isEmpty() ? new NbtList() : shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).copy();
+                NbtList items = shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).isEmpty() ? new NbtList() : shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).copy();
                 NbtCompound insertStackNbt = insertStack.writeNbt(new NbtCompound());
                 ArrayList<NbtCompound> newOriginalItemNbt = new ArrayList<>();
                 ArrayList<Integer> itemSlots = new ArrayList<>();
                 int slot = -1;
-                if (shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).isEmpty()) {
-                    insertStackNbt.putByte("Slot", (byte) 0);
+                if (shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).isEmpty()) {
+                    insertStackNbt.putByte(SLOT, (byte) 0);
                 } else {
-                    shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).forEach(nbtElement1 -> {
+                    shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).forEach(nbtElement1 -> {
                         NbtCompound originaItemNbt = (NbtCompound) nbtElement1;
                         NbtCompound originalItemNbtCopy = originaItemNbt.copy();
                         newOriginalItemNbt.add(originalItemNbtCopy);
                     });
                     for (NbtCompound newOriginalItem : newOriginalItemNbt) {
-                        itemSlots.add(newOriginalItem.getInt("Slot"));
+                        itemSlots.add(newOriginalItem.getInt(SLOT));
                     }
                     List<Integer> emptySlots = new ArrayList<>(IntStream.range(0, 27).boxed().toList());
                     emptySlots.removeAll(itemSlots);
                     if (!emptySlots.isEmpty()) {
                         slot = Collections.min(emptySlots);
-                        insertStackNbt.putByte("Slot", (byte) slot);
+                        insertStackNbt.putByte(SLOT, (byte) slot);
                     }
                 }
                 items.add(insertStackNbt);
                 NbtCompound blockEntityTag = new NbtCompound();
-                blockEntityTag.put("Items", items);
-                blockEntityTag.putString("id", "minecraft:shulker_box");
+                blockEntityTag.put(ITEMS, items);
+                blockEntityTag.putString(ID, SHULKER_BOX_ID);
                 NbtCompound tag = new NbtCompound();
-                tag.put("BlockEntityTag", blockEntityTag);
-                if (!shulkerBoxNbt.contains("tag")) {
-                    shulkerBoxNbt.put("tag", tag);
+                tag.put(BLOCK_ENTITY_TAG, blockEntityTag);
+                if (!shulkerBoxNbt.contains(TAG)) {
+                    shulkerBoxNbt.put(TAG, tag);
                     break;
-                } else if (!shulkerBoxNbt.getCompound("tag").contains("BlockEntityTag")) {
-                    shulkerBoxNbt.getCompound("tag").put("BlockEntityTag", blockEntityTag);
+                } else if (!shulkerBoxNbt.getCompound(TAG).contains(BLOCK_ENTITY_TAG)) {
+                    shulkerBoxNbt.getCompound(TAG).put(BLOCK_ENTITY_TAG, blockEntityTag);
                     break;
-                } else if (!shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").contains("Items") || shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).isEmpty()) {
-                    shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").put("Items", items);
+                } else if (!shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).contains(ITEMS) || shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).isEmpty()) {
+                    shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).put(ITEMS, items);
                     break;
                 } else {
                     for (NbtCompound newOriginalItem : newOriginalItemNbt) {
-                        int newOriginalItemSlot = newOriginalItem.getInt("Slot");
-                        int newOriginalItemCount = newOriginalItem.getInt("Count");
+                        int newOriginalItemSlot = newOriginalItem.getInt(SLOT);
+                        int newOriginalItemCount = newOriginalItem.getInt(COUNT);
                         NbtCompound newOriginalItemCopy = newOriginalItem.copy();
                         NbtCompound insertStackNbtCopy = insertStackNbt.copy();
-                        newOriginalItemCopy.remove("Slot");
-                        newOriginalItemCopy.remove("Count");
-                        insertStackNbtCopy.remove("Slot");
-                        insertStackNbtCopy.remove("Count");
+                        newOriginalItemCopy.remove(SLOT);
+                        newOriginalItemCopy.remove(COUNT);
+                        insertStackNbtCopy.remove(SLOT);
+                        insertStackNbtCopy.remove(COUNT);
                         if (newOriginalItemCopy.equals(insertStackNbtCopy) && insertStack.isStackable()) {
                             if (insertStack.getCount() + newOriginalItemCount <= insertStack.getMaxCount()) {
-                                shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).stream().filter(nbtElement1 -> nbtElement1 instanceof NbtCompound nbtCompound1 && nbtCompound1.getInt("Slot") == newOriginalItemSlot).findFirst().ifPresentOrElse(nbtElement1 -> {
+                                shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).stream().filter(nbtElement1 -> nbtElement1 instanceof NbtCompound nbtCompound1 && nbtCompound1.getInt(SLOT) == newOriginalItemSlot).findFirst().ifPresentOrElse(nbtElement1 -> {
                                     NbtCompound originalItemNbt = (NbtCompound) nbtElement1;
-                                    originalItemNbt.putByte("Count", (byte) (originalItemNbt.getByte("Count") + insertStack.getCount()));
+                                    originalItemNbt.putByte(COUNT, (byte) (originalItemNbt.getByte(COUNT) + insertStack.getCount()));
                                     insertStack.setCount(0);
                                 }, () -> player.getInventory().offerOrDrop(insertStack));
                                 break;
                             } else {
-                                shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).stream().filter(nbtElement1 -> nbtElement1 instanceof NbtCompound nbtCompound1 && nbtCompound1.getInt("Slot") == newOriginalItemSlot).findFirst().ifPresentOrElse(nbtElement1 -> {
+                                shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).stream().filter(nbtElement1 -> nbtElement1 instanceof NbtCompound nbtCompound1 && nbtCompound1.getInt(SLOT) == newOriginalItemSlot).findFirst().ifPresentOrElse(nbtElement1 -> {
                                     NbtCompound originalItemNbt = (NbtCompound) nbtElement1;
-                                    originalItemNbt.putByte("Count", (byte) insertStack.getMaxCount());
+                                    originalItemNbt.putByte(COUNT, (byte) insertStack.getMaxCount());
                                     insertStack.setCount(insertStack.getCount() - (insertStack.getMaxCount() - newOriginalItemCount));
                                 }, () -> player.getInventory().offerOrDrop(insertStack));
                             }
@@ -218,8 +237,8 @@ public class ElectromagnetItem extends FilterableItem {
                     }
                     if (insertStack.getCount() > 0) {
                         if (slot != -1) {
-                            insertStackNbt.putByte("Count", (byte) insertStack.getCount());
-                            shulkerBoxNbt.getCompound("tag").getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).add(insertStackNbt);
+                            insertStackNbt.putByte(COUNT, (byte) insertStack.getCount());
+                            shulkerBoxNbt.getCompound(TAG).getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).add(insertStackNbt);
                             insertStack.setCount(0);
                         } else {
                             if (++currentIndex > boxes) {

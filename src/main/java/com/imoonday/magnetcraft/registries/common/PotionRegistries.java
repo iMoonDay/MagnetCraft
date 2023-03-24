@@ -9,6 +9,9 @@ import net.minecraft.registry.Registry;
 import static com.imoonday.magnetcraft.registries.common.EffectRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("unused")
 public class PotionRegistries {
 

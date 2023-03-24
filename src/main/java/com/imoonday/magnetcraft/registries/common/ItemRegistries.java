@@ -23,6 +23,9 @@ import net.minecraft.registry.Registry;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 public class ItemRegistries {
 
     public static final Item RAW_MAGNET_ITEM = register("raw_magnet", new Item(new FabricItemSettings()));

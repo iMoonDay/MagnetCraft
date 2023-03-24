@@ -5,11 +5,14 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 
+/**
+ * @author iMoonDay
+ */
 public class DegaussingEffect extends StatusEffect {
     public DegaussingEffect() {
         super(
-                StatusEffectCategory.HARMFUL, // 药水效果是有益的还是有害的
-                0xFFFFFF); // 显示的颜色
+                StatusEffectCategory.HARMFUL,
+                0xFFFFFF);
     }
 
     @Override

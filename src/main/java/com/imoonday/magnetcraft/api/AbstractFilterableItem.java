@@ -23,21 +23,31 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static net.minecraft.item.Items.AIR;
 
-public abstract class FilterableItem extends SwitchableItem implements ImplementedInventory {
+/**
+ * @author iMoonDay
+ */
+public abstract class AbstractFilterableItem extends AbstractSwitchableItem implements ImplementedInventory {
 
+    public static final String FILTERABLE = "Filterable";
+    public static final String WHITELIST = "Whitelist";
+    public static final String FILTER = "Filter";
+    public static final String COMPARE_DAMAGE = "CompareDamage";
+    public static final String COMPARE_NBT = "CompareNbt";
+    public static final String SHULKER_BOX = "ShulkerBox";
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(9, ItemStack.EMPTY);
 
-    public FilterableItem(Settings settings) {
+    public AbstractFilterableItem(Settings settings) {
         super(settings);
     }
 
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = super.getDefaultStack();
-        stack.getOrCreateNbt().putBoolean("Filterable", true);
+        stack.getOrCreateNbt().putBoolean(FILTERABLE, true);
         filterSet(stack);
         if (canTeleportItems()) {
             shulkerBoxCheck(stack);
@@ -55,13 +65,13 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
 
     @Override
     public void appendTooltip(ItemStack itemStack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-        if (itemStack.getNbt() != null && itemStack.getNbt().getBoolean("Filterable")) {
-            tooltip.add(itemStack.getOrCreateNbt().getBoolean("Whitelist") ? Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD) : Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-            for (int i = 0; i < itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).size(); i++) {
-                NbtCompound filter = itemStack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE).getCompound(i);
+        if (itemStack.getNbt() != null && itemStack.getNbt().getBoolean(FILTERABLE)) {
+            tooltip.add(itemStack.getOrCreateNbt().getBoolean(WHITELIST) ? Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.whitelist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD) : Text.literal("[").append(Text.translatable("text.autoconfig.magnetcraft.option.blacklist")).append("]").formatted(Formatting.GRAY).formatted(Formatting.BOLD));
+            IntStream.range(0, itemStack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE).size()).forEach(i -> {
+                NbtCompound filter = itemStack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE).getCompound(i);
                 ItemStack stack = ItemStack.fromNbt(filter);
                 tooltip.add(Text.literal("[" + i + "] ").append(stack.getName()).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
-            }
+            });
         }
     }
 
@@ -78,11 +88,11 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
         return inventory;
     }
 
-    public void openScreen(PlayerEntity player, Hand hand, FilterableItem filterableMagnetItem) {
+    public void openScreen(PlayerEntity player, Hand hand, AbstractFilterableItem filterableMagnetItem) {
         filterableMagnetItem.inventory.clear();
         ItemStack stack = player.getStackInHand(hand);
         int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : -1;
-        NbtList list = stack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < list.size(); i++) {
             ItemStack itemstackFromNbt = ItemStack.fromNbt(list.getCompound(i));
             filterableMagnetItem.inventory.set(i, itemstackFromNbt);
@@ -108,34 +118,34 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
     }
 
     public static void filterCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("Filter") || !stack.getNbt().contains("Whitelist") || !stack.getNbt().contains("CompareDamage") || !stack.getNbt().contains("CompareNbt") || !stack.getNbt().contains("Filterable")) {
+        if (stack.getNbt() == null || !stack.getNbt().contains(FILTER) || !stack.getNbt().contains(WHITELIST) || !stack.getNbt().contains(COMPARE_DAMAGE) || !stack.getNbt().contains(COMPARE_NBT) || !stack.getNbt().contains(FILTERABLE)) {
             filterSet(stack);
         }
     }
 
     public static void filterSet(ItemStack stack) {
-        if (!stack.getOrCreateNbt().contains("Filterable")) {
-            stack.getOrCreateNbt().putBoolean("Filterable", false);
+        if (!stack.getOrCreateNbt().contains(FILTERABLE)) {
+            stack.getOrCreateNbt().putBoolean(FILTERABLE, false);
         }
-        if (stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
-            if (!stack.getOrCreateNbt().contains("Whitelist")) {
-                stack.getOrCreateNbt().putBoolean("Whitelist", false);
+        if (stack.getNbt() != null && stack.getNbt().getBoolean(FILTERABLE)) {
+            if (!stack.getOrCreateNbt().contains(WHITELIST)) {
+                stack.getOrCreateNbt().putBoolean(WHITELIST, false);
             }
-            if (!stack.getOrCreateNbt().contains("Filter")) {
-                stack.getOrCreateNbt().put("Filter", new NbtList());
+            if (!stack.getOrCreateNbt().contains(FILTER)) {
+                stack.getOrCreateNbt().put(FILTER, new NbtList());
             }
-            if (!stack.getOrCreateNbt().contains("CompareDamage")) {
-                stack.getOrCreateNbt().putBoolean("CompareDamage", false);
+            if (!stack.getOrCreateNbt().contains(COMPARE_DAMAGE)) {
+                stack.getOrCreateNbt().putBoolean(COMPARE_DAMAGE, false);
             }
-            if (!stack.getOrCreateNbt().contains("CompareNbt")) {
-                stack.getOrCreateNbt().putBoolean("CompareNbt", false);
+            if (!stack.getOrCreateNbt().contains(COMPARE_NBT)) {
+                stack.getOrCreateNbt().putBoolean(COMPARE_NBT, false);
             }
         }
     }
 
     public static void setFilterItems(ItemStack stack, ArrayList<ItemStack> stacks) {
         filterCheck(stack);
-        NbtList list = stack.getOrCreateNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
         list.clear();
         for (ItemStack otherStack : stacks) {
             NbtCompound otherStackNbt = otherStack.writeNbt(new NbtCompound());
@@ -147,7 +157,7 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
                 list.add(otherStackNbt);
             }
         }
-        stack.getOrCreateNbt().put("Filter", list);
+        stack.getOrCreateNbt().put(FILTER, list);
     }
 
     public static void setBoolean(ItemStack stack, String key, boolean b) {
@@ -159,23 +169,23 @@ public abstract class FilterableItem extends SwitchableItem implements Implement
     }
 
     public static void shulkerBoxCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("ShulkerBox")) {
+        if (stack.getNbt() == null || !stack.getNbt().contains(SHULKER_BOX)) {
             shulkerBoxSet(stack);
         }
     }
 
     public static void shulkerBoxSet(ItemStack stack) {
-        if (!stack.getOrCreateNbt().contains("ShulkerBox")) {
-            stack.getOrCreateNbt().put("ShulkerBox", new NbtCompound());
+        if (!stack.getOrCreateNbt().contains(SHULKER_BOX)) {
+            stack.getOrCreateNbt().put(SHULKER_BOX, new NbtCompound());
         }
     }
 
     public static void setShulkerBoxItems(ItemStack stack, ArrayList<ItemStack> stacks) {
         shulkerBoxCheck(stack);
-        NbtList list = stack.getOrCreateNbt().getList("ShulkerBox", NbtElement.COMPOUND_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList(SHULKER_BOX, NbtElement.COMPOUND_TYPE);
         list.clear();
         stacks.stream().map(otherStack -> otherStack.writeNbt(new NbtCompound())).forEach(list::add);
-        stack.getOrCreateNbt().put("ShulkerBox", list);
+        stack.getOrCreateNbt().put(SHULKER_BOX, list);
     }
 
     public boolean canTeleportItems() {

@@ -13,6 +13,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.JUMPING_PACKET_ID;
 
+/**
+ * @author iMoonDay
+ */
 @Environment(EnvType.CLIENT)
 @Mixin(ClientPlayerEntity.class)
 public class ClientPlayerEntityMixin {

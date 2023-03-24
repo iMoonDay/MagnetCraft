@@ -17,8 +17,14 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static com.imoonday.magnetcraft.registries.common.EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT;
 
+/**
+ * @author iMoonDay
+ */
+@SuppressWarnings({"AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc", "AlibabaAbstractClassShouldStartWithAbstractNaming"})
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin {
+
+    private static final String USED_TICK = "UsedTick";
 
     @Shadow
     public abstract ItemStack getEquippedStack(EquipmentSlot slot);
@@ -45,14 +51,14 @@ public abstract class PlayerEntityMixin {
             }
             if (!world.isClient && !player.isSpectator()) {
                 ItemStack stack = player.getEquippedStack(EquipmentSlot.FEET);
-                boolean hasTick = stack.getNbt() != null && stack.getNbt().contains("UsedTick");
-                int tick = hasTick ? stack.getNbt().getInt("UsedTick") : 0;
+                boolean hasTick = stack.getNbt() != null && stack.getNbt().contains(USED_TICK);
+                int tick = hasTick ? stack.getNbt().getInt(USED_TICK) : 0;
                 if (EnchantmentMethods.hasEnchantment(stack, MAGNETIC_LEVITATION_ENCHANTMENT) && player.getMagneticLevitationMode() && !player.getAbilities().creativeMode) {
-                    stack.getOrCreateNbt().putInt("UsedTick", ++tick);
+                    stack.getOrCreateNbt().putInt(USED_TICK, ++tick);
                 }
                 int maxTick = 60 * 20;
-                while (hasTick && stack.getNbt().getInt("UsedTick") >= maxTick) {
-                    stack.getOrCreateNbt().putInt("UsedTick", stack.getOrCreateNbt().getInt("UsedTick") - maxTick);
+                while (hasTick && stack.getNbt().getInt(USED_TICK) >= maxTick) {
+                    stack.getOrCreateNbt().putInt(USED_TICK, stack.getOrCreateNbt().getInt(USED_TICK) - maxTick);
                     MagnetCraft.DamageMethods.addDamage(stack, player.getRandom(), 1, true);
                 }
             }

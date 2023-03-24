@@ -18,9 +18,14 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 
-@SuppressWarnings("ConstantValue")
+/**
+ * @author iMoonDay
+ */
+@SuppressWarnings({"ConstantValue", "AlibabaUndefineMagicConstant"})
 public class LodestoneScreenHandler extends ScreenHandler {
 
+    public static final String REDSTONE = "redstone";
+    public static final String DIS = "dis";
     private BlockPos pos;
     private final Inventory inventory;
     private final PlayerEntity player;
@@ -88,6 +93,7 @@ public class LodestoneScreenHandler extends ScreenHandler {
         }
     }
 
+    @SuppressWarnings("AlibabaSwitchStatement")
     @Override
     public boolean onButtonClick(PlayerEntity player, int id) {
         if (id < 0 || id > 3) {
@@ -101,21 +107,21 @@ public class LodestoneScreenHandler extends ScreenHandler {
                 int maxDis = ModConfig.getValue().lodestoneMaxDis;
                 switch (id) {
                     case 0 -> {
-                        nbt.putBoolean("redstone", !entity.createNbt().getBoolean("redstone"));
-                        if (entity.createNbt().getBoolean("redstone")) {
-                            nbt.putDouble("dis", lastDis);
+                        nbt.putBoolean(REDSTONE, !entity.createNbt().getBoolean(REDSTONE));
+                        if (entity.createNbt().getBoolean(REDSTONE)) {
+                            nbt.putDouble(DIS, lastDis);
                         } else {
-                            this.lastDis = (int) nbt.getDouble("dis");
+                            this.lastDis = (int) nbt.getDouble(DIS);
                         }
                     }
                     case 1 -> {
-                        if (!entity.createNbt().getBoolean("redstone")) {
-                            nbt.putDouble("dis", entity.createNbt().getDouble("dis") - disEachClick >= 0 ? entity.createNbt().getDouble("dis") - disEachClick : maxDis);
+                        if (!entity.createNbt().getBoolean(REDSTONE)) {
+                            nbt.putDouble(DIS, entity.createNbt().getDouble(DIS) - disEachClick >= 0 ? entity.createNbt().getDouble(DIS) - disEachClick : maxDis);
                         }
                     }
                     case 2 -> {
-                        if (!entity.createNbt().getBoolean("redstone")) {
-                            nbt.putDouble("dis", entity.createNbt().getDouble("dis") + disEachClick <= maxDis ? entity.createNbt().getDouble("dis") + disEachClick : 0);
+                        if (!entity.createNbt().getBoolean(REDSTONE)) {
+                            nbt.putDouble(DIS, entity.createNbt().getDouble(DIS) + disEachClick <= maxDis ? entity.createNbt().getDouble(DIS) + disEachClick : 0);
                         }
                     }
                     case 3 -> nbt.putBoolean("filter", !isFilter());

@@ -30,10 +30,16 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * @author iMoonDay
+ */
 public abstract class AbstractMagneticSuckerItem extends Item {
 
     public static final String BLOCK_ENTITY_TAG_KEY = "BlockEntityTag";
     public static final String BLOCK_STATE_TAG_KEY = "BlockStateTag";
+    public static final String TAG = "tag";
+    public static final String POWER = "power";
+    public static final String BLOCK = "Block";
 
     public AbstractMagneticSuckerItem(Settings settings) {
         super(settings);
@@ -51,15 +57,15 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         if (blockEntity != null) {
             NbtCompound tag = new NbtCompound();
             tag.put(BLOCK_ENTITY_TAG_KEY, blockEntity.createNbtWithId());
-            itemNbt.put("tag", tag);
+            itemNbt.put(TAG, tag);
         }
         Collection<Property<?>> properties = state.getProperties();
         if (!properties.isEmpty()) {
-            NbtCompound tag = Optional.ofNullable(itemNbt.getCompound("tag")).orElse(new NbtCompound());
+            NbtCompound tag = Optional.ofNullable(itemNbt.getCompound(TAG)).orElse(new NbtCompound());
             NbtCompound nbt = new NbtCompound();
-            properties.stream().filter(property -> property instanceof IntProperty && !property.getName().equals("power")).map(IntProperty.class::cast).forEach(property -> nbt.putInt(property.getName(), state.get(property)));
+            properties.stream().filter(property -> property instanceof IntProperty && !POWER.equals(property.getName())).map(IntProperty.class::cast).forEach(property -> nbt.putInt(property.getName(), state.get(property)));
             tag.put(BlockItem.BLOCK_STATE_TAG_KEY, nbt);
-            itemNbt.put("tag", tag);
+            itemNbt.put(TAG, tag);
         }
         return itemNbt;
     }
@@ -79,6 +85,10 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         if (!player.getAbilities().creativeMode) {
             MagnetCraft.DamageMethods.addDamage(stack, player.getRandom(), 1, true);
         }
+    }
+
+    protected static boolean cannotBreak(PlayerEntity player, World world, BlockPos placePos) {
+        return world.getBlockState(placePos).getHardness(world, placePos) == -1.0f && !player.isCreative();
     }
 
     @Override
@@ -109,7 +119,7 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         if (player instanceof ServerPlayerEntity) {
             Criteria.PLACED_BLOCK.trigger((ServerPlayerEntity) player, placePos, blockItemStack);
         }
-        stack.getOrCreateNbt().remove("Block");
+        stack.getOrCreateNbt().remove(BLOCK);
         BlockSoundGroup blockSoundGroup = state.getSoundGroup();
         world.playSound(player, placePos, blockSoundGroup.getPlaceSound(), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f);
         world.emitGameEvent(GameEvent.BLOCK_PLACE, placePos, GameEvent.Emitter.of(player, state));
@@ -132,7 +142,9 @@ public abstract class AbstractMagneticSuckerItem extends Item {
             StateManager<Block, BlockState> stateManager = blockState.getBlock().getStateManager();
             for (String string : nbtCompound2.getKeys()) {
                 Property<?> property = stateManager.getProperty(string);
-                if (property == null) continue;
+                if (property == null) {
+                    continue;
+                }
                 String string2 = Objects.requireNonNull(nbtCompound2.get(string)).asString();
                 blockState = with(blockState, property, string2);
             }

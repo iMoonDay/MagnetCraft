@@ -15,6 +15,9 @@ import net.minecraft.world.Heightmap;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 public class EntityRegistries {
 
     public static final EntityType<MagneticIronGolemEntity> MAGNETIC_IRON_GOLEM = register("magnetic_iron_golem", EntityType.Builder.create(MagneticIronGolemEntity::new, SpawnGroup.MISC).setDimensions(1.4f, 2.7f).maxTrackingRange(15));

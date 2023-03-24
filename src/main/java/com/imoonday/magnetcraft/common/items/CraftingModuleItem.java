@@ -9,6 +9,9 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
+/**
+ * @author iMoonDay
+ */
 public class CraftingModuleItem extends Item {
     public CraftingModuleItem(Settings settings) {
         super(settings);

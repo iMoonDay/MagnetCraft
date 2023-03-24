@@ -16,6 +16,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
+/**
+ * @author iMoonDay
+ */
 public class DemagnetizerEntity extends BlockEntity {
 
     public DemagnetizerEntity(BlockPos pos, BlockState state) {

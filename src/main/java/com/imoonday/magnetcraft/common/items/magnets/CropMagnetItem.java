@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
-import com.imoonday.magnetcraft.api.FilterableItem;
+import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
@@ -28,7 +28,14 @@ import java.util.Objects;
 import static com.imoonday.magnetcraft.common.items.magnets.ElectromagnetItem.tryInsertIntoShulkerBox;
 import static net.minecraft.state.property.Properties.*;
 
-public class CropMagnetItem extends FilterableItem {
+/**
+ * @author iMoonDay
+ */
+public class CropMagnetItem extends AbstractFilterableItem {
+
+    public static final String FILTERABLE = "Filterable";
+    public static final String FILTER = "Filter";
+    public static final String WHITELIST = "Whitelist";
 
     public CropMagnetItem(Settings settings) {
         super(settings);
@@ -41,7 +48,7 @@ public class CropMagnetItem extends FilterableItem {
     @Override
     public ItemStack getDefaultStack() {
         ItemStack stack = new ItemStack(this);
-        stack.getOrCreateNbt().putBoolean("Filterable", true);
+        stack.getOrCreateNbt().putBoolean(FILTERABLE, true);
         return stack;
     }
 
@@ -63,7 +70,7 @@ public class CropMagnetItem extends FilterableItem {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stackInHand = user.getStackInHand(hand);
-        if (stackInHand.getOrCreateNbt().getBoolean("Filterable") && user.isSneaky() && !user.getAbilities().flying) {
+        if (stackInHand.getOrCreateNbt().getBoolean(FILTERABLE) && user.isSneaky() && !user.getAbilities().flying) {
             if (!user.world.isClient) {
                 openScreen(user, hand, this);
             }
@@ -188,11 +195,11 @@ public class CropMagnetItem extends FilterableItem {
     }
 
     public static boolean canBreak(ItemStack stack, Item requiredItem) {
-        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
+        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean(FILTERABLE)) {
             String item = Registries.ITEM.getId(requiredItem).toString();
-            NbtList list = stack.getNbt().getList("Filter", NbtElement.COMPOUND_TYPE);
+            NbtList list = stack.getNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
             boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item));
-            boolean isWhitelist = stack.getNbt().getBoolean("Whitelist");
+            boolean isWhitelist = stack.getNbt().getBoolean(WHITELIST);
             return (isWhitelist && inList) || (!isWhitelist && !inList);
         }
         return true;

@@ -18,6 +18,9 @@ import net.minecraft.util.math.BlockPos;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 public class FluidRegistries {
 
     public static final FlowableFluid STILL_MAGNETIC_FLUID = register("magnetic_fluid", new MagneticFluid.Still());

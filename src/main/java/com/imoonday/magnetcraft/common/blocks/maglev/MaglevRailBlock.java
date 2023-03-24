@@ -19,6 +19,9 @@ import net.minecraft.world.WorldView;
 
 import static net.minecraft.registry.tag.BlockTags.RAILS;
 
+/**
+ * @author iMoonDay
+ */
 public class MaglevRailBlock extends RailBlock {
     public MaglevRailBlock(Settings settings) {
         super(settings);

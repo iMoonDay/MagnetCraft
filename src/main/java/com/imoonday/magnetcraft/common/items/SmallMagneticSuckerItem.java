@@ -24,7 +24,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+/**
+ * @author iMoonDay
+ */
 public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
+
+    public static final String BLOCK = "Block";
+    public static final String ID = "id";
+    public static final String POS = "Pos";
+
     public SmallMagneticSuckerItem(Settings settings) {
         super(settings);
     }
@@ -32,8 +40,8 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         NbtCompound nbt = stack.getNbt();
-        NbtCompound block = stack.getSubNbt("Block");
-        if (nbt != null && nbt.contains("Block") && block != null && block.contains("id")) {
+        NbtCompound block = stack.getSubNbt(BLOCK);
+        if (nbt != null && nbt.contains(BLOCK) && block != null && block.contains(ID)) {
             ItemStack stackInMagnet = ItemStack.fromNbt(block);
             tooltip.add(stackInMagnet.getName().copyContentOnly().formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         }
@@ -41,19 +49,19 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     @Override
     public ItemStack finishUsing(ItemStack stack, World world, LivingEntity user) {
-        if (!(user instanceof PlayerEntity player) || stack.getNbt() == null || !stack.getNbt().contains("Pos") || stack.getNbt().getIntArray("Pos").length != 3) {
+        if (!(user instanceof PlayerEntity player) || stack.getNbt() == null || !stack.getNbt().contains(POS) || stack.getNbt().getIntArray(POS).length != 3) {
             return stack;
         }
-        BlockPos pos = new BlockPos(stack.getOrCreateNbt().getIntArray("Pos")[0], stack.getOrCreateNbt().getIntArray("Pos")[1], stack.getOrCreateNbt().getIntArray("Pos")[2]);
+        BlockPos pos = new BlockPos(stack.getOrCreateNbt().getIntArray(POS)[0], stack.getOrCreateNbt().getIntArray(POS)[1], stack.getOrCreateNbt().getIntArray(POS)[2]);
         BlockState state = world.getBlockState(pos);
-        if (state.getHardness(world, pos) == -1.0f && !player.isCreative()) {
+        if (cannotBreak(player, world, pos)) {
             return stack;
         }
-        stack.getNbt().remove("Pos");
+        stack.getNbt().remove(POS);
         Block block = state.getBlock();
         ItemStack blockStack = new ItemStack(block);
         NbtCompound itemNbt = getItemNbt(world, pos, state, blockStack);
-        stack.getOrCreateNbt().put("Block", itemNbt);
+        stack.getOrCreateNbt().put(BLOCK, itemNbt);
         breakBlock(stack, world, player, pos, state, block);
         player.getInventory().markDirty();
         player.getItemCooldownManager().set(this, 20);
@@ -62,8 +70,8 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (stack.getNbt() != null && stack.getNbt().contains("Pos")) {
-            stack.getNbt().remove("Pos");
+        if (stack.getNbt() != null && stack.getNbt().contains(POS)) {
+            stack.getNbt().remove(POS);
         }
     }
 
@@ -77,8 +85,8 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
         Direction direction = context.getSide();
         Vec3d hitPos = context.getHitPos();
         boolean insideBlock = context.hitsInsideBlock();
-        if (stack.getNbt() != null && stack.getNbt().contains("Block")) {
-            ItemStack blockItemStack = ItemStack.fromNbt(stack.getNbt().getCompound("Block"));
+        if (stack.getNbt() != null && stack.getNbt().contains(BLOCK)) {
+            ItemStack blockItemStack = ItemStack.fromNbt(stack.getNbt().getCompound(BLOCK));
             Block blockFromItem = Block.getBlockFromItem(blockItemStack.getItem());
             BlockHitResult hit = new BlockHitResult(hitPos, direction, blockPos, insideBlock);
             ItemUsageContext newContext = new ItemUsageContext(world, player, hand, blockItemStack, hit);
@@ -88,7 +96,7 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
             return state == null || tryPlaceFailed(ctx, state) ? ActionResult.FAIL : place(stack, player, world, blockItemStack, placePos, state);
         } else {
             if (player != null && (player.getAbilities().creativeMode || !MagnetCraft.DamageMethods.isEmptyDamage(stack))) {
-                stack.getOrCreateNbt().putIntArray("Pos", new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
+                stack.getOrCreateNbt().putIntArray(POS, new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
                 player.setCurrentHand(hand);
             }
         }

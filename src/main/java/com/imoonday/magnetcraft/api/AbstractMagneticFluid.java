@@ -13,6 +13,9 @@ import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
+/**
+ * @author iMoonDay
+ */
 public abstract class AbstractMagneticFluid extends FlowableFluid {
 
     @Override

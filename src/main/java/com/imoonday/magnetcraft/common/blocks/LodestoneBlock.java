@@ -22,7 +22,16 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
+/**
+ * @author iMoonDay
+ */
 public class LodestoneBlock extends BlockWithEntity {
+
+    public static final String REDSTONE = "redstone";
+    public static final String DIS = "dis";
+    public static final String DIRECTION = "direction";
+    public static final String FILTER = "filter";
+
     public LodestoneBlock(Settings settings) {
         super(settings);
     }
@@ -47,9 +56,9 @@ public class LodestoneBlock extends BlockWithEntity {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         NbtCompound nbt = new NbtCompound();
-        nbt.putBoolean("redstone", true);
-        nbt.putInt("direction", 0);
-        nbt.putBoolean("filter", false);
+        nbt.putBoolean(REDSTONE, true);
+        nbt.putInt(DIRECTION, 0);
+        nbt.putBoolean(FILTER, false);
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity != null) {
             blockEntity.readNbt(nbt);
@@ -59,18 +68,20 @@ public class LodestoneBlock extends BlockWithEntity {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity == null) return ActionResult.FAIL;
-        int direction = blockEntity.createNbt().getInt("direction");
+        if (blockEntity == null) {
+            return ActionResult.FAIL;
+        }
+        int direction = blockEntity.createNbt().getInt(DIRECTION);
         NbtCompound nbt = new NbtCompound();
         Direction side = hit.getSide();
         if (player.isSneaky()) {
             switch (side) {
-                case SOUTH -> nbt.putInt("direction", direction == 1 ? 0 : 1);
-                case WEST -> nbt.putInt("direction", direction == 2 ? 0 : 2);
-                case NORTH -> nbt.putInt("direction", direction == 3 ? 0 : 3);
-                case EAST -> nbt.putInt("direction", direction == 4 ? 0 : 4);
-                case UP -> nbt.putInt("direction", direction == 5 ? 0 : 5);
-                case DOWN -> nbt.putInt("direction", direction == 6 ? 0 : 6);
+                case SOUTH -> nbt.putInt(DIRECTION, direction == 1 ? 0 : 1);
+                case WEST -> nbt.putInt(DIRECTION, direction == 2 ? 0 : 2);
+                case NORTH -> nbt.putInt(DIRECTION, direction == 3 ? 0 : 3);
+                case EAST -> nbt.putInt(DIRECTION, direction == 4 ? 0 : 4);
+                case UP -> nbt.putInt(DIRECTION, direction == 5 ? 0 : 5);
+                case DOWN -> nbt.putInt(DIRECTION, direction == 6 ? 0 : 6);
             }
         } else {
             Block block = Block.getBlockFromItem(player.getStackInHand(hand).getItem());
@@ -118,12 +129,16 @@ public class LodestoneBlock extends BlockWithEntity {
 
     public static void showState(World world, BlockPos pos, @Nullable PlayerEntity player) {
         BlockEntity blockEntity = world.getBlockEntity(pos);
-        if (blockEntity == null) return;
-        boolean redstone = blockEntity.createNbt().getBoolean("redstone");
-        double dis = blockEntity.createNbt().getDouble("dis");
-        int direction = blockEntity.createNbt().getInt("direction");
+        if (blockEntity == null) {
+            return;
+        }
+        boolean redstone = blockEntity.createNbt().getBoolean(REDSTONE);
+        double dis = blockEntity.createNbt().getDouble(DIS);
+        int direction = blockEntity.createNbt().getInt(DIRECTION);
         String directionText = "text.magnetcraft.message.direction." + direction;
         Text text = redstone ? Text.translatable("text.magnetcraft.message.redstone_mode").append(Text.translatable("block.magnetcraft.lodestone.tooltip.3", dis)).append(Text.translatable(directionText)) : Text.translatable("block.magnetcraft.lodestone.tooltip.3", dis).append(Text.translatable(directionText));
-        if (!world.isClient && player != null) player.sendMessage(text, true);
+        if (!world.isClient && player != null) {
+            player.sendMessage(text, true);
+        }
     }
 }

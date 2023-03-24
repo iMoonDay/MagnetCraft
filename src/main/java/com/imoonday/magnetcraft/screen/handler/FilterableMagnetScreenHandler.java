@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.screen.handler;
 
-import com.imoonday.magnetcraft.api.FilterableItem;
+import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.minecraft.block.Block;
@@ -24,9 +24,17 @@ import java.util.Arrays;
 import static com.imoonday.magnetcraft.common.items.MagnetControllerItem.changeMagnetEnable;
 import static net.minecraft.item.Items.*;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("ConstantValue")
 public class FilterableMagnetScreenHandler extends ScreenHandler {
 
+    public static final String SHULKER_BOX = "ShulkerBox";
+    public static final String WHITELIST = "Whitelist";
+    public static final String COMPARE_DAMAGE = "CompareDamage";
+    public static final String COMPARE_NBT = "CompareNbt";
+    public static final String ENABLE = "Enable";
     private final int slot;
     private final Inventory filterSlots;
     private final Inventory shulkerBoxSlots = new SimpleInventory(3);
@@ -69,7 +77,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
         this.filterSlots = filterSlots;
         this.slot = slot;
         this.player = playerInventory.player;
-        NbtList list = getStack().getOrCreateNbt().getList("ShulkerBox", NbtElement.COMPOUND_TYPE);
+        NbtList list = getStack().getOrCreateNbt().getList(SHULKER_BOX, NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < list.size(); i++) {
             ItemStack itemstackFromNbt = ItemStack.fromNbt(list.getCompound(i));
             this.shulkerBoxSlots.setStack(i, itemstackFromNbt);
@@ -124,9 +132,9 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
             stacks.add(inventory.getStack(i));
         }
         if (inventory == this.filterSlots) {
-            FilterableItem.setFilterItems(getStack(), stacks);
+            AbstractFilterableItem.setFilterItems(getStack(), stacks);
         } else if (inventory == this.shulkerBoxSlots) {
-            FilterableItem.setShulkerBoxItems(getStack(), stacks);
+            AbstractFilterableItem.setShulkerBoxItems(getStack(), stacks);
         }
         this.sendContentUpdates();
     }
@@ -144,15 +152,15 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
             return false;
         }
         switch (id) {
-            case 0 -> FilterableItem.setBoolean(getStack(), "Whitelist", true);
-            case 1 -> FilterableItem.setBoolean(getStack(), "Whitelist", false);
-            case 2 -> FilterableItem.setBoolean(getStack(), "CompareDamage");
-            case 3 -> FilterableItem.setBoolean(getStack(), "CompareNbt");
+            case 0 -> AbstractFilterableItem.setBoolean(getStack(), WHITELIST, true);
+            case 1 -> AbstractFilterableItem.setBoolean(getStack(), WHITELIST, false);
+            case 2 -> AbstractFilterableItem.setBoolean(getStack(), COMPARE_DAMAGE);
+            case 3 -> AbstractFilterableItem.setBoolean(getStack(), COMPARE_NBT);
             case 4 -> {
                 if (getStack().isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
                     changeMagnetEnable(player);
                 } else {
-                    FilterableItem.setBoolean(getStack(), "Enable");
+                    AbstractFilterableItem.setBoolean(getStack(), ENABLE);
                 }
             }
         }

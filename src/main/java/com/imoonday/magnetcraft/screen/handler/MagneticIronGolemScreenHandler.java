@@ -9,6 +9,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("ConstantValue")
 public class MagneticIronGolemScreenHandler extends ScreenHandler {
 

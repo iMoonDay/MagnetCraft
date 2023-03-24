@@ -11,6 +11,9 @@ import net.minecraft.util.math.RotationAxis;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 @Environment(value= EnvType.CLIENT)
 public class MagneticIronGolemEntityRenderer extends MobEntityRenderer<MagneticIronGolemEntity, MagneticIronGolemEntityModel> {
 
@@ -27,7 +30,8 @@ public class MagneticIronGolemEntityRenderer extends MobEntityRenderer<MagneticI
     @Override
     protected void setupTransforms(MagneticIronGolemEntity entity, MatrixStack matrixStack, float f, float g, float h) {
         super.setupTransforms(entity, matrixStack, f, g, h);
-        if ((double)entity.limbAnimator.getSpeed() < 0.01) {
+        double d = 0.01;
+        if ((double)entity.limbAnimator.getSpeed() < d) {
             return;
         }
         float i = 13.0f;

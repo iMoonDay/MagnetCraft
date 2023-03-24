@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.function.Consumer;
 
+/**
+ * @author iMoonDay
+ */
 @Mixin(EntityType.class)
 public class EntityTypeMixin {
 

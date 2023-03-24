@@ -7,9 +7,14 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
+/**
+ * @author iMoonDay
+ */
 public class MagneticIronArmorMaterial implements ArmorMaterial {
+
     private static final int[] BASE_DURABILITY = new int[] {13, 15, 16, 11};
     private static final int[] PROTECTION_VALUES = new int[] {2,5,6,2};
+    public static final String MAGNETIC_IRON = "magnetic_iron";
 
     @Override
     public int getDurability(ArmorItem.Type type) {
@@ -39,7 +44,7 @@ public class MagneticIronArmorMaterial implements ArmorMaterial {
     @Override
     public String getName() {
         // Must be all lowercase
-        return "magnetic_iron";
+        return MAGNETIC_IRON;
     }
 
     @Override

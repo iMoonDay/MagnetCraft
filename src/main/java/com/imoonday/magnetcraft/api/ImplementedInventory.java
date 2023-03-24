@@ -8,9 +8,10 @@ import net.minecraft.util.collection.DefaultedList;
 
 /**
  * 一个简单的 {@code Inventory} 实现，仅有默认的方法和物品列表获取器。
- *
+ * <p>
  * Originally by Juuz
  */
+@SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
 public interface ImplementedInventory extends Inventory {
 
     /**

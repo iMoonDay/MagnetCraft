@@ -25,6 +25,10 @@ import net.minecraft.util.Identifier;
 
 import static com.imoonday.magnetcraft.registries.common.FluidRegistries.*;
 
+/**
+ * @author iMoonDay
+ */
+@SuppressWarnings("AlibabaUndefineMagicConstant")
 public class MagneticFluid extends AbstractMagneticFluid {
 
     @Override
@@ -102,7 +106,8 @@ public class MagneticFluid extends AbstractMagneticFluid {
     public static void tick(LivingEntity entity) {
         FluidState fluidState = entity.getBlockStateAtPos().getFluidState();
         BlockState blockState = entity.getBlockStateAtPos();
-        if ((fluidState.isIn(FluidTags.MAGNETIC_FLUID) && entity.isTouchingWater()) || blockState.isOf(BlockRegistries.MAGNETIC_FLUID_CAULDRON)) {
+        boolean inFluid = (fluidState.isIn(FluidTags.MAGNETIC_FLUID) && entity.isTouchingWater()) || blockState.isOf(BlockRegistries.MAGNETIC_FLUID_CAULDRON);
+        if (inFluid) {
             double fluidHeight = fluidState.getHeight();
             int level = fluidState.getLevel();
             double multiplier = 0.9 - level * 0.05;

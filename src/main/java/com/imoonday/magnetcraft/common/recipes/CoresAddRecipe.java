@@ -16,6 +16,9 @@ import static com.imoonday.magnetcraft.registries.special.RecipeRegistries.*;
 import static com.imoonday.magnetcraft.common.tags.ItemTags.CORES;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.MINERAL_MAGNET_ITEM;
 
+/**
+ * @author iMoonDay
+ */
 public class CoresAddRecipe extends SpecialCraftingRecipe {
 
     public CoresAddRecipe(Identifier id, CraftingRecipeCategory category) {
@@ -113,7 +116,9 @@ public class CoresAddRecipe extends SpecialCraftingRecipe {
         DefaultedList<ItemStack> defaultedList = DefaultedList.ofSize(inventory.size(), ItemStack.EMPTY);
         for (int i = 0; i < defaultedList.size(); ++i) {
             Item item = inventory.getStack(i).getItem();
-            if (!item.hasRecipeRemainder() || item == excludeItem) continue;
+            if (!item.hasRecipeRemainder() || item == excludeItem) {
+                continue;
+            }
             defaultedList.set(i, new ItemStack(item.getRecipeRemainder()));
         }
         return defaultedList;

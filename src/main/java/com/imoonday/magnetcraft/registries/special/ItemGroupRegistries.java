@@ -14,9 +14,13 @@ import static com.imoonday.magnetcraft.registries.common.FluidRegistries.MAGNETI
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.*;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("CodeBlock2Expr")
 public class ItemGroupRegistries {
 
+    @SuppressWarnings("AlibabaMethodTooLong")
     public static void register() {
 
         FabricItemGroup.builder(id("magnet"))

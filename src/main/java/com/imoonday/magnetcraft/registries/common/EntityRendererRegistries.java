@@ -10,6 +10,9 @@ import net.minecraft.client.render.entity.model.EntityModelLayer;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 @Environment(EnvType.CLIENT)
 public class EntityRendererRegistries {
 

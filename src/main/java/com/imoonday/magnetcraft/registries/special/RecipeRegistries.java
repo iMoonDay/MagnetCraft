@@ -5,6 +5,9 @@ import com.imoonday.magnetcraft.common.recipes.FilterAddRecipe;
 import net.minecraft.recipe.RecipeSerializer;
 import net.minecraft.recipe.SpecialRecipeSerializer;
 
+/**
+ * @author iMoonDay
+ */
 public class RecipeRegistries {
 
     public static final RecipeSerializer<CoresAddRecipe> CORES_ADD_RECIPE = RecipeSerializer.register("cores_add", new SpecialRecipeSerializer<>(CoresAddRecipe::new));

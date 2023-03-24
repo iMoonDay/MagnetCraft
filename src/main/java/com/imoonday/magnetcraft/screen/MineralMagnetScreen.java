@@ -16,15 +16,20 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 
-import java.util.Objects;
-
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.RAW_MAGNET_ITEM;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 import static net.minecraft.item.Items.*;
 
+/**
+ * @author iMoonDay
+ */
 public class MineralMagnetScreen extends HandledScreen<MineralMagnetScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/mineral_magnet.png");
+    public static final String FILTERABLE = "Filterable";
+    public static final String CORES = "Cores";
+    public static final String ENABLE = "enable";
+    public static final String ID = "id";
 
     public MineralMagnetScreen(MineralMagnetScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -129,10 +134,10 @@ public class MineralMagnetScreen extends HandledScreen<MineralMagnetScreenHandle
 
     public boolean canDestory(Item requiredItem) {
         ItemStack stack = this.handler.getSlot() != -1 ? this.handler.getInventory().getStack(this.handler.getSlot()) : this.handler.getInventory().player.getOffHandStack();
-        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean("Filterable")) {
+        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean(FILTERABLE)) {
             String item = Registries.ITEM.getId(requiredItem).toString();
-            NbtList list = stack.getNbt().getList("Cores", NbtElement.COMPOUND_TYPE);
-            return list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item) && ((NbtCompound) nbtElement).getBoolean("enable"));
+            NbtList list = stack.getNbt().getList(CORES, NbtElement.COMPOUND_TYPE);
+            return list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString(ID).equals(item) && nbtCompound.getBoolean(ENABLE));
         }
         return false;
     }

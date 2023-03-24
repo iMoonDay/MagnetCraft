@@ -36,6 +36,9 @@ import java.util.Map;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("unused")
 public class BlockRegistries {
 

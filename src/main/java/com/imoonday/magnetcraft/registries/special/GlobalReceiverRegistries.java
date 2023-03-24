@@ -21,13 +21,25 @@ import net.minecraft.text.Text;
 
 import static com.imoonday.magnetcraft.registries.common.EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
+
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("RedundantCast")
 public class GlobalReceiverRegistries {
+
+    public static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
+    public static final String ITEMS = "Items";
+    public static final String ID = "id";
+    public static final int PERMISSION_LEVEL_4 = 4;
+    public static final String ON = "on";
+    public static final String OFF = "off";
 
     public static void serverPlayNetworkingRegister() {
         ServerPlayNetworking.registerGlobalReceiver(KEYBINDINGS_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             if (!player.getItemCooldownManager().isCoolingDown(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
-                if (player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) && stack.getNbt() != null && stack.getNbt().getCompound("BlockEntityTag").getList("Items", NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).anyMatch(nbtCompound -> nbtCompound.getString("id").equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString()))))) {
+                boolean contains = player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) && stack.getNbt() != null && stack.getNbt().getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).anyMatch(nbtCompound -> nbtCompound.getString(ID).equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString()))));
+                if (contains) {
                     PacketByteBuf newBuf = PacketByteBufs.create();
                     newBuf.writeBoolean(!((MagnetCraftEntity) player).getEnable());
                     MagnetControllerItem.useController(player, null, false);
@@ -38,13 +50,13 @@ public class GlobalReceiverRegistries {
         }));
 
         ServerPlayNetworking.registerGlobalReceiver(BLACKLIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
-            if (player.hasPermissionLevel(4)) {
+            if (player.hasPermissionLevel(PERMISSION_LEVEL_4)) {
                 CommandRegistries.itemListHandling(player, null, CommandRegistries.ListType.BLACKLIST, null);
             }
         }));
 
         ServerPlayNetworking.registerGlobalReceiver(WHITELIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
-            if (player.hasPermissionLevel(4)) {
+            if (player.hasPermissionLevel(PERMISSION_LEVEL_4)) {
                 CommandRegistries.itemListHandling(player, null, CommandRegistries.ListType.WHITELIST, null);
             }
         }));
@@ -53,8 +65,8 @@ public class GlobalReceiverRegistries {
             if (MagnetCraft.EnchantmentMethods.hasEnchantment(player, EquipmentSlot.FEET, MAGNETIC_LEVITATION_ENCHANTMENT)) {
                 boolean mode = !((MagnetCraftEntity) player).getMagneticLevitationMode();
                 ((MagnetCraftEntity) player).setMagneticLevitationMode(mode);
-                String OnOff = mode ? "on" : "off";
-                player.sendMessage(Text.translatable("text.magnetcraft.message.magnetic_levitation_mode." + OnOff), true);
+                String onOff = mode ? ON : OFF;
+                player.sendMessage(Text.translatable("text.magnetcraft.message.magnetic_levitation_mode." + onOff), true);
                 if (!mode && !player.getAbilities().flying && MagnetCraft.EnchantmentMethods.hasEnchantment(player, EquipmentSlot.FEET, MAGNETIC_LEVITATION_ENCHANTMENT) && !player.isOnGround()) {
                     player.setNoGravity(false);
                 }
@@ -73,8 +85,8 @@ public class GlobalReceiverRegistries {
             if (MagnetCraft.EnchantmentMethods.hasEnchantment(player, EquipmentSlot.FEET, MAGNETIC_LEVITATION_ENCHANTMENT)) {
                 boolean enable = !((MagnetCraftEntity) player).getAutomaticLevitation();
                 ((MagnetCraftEntity) player).setAutomaticLevitation(enable);
-                String OnOff = enable ? "on" : "off";
-                player.sendMessage(Text.translatable("text.magnetcraft.message.automatic_levitation." + OnOff));
+                String onOff = enable ? ON : OFF;
+                player.sendMessage(Text.translatable("text.magnetcraft.message.automatic_levitation." + onOff));
                 PacketByteBuf clientBuf = PacketByteBufs.create();
                 clientBuf.writeBoolean(enable);
                 ServerPlayNetworking.send(player, AUTOMATIC_LEVITATION_PACKET_ID, clientBuf);

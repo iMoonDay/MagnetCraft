@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.screen.handler;
 
-import com.imoonday.magnetcraft.api.FilterableItem;
+import com.imoonday.magnetcraft.api.AbstractFilterableItem;
 import com.imoonday.magnetcraft.registries.special.ScreenRegistries;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
@@ -24,9 +24,13 @@ import static com.imoonday.magnetcraft.registries.common.ItemRegistries.RAW_MAGN
 import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags.SHULKER_BOXES;
 import static net.minecraft.item.Items.*;
 
+/**
+ * @author iMoonDay
+ */
 @SuppressWarnings("ConstantValue")
 public class MineralMagnetScreenHandler extends ScreenHandler {
 
+    public static final String SHULKER_BOX = "ShulkerBox";
     private final int slot;
     private final PlayerInventory inventory;
     private final Inventory shulkerBoxSlots = new SimpleInventory(3);
@@ -48,7 +52,7 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
         this.inventory = inventory;
         this.slot = slot;
         ItemStack stack = getSlot() != -1 ? getInventory().getStack(getSlot()) : getInventory().player.getOffHandStack();
-        NbtList list = stack.getOrCreateNbt().getList("ShulkerBox", NbtElement.COMPOUND_TYPE);
+        NbtList list = stack.getOrCreateNbt().getList(SHULKER_BOX, NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < list.size(); i++) {
             ItemStack itemstackFromNbt = ItemStack.fromNbt(list.getCompound(i));
             this.shulkerBoxSlots.setStack(i, itemstackFromNbt);
@@ -84,7 +88,7 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
                 stacks.add(inventory.getStack(i));
             }
             ItemStack stack = getSlot() != -1 ? getInventory().getStack(getSlot()) : getInventory().player.getOffHandStack();
-            FilterableItem.setShulkerBoxItems(stack, stacks);
+            AbstractFilterableItem.setShulkerBoxItems(stack, stacks);
         }
         this.sendContentUpdates();
     }

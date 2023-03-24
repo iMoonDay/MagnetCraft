@@ -5,7 +5,10 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
 
-@SuppressWarnings("unused")
+/**
+ * @author iMoonDay
+ */
+@SuppressWarnings({"unused", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc"})
 public interface MagnetCraftEntity {
 
     NbtCompound getAttractData();

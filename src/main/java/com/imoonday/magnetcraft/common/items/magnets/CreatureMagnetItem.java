@@ -1,7 +1,7 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.MagnetCraft;
-import com.imoonday.magnetcraft.api.SwitchableItem;
+import com.imoonday.magnetcraft.api.AbstractSwitchableItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -26,16 +26,21 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.UUID;
 
-public class CreatureMagnetItem extends SwitchableItem {
+/**
+ * @author iMoonDay
+ */
+public class CreatureMagnetItem extends AbstractSwitchableItem {
 
     public static final UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");
+    public static final String ENABLE = "Enable";
+    public static final String USED_TICK = "UsedTick";
 
     public CreatureMagnetItem(Settings settings) {
         super(settings);
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.CREATURE_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains("Enable") ? 0.0F : itemStack.getOrCreateNbt().getBoolean("Enable") ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.CREATURE_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains(ENABLE) ? 0.0F : itemStack.getOrCreateNbt().getBoolean(ENABLE) ? 1.0F : 0.0F);
     }
 
     @Override
@@ -106,7 +111,7 @@ public class CreatureMagnetItem extends SwitchableItem {
         boolean cooling = user.getItemCooldownManager().isCoolingDown(this);
         boolean entityCanAttract = !(entity instanceof PlayerEntity) && !(entity instanceof EnderDragonEntity) && !(entity instanceof WitherEntity);
         boolean creative = user.isCreative();
-        boolean enable = stack.getOrCreateNbt().getBoolean("Enable");
+        boolean enable = stack.getOrCreateNbt().getBoolean(ENABLE);
         boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
         if ((((!sneaking && !reversal) || (sneaking && reversal)) || !sneakToSwitch) && enable && !cooling && entityCanAttract) {
             if (hasAttractOwner && !entity.isAdsorbedByEntity() && !entity.isAdsorbedByBlock()) {
@@ -149,25 +154,25 @@ public class CreatureMagnetItem extends SwitchableItem {
         if (attractingEntity instanceof PlayerEntity player && usingMagnet && !player.isSpectator() && !(player.isCreative())) {
             if (player.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM)) {
                 ItemStack stack = player.getMainHandStack();
-                int tick = stack.getOrCreateNbt().getInt("UsedTick");
-                stack.getOrCreateNbt().putInt("UsedTick", ++tick);
+                int tick = stack.getOrCreateNbt().getInt(USED_TICK);
+                stack.getOrCreateNbt().putInt(USED_TICK, ++tick);
             } else {
                 ItemStack stack = player.getOffHandStack();
-                int tick = stack.getOrCreateNbt().getInt("UsedTick");
-                stack.getOrCreateNbt().putInt("UsedTick", ++tick);
+                int tick = stack.getOrCreateNbt().getInt(USED_TICK);
+                stack.getOrCreateNbt().putInt(USED_TICK, ++tick);
             }
         }
     }
 
 
     public static void usedTickCheck(ItemStack stack) {
-        if (stack.getNbt() == null || !stack.getNbt().contains("UsedTick")) {
+        if (stack.getNbt() == null || !stack.getNbt().contains(USED_TICK)) {
             usedTickSet(stack);
         }
     }
 
     public static void usedTickSet(ItemStack stack) {
-        stack.getOrCreateNbt().putInt("UsedTick", 0);
+        stack.getOrCreateNbt().putInt(USED_TICK, 0);
     }
 
     @Override
@@ -180,8 +185,8 @@ public class CreatureMagnetItem extends SwitchableItem {
         PlayerEntity playerByUuid = entity.world.getPlayerByUuid(entity.getAttractOwner());
         boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);
         if (!(entity instanceof PlayerEntity) && hasAttractOwner && playerByUuid != null && entity.getPos().isInRange(playerByUuid.getPos(), creatureDis) && playerByUuid.canAttract()) {
-            boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
-            boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean("Enable") && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
+            boolean attractOwnerMainhandCreature = playerByUuid.getMainHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getMainHandStack().getNbt() != null && playerByUuid.getMainHandStack().getNbt().getBoolean(ENABLE) && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.MAIN_HAND);
+            boolean attractOwnerOffhandCreature = playerByUuid.getOffHandStack().isOf(ItemRegistries.CREATURE_MAGNET_ITEM) && playerByUuid.getOffHandStack().getNbt() != null && playerByUuid.getOffHandStack().getNbt().getBoolean(ENABLE) && !MagnetCraft.DamageMethods.isEmptyDamage(playerByUuid, Hand.OFF_HAND);
             if ((attractOwnerMainhandCreature || attractOwnerOffhandCreature) && !entity.isAdsorbedByEntity() && !entity.isAdsorbedByBlock()) {
                 CreatureMagnetItem.followAttractOwner(entity, playerByUuid, true);
                 entity.setFollowing(true);

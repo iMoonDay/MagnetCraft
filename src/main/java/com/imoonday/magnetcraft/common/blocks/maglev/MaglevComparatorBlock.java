@@ -5,6 +5,9 @@ import net.minecraft.block.ComparatorBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
+/**
+ * @author iMoonDay
+ */
 public class MaglevComparatorBlock extends ComparatorBlock {
     public MaglevComparatorBlock(Settings settings) {
         super(settings);

@@ -30,7 +30,7 @@ import java.util.Objects;
 import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 
-@SuppressWarnings("RedundantCast")
+@SuppressWarnings("ALL")
 public class CommandRegistries {
 
     public static void register() {

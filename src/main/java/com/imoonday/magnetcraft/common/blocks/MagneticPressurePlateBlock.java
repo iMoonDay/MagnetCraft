@@ -6,8 +6,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
+/**
+ * @author iMoonDay
+ */
 public class MagneticPressurePlateBlock extends PressurePlateBlock {
-
 
     public MagneticPressurePlateBlock(ActivationRule type, Settings settings, BlockSetType blockSetType) {
         super(type, settings, blockSetType);

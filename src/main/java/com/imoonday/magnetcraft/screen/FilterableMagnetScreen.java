@@ -16,9 +16,16 @@ import java.awt.*;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
+/**
+ * @author iMoonDay
+ */
 public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/magnet_filter.png");
+    public static final String WHITELIST = "Whitelist";
+    public static final String ENABLE = "Enable";
+    public static final String COMPARE_DAMAGE = "CompareDamage";
+    public static final String COMPARE_NBT = "CompareNbt";
 
     public FilterableMagnetScreen(FilterableMagnetScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
@@ -69,10 +76,10 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
     @Override
     protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
         NbtCompound nbt = this.handler.getStack().getOrCreateNbt();
-        boolean whitelist = nbt.getBoolean("Whitelist");
-        boolean enable = nbt.getBoolean("Enable");
-        boolean compareDamage = nbt.getBoolean("CompareDamage");
-        boolean compareNbt = nbt.getBoolean("CompareNbt");
+        boolean whitelist = nbt.getBoolean(WHITELIST);
+        boolean enable = nbt.getBoolean(ENABLE);
+        boolean compareDamage = nbt.getBoolean(COMPARE_DAMAGE);
+        boolean compareNbt = nbt.getBoolean(COMPARE_NBT);
         boolean crop = this.handler.isCropMagnet();
         RenderSystem.setShader(GameRenderer::getPositionTexProgram);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
@@ -90,68 +97,16 @@ public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreen
         boolean onCompareDamage = mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.damage")) && mouseX <= x + 157 + 8 && mouseY >= y + 22 && mouseY <= y + 22 + 8;
         boolean onCompareNbt = mouseX >= x + 157 - 2 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.nbt")) && mouseX <= x + 157 + 8 && mouseY >= y + 38 && mouseY <= y + 38 + 8;
         if (whitelist) {
-            if (onWhitelist) {
-                drawTexture(matrices, x + 11, y + 22, 8, 174, 8, 8);
-            } else {
-                drawTexture(matrices, x + 11, y + 22, 0, 174, 8, 8);
-            }
-            if (onBlacklist) {
-                drawTexture(matrices, x + 11, y + 38, 8, 166, 8, 8);
-            } else {
-                drawTexture(matrices, x + 11, y + 38, 0, 166, 8, 8);
-            }
+            drawTexture(matrices, x + 11, y + 22, onWhitelist ? 8 : 0, 174, 8, 8);
+            drawTexture(matrices, x + 11, y + 38, onBlacklist ? 8 : 0, 166, 8, 8);
         } else {
-            if (onWhitelist) {
-                drawTexture(matrices, x + 11, y + 22, 8, 166, 8, 8);
-            } else {
-                drawTexture(matrices, x + 11, y + 22, 0, 166, 8, 8);
-            }
-            if (onBlacklist) {
-                drawTexture(matrices, x + 11, y + 38, 8, 174, 8, 8);
-            } else {
-                drawTexture(matrices, x + 11, y + 38, 0, 174, 8, 8);
-            }
+            drawTexture(matrices, x + 11, y + 22, onWhitelist ? 8 : 0, 166, 8, 8);
+            drawTexture(matrices, x + 11, y + 38, onBlacklist ? 8 : 0, 174, 8, 8);
         }
         if (!crop) {
-            if (compareDamage) {
-                if (onCompareDamage) {
-                    drawTexture(matrices, x + 157, y + 22, 8, 174, 8, 8);
-                } else {
-                    drawTexture(matrices, x + 157, y + 22, 0, 174, 8, 8);
-                }
-            } else {
-                if (onCompareDamage) {
-                    drawTexture(matrices, x + 157, y + 22, 8, 166, 8, 8);
-                } else {
-                    drawTexture(matrices, x + 157, y + 22, 0, 166, 8, 8);
-                }
-            }
-            if (compareNbt) {
-                if (onCompareNbt) {
-                    drawTexture(matrices, x + 157, y + 38, 8, 174, 8, 8);
-                } else {
-                    drawTexture(matrices, x + 157, y + 38, 0, 174, 8, 8);
-                }
-            } else {
-                if (onCompareNbt) {
-                    drawTexture(matrices, x + 157, y + 38, 8, 166, 8, 8);
-                } else {
-                    drawTexture(matrices, x + 157, y + 38, 0, 166, 8, 8);
-                }
-            }
-            if (enable) {
-                if (onEnable) {
-                    drawTexture(matrices, x + 11, y + 6, 8, 174, 8, 8);
-                } else {
-                    drawTexture(matrices, x + 11, y + 6, 0, 174, 8, 8);
-                }
-            } else {
-                if (onEnable) {
-                    drawTexture(matrices, x + 11, y + 6, 8, 166, 8, 8);
-                } else {
-                    drawTexture(matrices, x + 11, y + 6, 0, 166, 8, 8);
-                }
-            }
+            drawTexture(matrices, x + 157, y + 22, onCompareDamage ? 8 : 0, compareDamage ? 174 : 166, 8, 8);
+            drawTexture(matrices, x + 157, y + 38, onCompareNbt ? 8 : 0, compareNbt ? 174 : 166, 8, 8);
+            drawTexture(matrices, x + 11, y + 6, onEnable ? 8 : 0, enable ? 174 : 166, 8, 8);
             textRenderer.draw(matrices, Text.translatable("text.magnetcraft.screen.compare.damage"), x + 157 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.damage")) - 2, y + 22, Color.black.getRGB());
             textRenderer.draw(matrices, Text.translatable("text.magnetcraft.screen.compare.nbt"), x + 157 - textRenderer.getWidth(Text.translatable("text.magnetcraft.screen.compare.nbt")) - 2, y + 38, Color.black.getRGB());
             textRenderer.draw(matrices, Text.translatable("text.magnetcraft.screen.enable"), x + 11 + 8 + 2, y + 6, Color.black.getRGB());

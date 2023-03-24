@@ -3,6 +3,9 @@ package com.imoonday.magnetcraft.common.items.tools;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.ToolMaterial;
 
+/**
+ * @author iMoonDay
+ */
 public class CustomAxeItem extends AxeItem {
 
     public CustomAxeItem(ToolMaterial material, float attackDamage, float attackSpeed, Settings settings) {

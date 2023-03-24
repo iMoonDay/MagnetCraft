@@ -13,6 +13,9 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
+/**
+ * @author iMoonDay
+ */
 @Environment(EnvType.CLIENT)
 public class MagnetCraftClient implements ClientModInitializer {
 

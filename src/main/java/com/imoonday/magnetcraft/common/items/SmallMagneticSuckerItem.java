@@ -26,9 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     public static final String BLOCK = "Block";

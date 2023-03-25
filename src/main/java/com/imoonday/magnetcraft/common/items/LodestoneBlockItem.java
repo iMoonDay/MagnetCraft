@@ -11,9 +11,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class LodestoneBlockItem extends BlockItem {
     public LodestoneBlockItem(Block block, Settings settings) {
         super(block, settings);

@@ -16,9 +16,6 @@ import static com.imoonday.magnetcraft.registries.special.RecipeRegistries.*;
 import static com.imoonday.magnetcraft.common.tags.ItemTags.FILTERABLE_MAGNETS;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.FILTER_MODULE_ITEM;
 
-/**
- * @author iMoonDay
- */
 public class FilterAddRecipe extends SpecialCraftingRecipe {
 
     public static final String FILTERABLE = "Filterable";

@@ -5,9 +5,6 @@ import net.minecraft.block.LeverBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
-/**
- * @author iMoonDay
- */
 public class MaglevLeverBlock extends LeverBlock {
 
     public MaglevLeverBlock(Settings settings) {

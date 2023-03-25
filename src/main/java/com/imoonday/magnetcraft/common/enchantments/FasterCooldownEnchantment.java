@@ -9,9 +9,6 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
-/**
- * @author iMoonDay
- */
 public class FasterCooldownEnchantment extends Enchantment {
     public FasterCooldownEnchantment() {
         super(Enchantment.Rarity.UNCOMMON, EnchantmentTarget.BREAKABLE, new EquipmentSlot[]{});

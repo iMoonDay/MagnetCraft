@@ -20,9 +20,6 @@ import static com.imoonday.magnetcraft.registries.common.ItemRegistries.RAW_MAGN
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 import static net.minecraft.item.Items.*;
 
-/**
- * @author iMoonDay
- */
 public class MineralMagnetScreen extends HandledScreen<MineralMagnetScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/mineral_magnet.png");

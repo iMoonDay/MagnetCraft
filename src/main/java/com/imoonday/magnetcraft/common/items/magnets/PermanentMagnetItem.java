@@ -14,9 +14,6 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class PermanentMagnetItem extends AbstractFilterableItem {
 
     public static final String ENABLE = "Enable";

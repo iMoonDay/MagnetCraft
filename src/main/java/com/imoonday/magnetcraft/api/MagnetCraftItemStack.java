@@ -3,9 +3,6 @@ package com.imoonday.magnetcraft.api;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.math.random.Random;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
 public interface MagnetCraftItemStack {
 

@@ -39,9 +39,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Objects;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("AlibabaUndefineMagicConstant")
 public class MagneticIronGolemEntity extends IronGolemEntity implements ImplementedInventory {
 

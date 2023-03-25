@@ -1,0 +1,82 @@
+{
+  "variants": {
+    "facing=down,powered=false,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna",
+      "x": 180
+    },
+    "facing=down,powered=true,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna_on",
+      "x": 180
+    },
+    "facing=down,activated=true": {
+      "model": "magnetcraft:block/magnetic_antenna_activated",
+      "x": 180
+    },
+    "facing=east,powered=false,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,powered=true,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna_on",
+      "x": 90,
+      "y": 90
+    },
+    "facing=east,activated=true": {
+      "model": "magnetcraft:block/magnetic_antenna_activated",
+      "x": 90,
+      "y": 90
+    },
+    "facing=north,powered=false,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna",
+      "x": 90
+    },
+    "facing=north,powered=true,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna_on",
+      "x": 90
+    },
+    "facing=north,activated=true": {
+      "model": "magnetcraft:block/magnetic_antenna_activated",
+      "x": 90
+    },
+    "facing=south,powered=false,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,powered=true,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna_on",
+      "x": 90,
+      "y": 180
+    },
+    "facing=south,activated=true": {
+      "model": "magnetcraft:block/magnetic_antenna_activated",
+      "x": 90,
+      "y": 180
+    },
+    "facing=up,powered=false,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna"
+    },
+    "facing=up,powered=true,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna_on"
+    },
+    "facing=up,activated=true": {
+      "model": "magnetcraft:block/magnetic_antenna_activated"
+    },
+    "facing=west,powered=false,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,powered=true,activated=false": {
+      "model": "magnetcraft:block/magnetic_antenna_on",
+      "x": 90,
+      "y": 270
+    },
+    "facing=west,activated=true": {
+      "model": "magnetcraft:block/magnetic_antenna_activated",
+      "x": 90,
+      "y": 270
+    }
+  }
+}

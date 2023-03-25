@@ -7,9 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.MiningToolItem;
 
-/**
- * @author iMoonDay
- */
 public class AutomaticCollectionEnchantment extends Enchantment {
 
     public AutomaticCollectionEnchantment() {

@@ -8,9 +8,6 @@ import net.minecraft.util.Identifier;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 public class CustomStatRegistries {
 
     public static final Identifier ITEMS_TELEPORTED_TO_PLAYER = id("items_teleported_to_player");

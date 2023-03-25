@@ -3,9 +3,6 @@ package com.imoonday.magnetcraft.common.items.tools;
 import net.minecraft.item.PickaxeItem;
 import net.minecraft.item.ToolMaterial;
 
-/**
- * @author iMoonDay
- */
 public class CustomPickaxeItem extends PickaxeItem {
 
     public CustomPickaxeItem(ToolMaterial material, int attackDamage, float attackSpeed, Settings settings) {

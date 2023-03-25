@@ -12,9 +12,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author iMoonDay
- */
 public class DemagnetizerBlock extends BlockWithEntity {
 
     public DemagnetizerBlock(Settings settings) {

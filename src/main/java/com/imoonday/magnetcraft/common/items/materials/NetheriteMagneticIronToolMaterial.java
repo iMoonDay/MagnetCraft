@@ -4,9 +4,6 @@ import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.item.ToolMaterial;
 import net.minecraft.recipe.Ingredient;
 
-/**
- * @author iMoonDay
- */
 public class NetheriteMagneticIronToolMaterial implements ToolMaterial {
 
     public static final NetheriteMagneticIronToolMaterial INSTANCE = new NetheriteMagneticIronToolMaterial();

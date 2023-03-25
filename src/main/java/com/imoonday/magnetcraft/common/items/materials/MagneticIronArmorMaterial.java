@@ -7,9 +7,6 @@ import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 
-/**
- * @author iMoonDay
- */
 public class MagneticIronArmorMaterial implements ArmorMaterial {
 
     private static final int[] BASE_DURABILITY = new int[] {13, 15, 16, 11};

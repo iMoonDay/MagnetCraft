@@ -33,9 +33,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-/**
- * @author iMoonDay
- */
 public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandlerFactory, ImplementedInventory {
 
     public static final String REDSTONE = "redstone";
@@ -46,7 +43,6 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
     private boolean redstone;
     private double dis;
     private int direction;
-    private boolean enable;
     private boolean filter;
     private final DefaultedList<ItemStack> inventory = DefaultedList.ofSize(18, ItemStack.EMPTY);
 
@@ -55,7 +51,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         public int get(int index) {
             return switch (index) {
                 case 0 -> redstone ? 1 : 0;
-                case 1 -> (int) dis;
+                case 1 -> (int) getDis(world, pos, redstone, dis);
                 case 2 -> direction;
                 case 3 -> filter ? 1 : 0;
                 default -> 0;
@@ -78,21 +74,12 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
 
     public static void tick(World world, BlockPos pos, BlockState state, LodestoneEntity entity) {
         if (world != null) {
-            int maxDis = ModConfig.getValue().lodestoneMaxDis;
             world.updateListeners(pos, state, state, Block.NOTIFY_LISTENERS);
-            double dis = entity.dis <= maxDis ? entity.dis + 1 : maxDis + 1;
+            int maxDis = ModConfig.getValue().lodestoneMaxDis;
+            double dis = getDis(world, pos, entity.redstone, entity.dis);
             int getDirection = entity.direction;
             Vec3d centerPos = pos.toCenterPos().add(0, 0.5, 0);
-            if (entity.enable) {
-                centerPos = switch (getDirection) {
-                    case 1 -> centerPos.add(0, 0, 1);
-                    case 2 -> centerPos.add(-1, 0, 0);
-                    case 3 -> centerPos.add(0, 0, -1);
-                    case 4 -> centerPos.add(1, 0, 0);
-                    case 5 -> centerPos.add(0, 1, 0);
-                    case 6 -> centerPos.add(0, -1, 0);
-                    default -> centerPos;
-                };
+            if (entity.redstone ? world.isReceivingRedstonePower(pos) : dis > 1) {
                 Direction direction = switch (getDirection) {
                     case 1 -> Direction.SOUTH;
                     case 2 -> Direction.WEST;
@@ -102,8 +89,9 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                     case 6 -> Direction.DOWN;
                     default -> null;
                 };
-                ArrayList<Item> allowedItems = entity.inventory.stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
-                world.attractItems(centerPos, dis, entity.filter, allowedItems);
+                centerPos = direction != null ? centerPos.offset(direction, 1) : centerPos;
+                ArrayList<Item> allowedItems = entity.getItems().stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
+                world.attractItems(centerPos, dis <= maxDis ? dis : maxDis, entity.filter, allowedItems);
                 if (direction != null) {
                     putItemEntityIn(world, pos, entity, direction);
                 } else {
@@ -113,17 +101,19 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         }
     }
 
+    public static double getDis(World world, BlockPos pos, boolean redstone, double dis) {
+        int disPerPower = ModConfig.getValue().disPerPower;
+        return redstone ? world.getReceivedRedstonePower(pos) * disPerPower : dis;
+    }
+
     @Override
     public void writeNbt(NbtCompound nbt) {
-        int disPerPower = ModConfig.getValue().disPerPower;
         nbt.putBoolean(REDSTONE, redstone);
-        nbt.putDouble(DIS, redstone && world != null ? world.getReceivedRedstonePower(pos) * disPerPower : dis);
-        dis = nbt.getDouble(DIS);
-        enable = redstone ? world != null && world.isReceivingRedstonePower(pos) : dis > 1;
-        nbt.putBoolean(ENABLE, enable);
+        nbt.putDouble(DIS, dis);
         nbt.putInt(DIRECTION, direction);
         nbt.putBoolean(FILTER, filter);
         Inventories.writeNbt(nbt, inventory);
+        super.writeNbt(nbt);
     }
 
     @Override
@@ -141,6 +131,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         if (nbt.contains(FILTER)) {
             filter = nbt.getBoolean(FILTER);
         }
+        Inventories.readNbt(nbt, inventory);
     }
 
     @Nullable
@@ -179,7 +170,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).stream().map(entity -> (ItemEntity) entity).forEach(entity -> {
             DefaultedList<ItemStack> inventory = blockEntity.inventory;
             ItemStack stack = entity.getStack();
-            ArrayList<Item> allowedItems = blockEntity.inventory.stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
+            ArrayList<Item> allowedItems = blockEntity.getItems().stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
             if (!blockEntity.filter || allowedItems.contains(stack.getItem())) {
                 boolean hasEmptySlot = false;
                 boolean hasSameStack = false;

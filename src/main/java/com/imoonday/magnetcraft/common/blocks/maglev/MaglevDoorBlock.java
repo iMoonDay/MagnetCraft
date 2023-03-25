@@ -6,9 +6,6 @@ import net.minecraft.block.DoorBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
-/**
- * @author iMoonDay
- */
 public class MaglevDoorBlock extends DoorBlock {
 
     public MaglevDoorBlock(Settings settings, BlockSetType blockSetType) {

@@ -24,9 +24,6 @@ import static com.imoonday.magnetcraft.registries.common.ItemRegistries.RAW_MAGN
 import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalItemTags.SHULKER_BOXES;
 import static net.minecraft.item.Items.*;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("ConstantValue")
 public class MineralMagnetScreenHandler extends ScreenHandler {
 

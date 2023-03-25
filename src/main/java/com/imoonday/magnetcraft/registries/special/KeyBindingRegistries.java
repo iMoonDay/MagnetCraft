@@ -12,9 +12,6 @@ import org.lwjgl.glfw.GLFW;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
-/**
- * @author iMoonDay
- */
 public class KeyBindingRegistries {
 
     public static final String CATEGORY = "key.category.magnetcraft";

@@ -4,9 +4,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
 
-/**
- * @author iMoonDay
- */
 public class MagneticLevitationEnchantment extends Enchantment {
 
     public MagneticLevitationEnchantment() {

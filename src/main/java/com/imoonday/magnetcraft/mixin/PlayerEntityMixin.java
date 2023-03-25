@@ -23,9 +23,6 @@ import java.util.stream.DoubleStream;
 
 import static com.imoonday.magnetcraft.registries.common.EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT;
 
-/**
- * @author iMoonDay
- */
 @Mixin(PlayerEntity.class)
 public abstract class PlayerEntityMixin extends EntityMixin {
 

@@ -15,9 +15,6 @@ import java.awt.*;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("AlibabaUndefineMagicConstant")
 public class LodestoneScreen extends HandledScreen<LodestoneScreenHandler> {
 

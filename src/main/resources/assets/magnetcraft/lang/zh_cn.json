@@ -151,6 +151,7 @@
   "block.magnetcraft.magnetic_fluid_cauldron": "装有磁流体的炼药锅",
   "block.magnetcraft.circular_repeater": "红石循环中继器",
   "block.magnetcraft.electromagnetic_relay": "电磁继电器",
+  "block.magnetcraft.magnetic_antenna": "磁天线",
   "entity.magnetcraft.magnetic_iron_golem": "磁傀儡",
   "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "装备磁石的磁傀儡",
   "container.magnetcraft.advanced_grindstone_title": "附魔提取",

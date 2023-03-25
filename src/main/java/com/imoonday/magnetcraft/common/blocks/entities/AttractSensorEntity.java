@@ -14,9 +14,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-/**
- * @author iMoonDay
- */
 public class AttractSensorEntity extends BlockEntity {
 
     private int power;

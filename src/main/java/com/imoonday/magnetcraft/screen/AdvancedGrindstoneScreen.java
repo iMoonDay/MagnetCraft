@@ -20,9 +20,6 @@ import java.util.List;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 public class AdvancedGrindstoneScreen extends HandledScreen<AdvancedGrindstoneScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/advanced_grindstone.png");

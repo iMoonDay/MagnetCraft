@@ -27,9 +27,6 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Optional;
 
-/**
- * @author iMoonDay
- */
 public abstract class AbstractMagneticSuckerItem extends Item {
 
     public static final String BLOCK_ENTITY_TAG_KEY = "BlockEntityTag";

@@ -15,9 +15,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
-/**
- * @author iMoonDay
- */
 public abstract class AbstractSwitchableItem extends Item {
 
     public static final String ENABLE = "Enable";

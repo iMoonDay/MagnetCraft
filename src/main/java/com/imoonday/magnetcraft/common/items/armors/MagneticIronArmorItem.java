@@ -15,9 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class MagneticIronArmorItem extends ArmorItem {
 
 

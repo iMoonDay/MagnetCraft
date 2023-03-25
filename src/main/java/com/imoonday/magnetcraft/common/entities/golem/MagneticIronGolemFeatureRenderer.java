@@ -11,9 +11,6 @@ import java.util.Map;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 public class MagneticIronGolemFeatureRenderer extends FeatureRenderer<MagneticIronGolemEntity, MagneticIronGolemEntityModel> {
 
     private static final Map<MagneticIronGolemEntity.Crack, Identifier> DAMAGE_TO_TEXTURE = ImmutableMap.of(MagneticIronGolemEntity.Crack.LOW, id("textures/entity/magnetic_iron_golem/magnetic_iron_golem_crackiness_low.png"), MagneticIronGolemEntity.Crack.MEDIUM, id("textures/entity/magnetic_iron_golem/magnetic_iron_golem_crackiness_medium.png"), MagneticIronGolemEntity.Crack.HIGH, id("textures/entity/magnetic_iron_golem/magnetic_iron_golem_crackiness_high.png"));

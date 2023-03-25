@@ -20,9 +20,6 @@ import net.minecraft.world.WorldView;
 
 import java.util.Arrays;
 
-/**
- * @author iMoonDay
- */
 public class ElectromagneticRelayBlock extends AbstractRedstoneGateBlock {
 
     protected static final BooleanProperty PASS = BooleanProperty.of("pass");

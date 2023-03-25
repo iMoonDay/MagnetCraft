@@ -10,9 +10,6 @@ import net.minecraft.registry.Registry;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 public class EffectRegistries {
 
     public static final AttractEffect ATTRACT_EFFECT = register("attract", new AttractEffect());

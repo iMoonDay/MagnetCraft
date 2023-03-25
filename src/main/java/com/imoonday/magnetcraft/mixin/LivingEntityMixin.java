@@ -40,9 +40,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.Arrays;
 import java.util.Objects;
 
-/**
- * @author iMoonDay
- */
 @Mixin(LivingEntity.class)
 public class LivingEntityMixin extends EntityMixin{
 

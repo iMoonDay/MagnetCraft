@@ -17,9 +17,6 @@ import net.minecraft.world.World;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class PolorMagnetItem extends AbstractFilterableItem {
 
     public static final String ENABLE = "Enable";

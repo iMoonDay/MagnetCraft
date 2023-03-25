@@ -18,23 +18,20 @@ import net.minecraft.util.math.BlockPos;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 public class FluidRegistries {
 
     public static final FlowableFluid STILL_MAGNETIC_FLUID = register("magnetic_fluid", new MagneticFluid.Still());
     public static final FlowableFluid FLOWING_MAGNETIC_FLUID = register("flowing_magnetic_fluid", new MagneticFluid.Flowing());
     public static final Item MAGNETIC_FLUID_BUCKET = ItemRegistries.register("magnetic_fluid_bucket", new BucketItem(STILL_MAGNETIC_FLUID, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)));
-    public static final Block MAGNETIC_FLUID = BlockRegistries.register("magnetic_fluid", new FluidBlock(STILL_MAGNETIC_FLUID, FabricBlockSettings.copy(Blocks.WATER)) {
-    });
+    public static final Block MAGNETIC_FLUID = BlockRegistries.registerBlock("magnetic_fluid", new FluidBlock(STILL_MAGNETIC_FLUID, FabricBlockSettings.copy(Blocks.WATER)) {
+    }, false);
 
     public static void register() {
         itemDispenserBehaviorRegister();
         MagnetCraft.LOGGER.info("FluidRegistries.class Loaded");
     }
 
-    private static void itemDispenserBehaviorRegister(){
+    private static void itemDispenserBehaviorRegister() {
         ItemDispenserBehavior dispenserBehavior = new ItemDispenserBehavior() {
             private final ItemDispenserBehavior fallbackBehavior = new ItemDispenserBehavior();
 

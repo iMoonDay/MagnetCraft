@@ -25,9 +25,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.function.Predicate;
 
-/**
- * @author iMoonDay
- */
 @Mixin(CarvedPumpkinBlock.class)
 public class CarvedPumpkinBlockMixin {
 

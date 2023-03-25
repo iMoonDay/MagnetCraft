@@ -8,9 +8,6 @@ import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 
 import java.util.ArrayList;
 
-/**
- * @author iMoonDay
- */
 @Config(name = "magnetcraft")
 public class ModConfig implements ConfigData {
 

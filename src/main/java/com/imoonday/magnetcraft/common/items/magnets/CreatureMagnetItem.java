@@ -25,9 +25,6 @@ import net.minecraft.world.World;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * @author iMoonDay
- */
 public class CreatureMagnetItem extends AbstractSwitchableItem {
 
     public static final UUID EMPTY_UUID = UUID.fromString("00000000-0000-0000-0000-000000000000");

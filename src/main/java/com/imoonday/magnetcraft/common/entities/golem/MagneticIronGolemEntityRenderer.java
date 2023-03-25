@@ -11,9 +11,6 @@ import net.minecraft.util.math.RotationAxis;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 @Environment(value= EnvType.CLIENT)
 public class MagneticIronGolemEntityRenderer extends MobEntityRenderer<MagneticIronGolemEntity, MagneticIronGolemEntityModel> {
 

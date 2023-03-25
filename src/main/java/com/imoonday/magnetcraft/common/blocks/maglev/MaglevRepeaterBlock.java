@@ -5,9 +5,6 @@ import net.minecraft.block.RepeaterBlock;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldView;
 
-/**
- * @author iMoonDay
- */
 public class MaglevRepeaterBlock extends RepeaterBlock {
     public MaglevRepeaterBlock(Settings settings) {
         super(settings);

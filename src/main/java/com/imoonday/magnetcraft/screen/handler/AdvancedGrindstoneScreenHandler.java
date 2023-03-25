@@ -21,9 +21,6 @@ import net.minecraft.sound.SoundEvents;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings({"ConstantValue", "AlibabaUndefineMagicConstant", "AlibabaAvoidComplexCondition"})
 public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
 

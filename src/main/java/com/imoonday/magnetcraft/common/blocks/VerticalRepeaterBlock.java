@@ -28,9 +28,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-/**
- * @author iMoonDay
- */
 public class VerticalRepeaterBlock extends FacingBlock {
 
     public static final BooleanProperty POWERED = Properties.POWERED;

@@ -5,9 +5,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.effect.StatusEffect;
 import net.minecraft.entity.effect.StatusEffectCategory;
 
-/**
- * @author iMoonDay
- */
 public class DegaussingEffect extends StatusEffect {
     public DegaussingEffect() {
         super(

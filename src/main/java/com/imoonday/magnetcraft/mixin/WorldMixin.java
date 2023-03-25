@@ -20,9 +20,6 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.ArrayList;
 
-/**
- * @author iMoonDay
- */
 @Mixin(World.class)
 public class WorldMixin implements MagnetCraftWorld {
 

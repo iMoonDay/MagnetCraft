@@ -31,9 +31,6 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.IntStream;
 
-/**
- * @author iMoonDay
- */
 public class AdsorptionMagnetItem extends Item {
 
     public static final String CURRENT_ENTITY = "CurrentEntity";

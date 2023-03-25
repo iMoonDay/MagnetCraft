@@ -7,9 +7,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.random.Random;
 import org.spongepowered.asm.mixin.Mixin;
 
-/**
- * @author iMoonDay
- */
 @Mixin(ItemStack.class)
 public class ItemStackMixin implements MagnetCraftItemStack {
     @Override

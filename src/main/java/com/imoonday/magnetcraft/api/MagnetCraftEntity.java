@@ -9,9 +9,6 @@ import net.minecraft.util.math.BlockPos;
 
 import java.util.UUID;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings({"unused", "AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc"})
 public interface MagnetCraftEntity {
 

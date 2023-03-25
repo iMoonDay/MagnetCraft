@@ -16,9 +16,6 @@ import static com.imoonday.magnetcraft.registries.special.RecipeRegistries.*;
 import static com.imoonday.magnetcraft.common.tags.ItemTags.CORES;
 import static com.imoonday.magnetcraft.registries.common.ItemRegistries.MINERAL_MAGNET_ITEM;
 
-/**
- * @author iMoonDay
- */
 public class CoresAddRecipe extends SpecialCraftingRecipe {
 
     public CoresAddRecipe(Identifier id, CraftingRecipeCategory category) {

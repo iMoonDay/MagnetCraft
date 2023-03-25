@@ -20,9 +20,6 @@ import net.minecraft.text.Text;
 import static com.imoonday.magnetcraft.registries.common.EnchantmentRegistries.MAGNETIC_LEVITATION_ENCHANTMENT;
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.*;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("RedundantCast")
 public class GlobalReceiverRegistries {
 

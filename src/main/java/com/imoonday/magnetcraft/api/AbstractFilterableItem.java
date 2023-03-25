@@ -27,9 +27,6 @@ import java.util.stream.IntStream;
 
 import static net.minecraft.item.Items.AIR;
 
-/**
- * @author iMoonDay
- */
 public abstract class AbstractFilterableItem extends AbstractSwitchableItem implements ImplementedInventory {
 
     public static final String FILTERABLE = "Filterable";

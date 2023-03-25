@@ -19,9 +19,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 @Mixin(EnchantmentHelper.class)
 public class EnchantmentHelperMixin {
 

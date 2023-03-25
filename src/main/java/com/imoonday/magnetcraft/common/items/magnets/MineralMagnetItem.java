@@ -46,9 +46,6 @@ import static net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags.QU
 import static net.minecraft.item.Items.*;
 import static net.minecraft.registry.tag.BlockTags.*;
 
-/**
- * @author iMoonDay
- */
 public class MineralMagnetItem extends Item {
 
     public static final String CORES = "Cores";
@@ -193,20 +190,13 @@ public class MineralMagnetItem extends Item {
                 player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.2"), true);
                 return 0;
             }
+            broken:
             for (int x = -10; x <= 10; x++) {
-                if (player.isBroken(hand)) {
-                    isEmptyDamage = true;
-                    break;
-                }
                 for (int y = -10; y <= 10; y++) {
-                    if (player.isBroken(hand)) {
-                        isEmptyDamage = true;
-                        break;
-                    }
                     for (int z = -10; z <= 10; z++) {
                         if (player.isBroken(hand)) {
                             isEmptyDamage = true;
-                            break;
+                            break broken;
                         }
                         BlockPos pos = player.getBlockPos().add(x, y, z);
                         BlockState state = player.world.getBlockState(pos);
@@ -265,45 +255,49 @@ public class MineralMagnetItem extends Item {
             if (!player.isCreative() && totalValue > 0) {
                 player.addExperienceLevels(-requiredExperienceLevel);
             }
-            if (isEmptyDamage) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.3", requiredExperienceLevel));
-            }
-            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.4", total));
-            if (coal > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.6", coal));
-            }
-            if (iron > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.7", iron));
-            }
-            if (gold > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.8", gold));
-            }
-            if (diamond > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.9", diamond));
-            }
-            if (redstone > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.10", redstone));
-            }
-            if (copper > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.11", copper));
-            }
-            if (emerald > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.12", emerald));
-            }
-            if (lapis > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.13", lapis));
-            }
-            if (quartz > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.14", quartz));
-            }
-            if (magnetite > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.15", magnetite));
-            }
-            if (others > 0) {
-                player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.16", others));
-            }
+            sendMessage(player, requiredExperienceLevel, total, coal, iron, gold, diamond, redstone, copper, emerald, lapis, quartz, magnetite, others, isEmptyDamage);
         }
         return totalValue;
+    }
+
+    private static void sendMessage(PlayerEntity player, int requiredExperienceLevel, int total, int coal, int iron, int gold, int diamond, int redstone, int copper, int emerald, int lapis, int quartz, int magnetite, int others, boolean isEmptyDamage) {
+        if (isEmptyDamage) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.3", requiredExperienceLevel));
+        }
+        player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.4", total));
+        if (coal > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.6", coal));
+        }
+        if (iron > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.7", iron));
+        }
+        if (gold > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.8", gold));
+        }
+        if (diamond > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.9", diamond));
+        }
+        if (redstone > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.10", redstone));
+        }
+        if (copper > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.11", copper));
+        }
+        if (emerald > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.12", emerald));
+        }
+        if (lapis > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.13", lapis));
+        }
+        if (quartz > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.14", quartz));
+        }
+        if (magnetite > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.15", magnetite));
+        }
+        if (others > 0) {
+            player.sendMessage(Text.translatable("item.magnetcraft.mineral_magnet.tooltip.16", others));
+        }
     }
 
     public static void coresCheck(ItemStack stack) {

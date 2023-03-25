@@ -25,9 +25,6 @@ import net.minecraft.util.Identifier;
 
 import static com.imoonday.magnetcraft.registries.common.FluidRegistries.*;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("AlibabaUndefineMagicConstant")
 public class MagneticFluid extends AbstractMagneticFluid {
 

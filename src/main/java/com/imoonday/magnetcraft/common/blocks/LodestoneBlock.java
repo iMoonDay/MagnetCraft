@@ -22,9 +22,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author iMoonDay
- */
 public class LodestoneBlock extends BlockWithEntity {
 
     public static final String REDSTONE = "redstone";
@@ -62,6 +59,7 @@ public class LodestoneBlock extends BlockWithEntity {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity != null) {
             blockEntity.readNbt(nbt);
+            blockEntity.markDirty();
         }
     }
 

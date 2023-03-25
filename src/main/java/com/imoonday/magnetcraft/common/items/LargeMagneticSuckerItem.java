@@ -32,9 +32,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     public static final String EXTEND = "Extend";

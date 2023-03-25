@@ -16,9 +16,6 @@ import java.awt.*;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-/**
- * @author iMoonDay
- */
 public class FilterableMagnetScreen extends HandledScreen<FilterableMagnetScreenHandler> {
 
     private static final Identifier TEXTURE = id("textures/gui/magnet_filter.png");

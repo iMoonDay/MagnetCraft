@@ -15,9 +15,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class NetheriteMagneticIronArmorItem extends ArmorItem {
 
     public static final String USED_TICK = "UsedTick";

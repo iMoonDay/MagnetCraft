@@ -24,9 +24,6 @@ import java.util.Arrays;
 import static com.imoonday.magnetcraft.common.items.MagnetControllerItem.changeMagnetEnable;
 import static net.minecraft.item.Items.*;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("ConstantValue")
 public class FilterableMagnetScreenHandler extends ScreenHandler {
 

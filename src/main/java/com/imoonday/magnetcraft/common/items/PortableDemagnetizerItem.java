@@ -10,9 +10,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
 
-/**
- * @author iMoonDay
- */
 public class PortableDemagnetizerItem extends AbstractSwitchableItem {
 
     public static final String ENABLE = "Enable";

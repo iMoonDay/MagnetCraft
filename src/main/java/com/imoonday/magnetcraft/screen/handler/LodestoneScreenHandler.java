@@ -18,9 +18,6 @@ import net.minecraft.screen.ScreenHandlerContext;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.math.BlockPos;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings({"ConstantValue", "AlibabaUndefineMagicConstant"})
 public class LodestoneScreenHandler extends ScreenHandler {
 

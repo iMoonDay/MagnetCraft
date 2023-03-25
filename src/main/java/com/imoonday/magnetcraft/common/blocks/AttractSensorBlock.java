@@ -19,9 +19,6 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-/**
- * @author iMoonDay
- */
 @SuppressWarnings("ALL")
 public class AttractSensorBlock extends BlockWithEntity {
     public AttractSensorBlock(Settings settings) {

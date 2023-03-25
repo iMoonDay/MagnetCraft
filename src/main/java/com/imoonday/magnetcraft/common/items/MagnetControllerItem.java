@@ -22,9 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-/**
- * @author iMoonDay
- */
 public class MagnetControllerItem extends AbstractFilterableItem {
 
     public static final String ENABLE = "Enable";

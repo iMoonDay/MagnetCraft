@@ -68,6 +68,13 @@ public class MagneticAntennaBlock extends RodBlock implements Waterloggable {
     }
 
     @Override
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        world.updateNeighborsAlways(pos, this);
+        world.updateNeighborsAlways(pos.offset(state.get(FACING).getOpposite()), this);
+        super.onStateReplaced(state, world, pos, newState, moved);
+    }
+
+    @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         if (!state.canPlaceAt(world, pos)) {
             world.breakBlock(pos, true);
@@ -75,25 +82,39 @@ public class MagneticAntennaBlock extends RodBlock implements Waterloggable {
         if (state.get(WATERLOGGED)) {
             world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
         }
+        world.scheduleBlockTick(pos, this, 1);
         return state;
     }
 
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        Direction direction = state.get(FACING);
-        BlockPos magnetBlockPos = getMagnetBlockPos(world, pos);
-        boolean isFirst = isFirst(state, world, pos, direction);
-        boolean powered = hasActivatedBlock(world, pos, direction) && isFirst;
-        boolean activated = hasRedstonePower(world, direction, magnetBlockPos) && !powered;
-        int power = getPower(world, pos, direction, powered);
-        world.setBlockState(pos, state.with(POWERED, powered).with(POWER, power).with(ACTIVATED, activated), Block.NOTIFY_LISTENERS);
-        world.updateNeighborsAlways(pos.offset(direction.getOpposite()), this);
+        update(state, world, pos);
         world.scheduleBlockTick(pos, this, 1);
     }
 
-    private int getPower(ServerWorld world, BlockPos pos, Direction direction, boolean powered) {
+    private void update(BlockState state, ServerWorld world, BlockPos pos) {
+        Direction direction = state.get(FACING);
+        BlockPos magnetBlockPos = getMagnetBlockPos(world, pos);
+        boolean isFirst = isFirst(state, world, pos, direction);
+        boolean strongPowered = hasStrongActivatedBlock(world, pos, direction);
+        boolean powered = (hasActivatedBlock(world, pos, direction) && isFirst) || strongPowered;
+        boolean activated = hasRedstonePower(world, direction, magnetBlockPos) && !powered;
+        int power = getPower(world, pos, direction, powered, strongPowered);
+        world.setBlockState(pos, state.with(POWERED, powered).with(POWER, power).with(ACTIVATED, activated), Block.NOTIFY_LISTENERS);
+        world.updateNeighborsAlways(pos.offset(direction.getOpposite()), this);
+    }
+
+    private boolean hasStrongActivatedBlock(ServerWorld world, BlockPos pos, Direction direction) {
+        return IntStream.rangeClosed(1, 30).mapToObj(i -> pos.offset(direction, i)).anyMatch(pos1 -> isActivatedBlock(world, direction, pos1) && getMagnetBlockState(world, pos1).isOf(BlockRegistries.NETHERITE_MAGNET_BLOCK));
+    }
+
+    private int getPower(ServerWorld world, BlockPos pos, Direction direction, boolean powered, boolean strongPowered) {
         AtomicInteger power = new AtomicInteger();
-        IntStream.rangeClosed(1, 15).mapToObj(i -> pos.offset(direction, i)).filter(pos1 -> isActivatedBlock(world, direction, pos1)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
+        if (strongPowered) {
+            IntStream.rangeClosed(1, 30).mapToObj(i -> pos.offset(direction, i)).filter(pos1 -> isActivatedBlock(world, direction, pos1) && getMagnetBlockState(world, pos1).isOf(BlockRegistries.NETHERITE_MAGNET_BLOCK)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
+        } else {
+            IntStream.rangeClosed(1, 15).mapToObj(i -> pos.offset(direction, i)).filter(pos1 -> isActivatedBlock(world, direction, pos1)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
+        }
         return power.intValue();
     }
 

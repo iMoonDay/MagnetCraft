@@ -47,7 +47,10 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
         BlockPos blockPos = context.getBlockPos();
-        if (player != null && (player.getAbilities().creativeMode || !stack.isBroken())) {
+        if (player == null) {
+            return ActionResult.FAIL;
+        }
+        if (player.getAbilities().creativeMode || !stack.isBroken()) {
             stack.getOrCreateNbt().putIntArray(POS, new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
             player.setCurrentHand(hand);
         }

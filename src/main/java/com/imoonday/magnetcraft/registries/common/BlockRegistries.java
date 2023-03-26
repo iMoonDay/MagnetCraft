@@ -55,10 +55,10 @@ public class BlockRegistries {
     public static final LodestoneBlock LODESTONE_BLOCK = registerBlock("lodestone", new LodestoneBlock(FabricBlockSettings.copy(Blocks.LODESTONE)), false);
     public static final LodestoneBlockItem LODESTONE_BLOCK_ITEM = registerBlockItem("lodestone", new LodestoneBlockItem(LODESTONE_BLOCK, new FabricItemSettings()));
     public static final BlockEntityType<LodestoneEntity> LODESTONE_ENTITY = Registry.register(Registries.BLOCK_ENTITY_TYPE, id("lodestone"), FabricBlockEntityTypeBuilder.create(LodestoneEntity::new, LODESTONE_BLOCK).build());
-    public static final MaglevRailBlock MAGLEV_RAIL_BLOCK = register("maglev_rail", new MaglevRailBlock(FabricBlockSettings.copy(Blocks.RAIL).noCollision()), true);
-    public static final MaglevPoweredRailBlock MAGLEV_POWERED_RAIL_BLOCK = register("maglev_powered_rail", new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.POWERED_RAIL).noCollision()), true);
-    public static final MaglevDetectorRailBlock MAGLEV_DETECTOR_RAIL_BLOCK = register("maglev_detector_rail", new MaglevDetectorRailBlock(FabricBlockSettings.copy(Blocks.DETECTOR_RAIL).noCollision()), true);
-    public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = register("maglev_activator_rail", new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.ACTIVATOR_RAIL).noCollision()), true);
+    public static final MaglevRailBlock MAGLEV_RAIL_BLOCK = register("maglev_rail", new MaglevRailBlock(FabricBlockSettings.copy(Blocks.RAIL)), true);
+    public static final MaglevPoweredRailBlock MAGLEV_POWERED_RAIL_BLOCK = register("maglev_powered_rail", new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.POWERED_RAIL)), true);
+    public static final MaglevDetectorRailBlock MAGLEV_DETECTOR_RAIL_BLOCK = register("maglev_detector_rail", new MaglevDetectorRailBlock(FabricBlockSettings.copy(Blocks.DETECTOR_RAIL)), true);
+    public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = register("maglev_activator_rail", new MaglevPoweredRailBlock(FabricBlockSettings.copy(Blocks.ACTIVATOR_RAIL)), true);
     public static final MaglevLeverBlock MAGLEV_LEVER_BLOCK = register("maglev_lever", new MaglevLeverBlock(FabricBlockSettings.copy(Blocks.LEVER).noCollision()), true);
     public static final MaglevButtonBlock MAGLEV_STONE_BUTTON_BLOCK = register("maglev_stone_button", new MaglevButtonBlock(FabricBlockSettings.copy(Blocks.STONE_BUTTON).noCollision(), BlockSetType.STONE, 20, false), true);
     public static final MaglevButtonBlock MAGLEV_OAK_BUTTON_BLOCK = register("maglev_oak_button", new MaglevButtonBlock(FabricBlockSettings.copy(Blocks.STONE_BUTTON).noCollision(), BlockSetType.OAK, 30, true), true);

@@ -4,24 +4,40 @@ import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.RailBlock;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
 
 import static net.minecraft.registry.tag.BlockTags.RAILS;
 
 public class MaglevRailBlock extends RailBlock {
+
+    public static final BooleanProperty PASSABLE = BooleanProperty.of("passable");
+
     public MaglevRailBlock(Settings settings) {
         super(settings);
+        this.setDefaultState(this.stateManager.getDefaultState().with(SHAPE, RailShape.NORTH_SOUTH).with(WATERLOGGED, false).with(PASSABLE, false));
+    }
+
+    @Override
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(SHAPE, WATERLOGGED, PASSABLE);
     }
 
     @Override
@@ -38,7 +54,23 @@ public class MaglevRailBlock extends RailBlock {
     }
 
     @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return getShape(state);
+    }
+
+    public static VoxelShape getShape(BlockState state) {
+        return state.contains(PASSABLE) && state.get(PASSABLE) ? VoxelShapes.empty() : Block.createCuboidShape(0.0, -0.1, 0.0, 16.0, 0.0, 16.0);
+    }
+
+    @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack stack = player.getStackInHand(hand);
+        if (player.isSneaking() && stack.isOf(Items.AIR) && hand.equals(Hand.MAIN_HAND)) {
+            world.setBlockState(pos, state.cycle(PASSABLE));
+            return ActionResult.SUCCESS;
+        }
+        //PASSABLE贴图
+        //一键切换工具
         return railExpand(world, pos, player, hand, hit);
     }
 
@@ -48,17 +80,8 @@ public class MaglevRailBlock extends RailBlock {
         if (isRail) {
             Direction direction = player.getMovementDirection();
             BlockState state;
-            RailShape shape;
-            if (direction == Direction.NORTH || direction == Direction.SOUTH) {
-                shape = RailShape.NORTH_SOUTH;
-            } else {
-                shape = RailShape.EAST_WEST;
-            }
-            if (stack.isOf(Item.fromBlock(BlockRegistries.MAGLEV_RAIL_BLOCK))) {
-                state = Block.getBlockFromItem(stack.getItem()).getDefaultState().with(SHAPE, shape);
-            } else {
-                state = Block.getBlockFromItem(stack.getItem()).getDefaultState().with(Properties.STRAIGHT_RAIL_SHAPE, shape);
-            }
+            RailShape shape = direction == Direction.NORTH || direction == Direction.SOUTH ? RailShape.NORTH_SOUTH : RailShape.EAST_WEST;
+            state = stack.isOf(Item.fromBlock(BlockRegistries.MAGLEV_RAIL_BLOCK)) ? Block.getBlockFromItem(stack.getItem()).getDefaultState().with(SHAPE, shape) : Block.getBlockFromItem(stack.getItem()).getDefaultState().with(Properties.STRAIGHT_RAIL_SHAPE, shape);
             boolean up = hit.getSide() == Direction.UP;
             boolean down = hit.getSide() == Direction.DOWN;
             if (up || down) {
@@ -80,8 +103,7 @@ public class MaglevRailBlock extends RailBlock {
                         if (down) {
                             offsetPos = offsetPos.up();
                         }
-                        times++;
-                        if (times > 15) {
+                        if (++times > 15) {
                             return ActionResult.CONSUME;
                         }
                     }

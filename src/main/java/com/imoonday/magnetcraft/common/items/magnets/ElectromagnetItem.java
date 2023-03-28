@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.common.items.magnets;
 
 import com.imoonday.magnetcraft.api.AbstractFilterableItem;
+import com.imoonday.magnetcraft.common.entities.wrench.MagneticWrenchEntity;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import com.imoonday.magnetcraft.registries.special.CustomStatRegistries;
@@ -8,6 +9,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.client.item.TooltipContext;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
@@ -139,8 +141,9 @@ public class ElectromagnetItem extends AbstractFilterableItem {
             dis += magnetHandSpacing;
         }
         double finalDis = dis;
-        int count = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).size();
-        player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis)).forEach(targetEntity -> {
+        List<Entity> entities = player.world.getOtherEntities(player, player.getBoundingBox().expand(dis), targetEntity -> (targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.getPos().isInRange(player.getPos(), finalDis));
+        int count = entities.size();
+        entities.forEach(targetEntity -> {
             player.addDamage(hand, 1, true);
             if (targetEntity instanceof ExperienceOrbEntity entity) {
                 int amount = entity.getExperienceAmount();
@@ -152,9 +155,14 @@ public class ElectromagnetItem extends AbstractFilterableItem {
             player.incrementStat(CustomStatRegistries.ITEMS_TELEPORTED_TO_PLAYER);
             player.playSound(SoundEvents.ENTITY_ITEM_PICKUP, 1, 1);
         });
+        List<Entity> wrenchEntities = player.world.getOtherEntities(null, player.getBoundingBox().expand(dis * 10), entity -> (entity instanceof MagneticWrenchEntity wrench && wrench.getOwner() == player));
+        wrenchEntities.forEach(entity -> entity.setPosition(player.getPos()));
         String text = count > 0 ? "text.magnetcraft.message.teleport.tooltip.1" : "text.magnetcraft.message.teleport.tooltip.2";
         if (!world.isClient && message) {
             player.sendMessage(Text.translatable(text, dis, count));
+        }
+        if (!wrenchEntities.isEmpty() && !world.isClient) {
+            player.sendMessage(Text.translatable("text.magnetcraft.message.teleport.tooltip.3", wrenchEntities.size()));
         }
     }
 

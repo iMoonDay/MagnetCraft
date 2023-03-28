@@ -9,7 +9,6 @@ import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -64,11 +63,11 @@ public class MaglevRailBlock extends RailBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack stack = player.getStackInHand(hand);
-        if (player.isSneaking() && stack.isOf(Items.AIR) && hand.equals(Hand.MAIN_HAND)) {
-            world.setBlockState(pos, state.cycle(PASSABLE));
-            return ActionResult.SUCCESS;
-        }
+//        ItemStack stack = player.getStackInHand(hand);
+//        if (player.isSneaking() && stack.isOf(Items.AIR) && hand.equals(Hand.MAIN_HAND)) {
+//            world.setBlockState(pos, state.cycle(PASSABLE));
+//            return ActionResult.SUCCESS;
+//        }
         //PASSABLE贴图
         //一键切换工具
         return railExpand(world, pos, player, hand, hit);

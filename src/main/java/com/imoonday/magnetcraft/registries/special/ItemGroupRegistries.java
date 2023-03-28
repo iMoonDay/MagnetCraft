@@ -57,6 +57,7 @@ public class ItemGroupRegistries {
             content.addAfter(MAGNETIC_IRON_PICKAXE, MAGNETIC_IRON_AXE);
             content.addAfter(MAGNETIC_IRON_AXE, MAGNETIC_IRON_SHOVEL);
             content.addAfter(MAGNETIC_IRON_SHOVEL, MAGNETIC_IRON_HOE);
+            content.addAfter(MAGNETIC_IRON_HOE, MAGNETIC_WRENCH_ITEM);
             content.addAfter(Items.NETHERITE_HOE, NETHERITE_MAGNETIC_IRON_SHOVEL);
             content.addAfter(NETHERITE_MAGNETIC_IRON_SHOVEL, NETHERITE_MAGNETIC_IRON_PICKAXE);
             content.addAfter(NETHERITE_MAGNETIC_IRON_PICKAXE, NETHERITE_MAGNETIC_IRON_AXE);
@@ -88,6 +89,7 @@ public class ItemGroupRegistries {
             content.add(MAGNETIC_SUCKER_CORE_ITEM);
             content.add(SMALL_MAGNETIC_SUCKER_ITEM);
             content.add(LARGE_MAGNETIC_SUCKER_ITEM.getDefaultStack());
+            content.add(MAGNETIC_WRENCH_ITEM);
             content.addAfter(Items.ACTIVATOR_RAIL, MAGLEV_RAIL_BLOCK);
             content.addAfter(MAGLEV_RAIL_BLOCK, MAGLEV_POWERED_RAIL_BLOCK);
             content.addAfter(MAGLEV_POWERED_RAIL_BLOCK, MAGLEV_DETECTOR_RAIL_BLOCK);

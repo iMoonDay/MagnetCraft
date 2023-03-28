@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.common.enchantments;
 
+import com.imoonday.magnetcraft.common.items.MagneticWrenchItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
@@ -33,6 +34,7 @@ public class AutomaticLootingEnchantment extends Enchantment {
                 || item instanceof AxeItem
                 || item instanceof TridentItem
                 || item instanceof BowItem
-                || item instanceof CrossbowItem;
+                || item instanceof CrossbowItem
+                || item instanceof MagneticWrenchItem;
     }
 }

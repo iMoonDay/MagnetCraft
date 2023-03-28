@@ -6,8 +6,6 @@ import net.minecraft.block.DetectorRailBlock;
 import net.minecraft.block.ShapeContext;
 import net.minecraft.block.enums.RailShape;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.util.ActionResult;
@@ -53,11 +51,11 @@ public class MaglevDetectorRailBlock extends DetectorRailBlock {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack stack = player.getStackInHand(hand);
-        if (player.isSneaking() && stack.isOf(Items.AIR) && hand.equals(Hand.MAIN_HAND)) {
-            world.setBlockState(pos, state.cycle(PASSABLE));
-            return ActionResult.SUCCESS;
-        }
+//        ItemStack stack = player.getStackInHand(hand);
+//        if (player.isSneaking() && stack.isOf(Items.AIR) && hand.equals(Hand.MAIN_HAND)) {
+//            world.setBlockState(pos, state.cycle(PASSABLE));
+//            return ActionResult.SUCCESS;
+//        }
         return MaglevRailBlock.railExpand(world, pos, player, hand, hit);
     }
 

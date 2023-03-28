@@ -1,0 +1,6 @@
+{
+  "parent": "magnetcraft:block/maglev_rail_flat_passable",
+  "textures": {
+    "rail": "magnetcraft:block/maglev_detector_rail_passable"
+  }
+}

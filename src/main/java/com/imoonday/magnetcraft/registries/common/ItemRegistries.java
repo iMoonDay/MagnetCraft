@@ -68,8 +68,8 @@ public class ItemRegistries {
 
     //磁吸盘
     public static final Item MAGNETIC_SUCKER_CORE_ITEM = register("magnetic_sucker_core", new Item(new FabricItemSettings().maxCount(1)));
-    public static final SmallMagneticSuckerItem SMALL_MAGNETIC_SUCKER_ITEM = register("small_magnetic_sucker",new SmallMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
-    public static final LargeMagneticSuckerItem LARGE_MAGNETIC_SUCKER_ITEM = register("large_magnetic_sucker",new LargeMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(300)));
+    public static final SmallMagneticSuckerItem SMALL_MAGNETIC_SUCKER_ITEM = register("small_magnetic_sucker", new SmallMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(100)));
+    public static final LargeMagneticSuckerItem LARGE_MAGNETIC_SUCKER_ITEM = register("large_magnetic_sucker", new LargeMagneticSuckerItem(new FabricItemSettings().maxCount(1).maxDamage(300)));
 
     //磁铁工具
     public static final SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, new Item.Settings()));
@@ -77,6 +77,9 @@ public class ItemRegistries {
     public static final CustomAxeItem MAGNETIC_IRON_AXE = register("magnetic_iron_axe", new CustomAxeItem(MagneticIronToolMaterial.INSTANCE, 5.5f, -3.0f, new Item.Settings()));
     public static final CustomShovelItem MAGNETIC_IRON_SHOVEL = register("magnetic_iron_shovel", new CustomShovelItem(MagneticIronToolMaterial.INSTANCE, 1.5f, -3.0f, new Item.Settings()));
     public static final CustomHoeItem MAGNETIC_IRON_HOE = register("magnetic_iron_hoe", new CustomHoeItem(MagneticIronToolMaterial.INSTANCE, -2, -1.0f, new Item.Settings()));
+
+    //磁扳手
+    public static final MagneticWrenchItem MAGNETIC_WRENCH_ITEM = register("magnetic_wrench", new MagneticWrenchItem(new FabricItemSettings()));
 
     //下界磁铁工具
     public static final SwordItem NETHERITE_MAGNETIC_IRON_SWORD = register("netherite_magnetic_iron_sword", new SwordItem(NetheriteMagneticIronToolMaterial.INSTANCE, 4, -2.4f, new Item.Settings().fireproof()));
@@ -103,12 +106,18 @@ public class ItemRegistries {
     public static final HorseArmorItem MAGNETIC_IRON_HORSE_ARMOR = register("magnetic_iron_horse_armor", new HorseArmorItem(9, "magnetic_iron", new Item.Settings().maxCount(1)));
 
     public static void register() {
+        addSpecialStackInGroup();
         MagnetCraft.LOGGER.info("ItemRegistries.class Loaded");
+    }
+
+    private static void addSpecialStackInGroup() {
+        ItemGroupEvents.modifyEntriesEvent(ItemGroupRegistries.MAGNETS).register(content -> content.addAfter(MINERAL_MAGNET_ITEM, MineralMagnetItem.getAllCoresStack()));
     }
 
     static <T extends Item> T register(String id, T item) {
         Registry.register(Registries.ITEM, id(id), item);
-        ItemGroupEvents.modifyEntriesEvent(ItemGroupRegistries.MAGNETS).register(content -> content.add(item));
+        ItemGroupEvents.modifyEntriesEvent(ItemGroupRegistries.MAGNETS).register(content -> content.add(item.getDefaultStack()));
         return item;
     }
+
 }

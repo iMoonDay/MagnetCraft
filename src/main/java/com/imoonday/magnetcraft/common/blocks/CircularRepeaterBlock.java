@@ -16,7 +16,6 @@ import net.minecraft.util.math.random.Random;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
-import net.minecraft.world.tick.TickPriority;
 
 public class CircularRepeaterBlock extends RepeaterBlock {
 
@@ -71,7 +70,7 @@ public class CircularRepeaterBlock extends RepeaterBlock {
             outputing = true;
         }
         world.setBlockState(pos, state.with(TICK, tick).with(OUTPUTING, outputing).with(POWERED, powered), Block.NOTIFY_LISTENERS);
-        world.scheduleBlockTick(pos, this, this.getUpdateDelayInternal(state), TickPriority.VERY_HIGH);
+        world.scheduleBlockTick(pos, this, 1);
     }
 
     @Override
@@ -93,11 +92,6 @@ public class CircularRepeaterBlock extends RepeaterBlock {
     @Override
     protected int getOutputLevel(BlockView world, BlockPos pos, BlockState state) {
         return state.get(OUTPUTING) && state.get(POWERED) ? 15 : 0;
-    }
-
-    @Override
-    protected int getUpdateDelayInternal(BlockState state) {
-        return 1;
     }
 
     @Override

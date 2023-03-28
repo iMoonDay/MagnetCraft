@@ -180,6 +180,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.adsorptionEntityId = this.getAdsorptionEntityId();
         this.adsorptionBlockPos = this.getAdsorptionBlockPos();
         entity.tryAttract();
+        CreatureMagnetItem.followingCheck(entity);
     }
 
     @Override

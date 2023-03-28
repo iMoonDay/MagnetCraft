@@ -1,0 +1,6 @@
+{
+  "parent": "magnetcraft:block/template_maglev_rail_raised_sw_passable",
+  "textures": {
+    "rail": "magnetcraft:block/maglev_activator_rail_passable"
+  }
+}

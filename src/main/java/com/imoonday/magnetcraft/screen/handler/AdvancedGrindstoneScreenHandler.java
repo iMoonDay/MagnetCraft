@@ -113,7 +113,7 @@ public class AdvancedGrindstoneScreenHandler extends ScreenHandler {
     private void updateResult() {
         ItemStack enchantedStack = this.input.getStack(0);
         ItemStack moduleStack = this.input.getStack(1);
-        boolean stackIn = !enchantedStack.isEmpty() && !moduleStack.isEmpty();
+        boolean stackIn = !enchantedStack.isEmpty() && (!moduleStack.isEmpty() || player.getAbilities().creativeMode);
         if (stackIn) {
             ItemStack enchantedBookStack;
             enchantedBookStack = new ItemStack(Items.ENCHANTED_BOOK);

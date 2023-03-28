@@ -17,6 +17,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Mixin(EnchantmentHelper.class)
@@ -28,13 +29,15 @@ public class EnchantmentHelperMixin {
         ArrayList<EnchantmentLevelEntry> list = Lists.newArrayList();
         Item item = stack.getItem();
         boolean bl = stack.isOf(Items.BOOK);
-        block0: for (Enchantment enchantment : Registries.ENCHANTMENT) {
+        block0:
+        for (Enchantment enchantment : Registries.ENCHANTMENT) {
             if (enchantment.isTreasure() && !treasureAllowed || !enchantment.isAvailableForRandomSelection() || !enchantment.target.isAcceptableItem(item) && !bl) {
                 continue;
             }
-            boolean b1 = enchantment.equals(EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT) && !EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT.isAcceptableItem(stack);
-            boolean b2 = enchantment.equals(Enchantments.UNBREAKING) && (stack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) || stack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) || stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM));
-            if (b1 || b2) {
+            Enchantment[] enchantments = {EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT, EnchantmentRegistries.ACCUMULATOR_ENCHANTMENT};
+            boolean isNotAcceptable = Arrays.stream(enchantments).anyMatch(enchantment1 -> isNotAcceptableItemStack(stack, enchantment, enchantment1));
+            boolean isMagnet = enchantment == Enchantments.UNBREAKING && (stack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) || stack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) || stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM));
+            if (isNotAcceptable || isMagnet) {
                 continue;
             }
             for (int i = enchantment.getMaxLevel(); i > enchantment.getMinLevel() - 1; --i) {
@@ -46,5 +49,9 @@ public class EnchantmentHelperMixin {
             }
         }
         cir.setReturnValue(list);
+    }
+
+    private static boolean isNotAcceptableItemStack(ItemStack stack, Enchantment enchantment, Enchantment testEnchantment) {
+        return enchantment == testEnchantment && !testEnchantment.isAcceptableItem(stack);
     }
 }

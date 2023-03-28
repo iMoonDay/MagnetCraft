@@ -1,10 +1,10 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.common.entities.wrench.MagneticWrenchEntity;
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorItem;
 import com.imoonday.magnetcraft.common.items.magnets.AdsorptionMagnetItem;
-import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
@@ -41,7 +41,7 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Mixin(LivingEntity.class)
-public class LivingEntityMixin extends EntityMixin{
+public class LivingEntityMixin extends EntityMixin {
 
     @Override
     public void addDamage(Hand hand, int damage, boolean unbreaking) {
@@ -105,7 +105,6 @@ public class LivingEntityMixin extends EntityMixin{
             }
             tick(entity);
             MagneticFluid.tick(entity);
-            CreatureMagnetItem.followingCheck(entity);
             if (world instanceof ServerWorld serverWorld) {
                 AdsorptionMagnetItem.tickCheck(serverWorld);
             }
@@ -123,7 +122,13 @@ public class LivingEntityMixin extends EntityMixin{
                 LivingEntity entity = (LivingEntity) (Object) this;
                 World world = player.world;
                 ItemStack stack;
-                stack = sourceEntity instanceof TridentEntity tridentEntity ? tridentEntity.asItemStack() : player.getMainHandStack();
+                if (sourceEntity instanceof TridentEntity tridentEntity) {
+                    stack = tridentEntity.asItemStack();
+                } else if (sourceEntity instanceof MagneticWrenchEntity wrench) {
+                    stack = wrench.asItemStack();
+                } else {
+                    stack = player.getMainHandStack();
+                }
                 boolean hasEnchantment = stack.hasEnchantment(EnchantmentRegistries.AUTOMATIC_LOOTING_ENCHANTMENT);
                 if (hasEnchantment) {
                     world.getOtherEntities(null, entity.getBoundingBox(), targetEntity -> ((targetEntity instanceof ItemEntity || targetEntity instanceof ExperienceOrbEntity) && targetEntity.age == 0)).forEach(targetEntity -> {
@@ -274,18 +279,18 @@ public class LivingEntityMixin extends EntityMixin{
                         if (handMagnetHasEnch) {
                             dis += enchMinDis + (enchLvl - 1) * disPerLvl;
                         }
-                        finalDis = Math.max(dis,finalDis);
+                        finalDis = Math.max(dis, finalDis);
                     }
                 }
             }
             if (hasEffect) {
                 amplifier = Objects.requireNonNull(entity.getStatusEffect(EffectRegistries.ATTRACT_EFFECT)).getAmplifier();
                 dis = attractDefaultDis + amplifier * disPerAmplifier;
-                finalDis = Math.max(dis,finalDis);
+                finalDis = Math.max(dis, finalDis);
             }
             if (horseArmorAttracting) {
                 dis = horseArmorAttractDis;
-                finalDis = Math.max(dis,finalDis);
+                finalDis = Math.max(dis, finalDis);
             }
             if (MagneticIronArmorItem.isInMagneticIronSuit(entity)) {
                 finalDis *= magnetSetMultiplier;
@@ -307,19 +312,19 @@ public class LivingEntityMixin extends EntityMixin{
                 if (handElectromagnet || handPermanent) {
                     if (mainhandElectromagnet) {
                         telDis = value.electromagnetTeleportMinDis + value.magnetHandSpacing;
-                        finalTelDis = Math.max(telDis,finalTelDis);
+                        finalTelDis = Math.max(telDis, finalTelDis);
                     }
                     if (offhandElectromagnet) {
                         telDis = value.electromagnetTeleportMinDis;
-                        finalTelDis = Math.max(telDis,finalTelDis);
+                        finalTelDis = Math.max(telDis, finalTelDis);
                     }
                     if (mainhandPermanent) {
                         telDis = value.permanentMagnetTeleportMinDis + value.magnetHandSpacing;
-                        finalTelDis = Math.max(telDis,finalTelDis);
+                        finalTelDis = Math.max(telDis, finalTelDis);
                     }
                     if (offhandPermanent) {
                         telDis = value.permanentMagnetTeleportMinDis;
-                        finalTelDis = Math.max(telDis,finalTelDis);
+                        finalTelDis = Math.max(telDis, finalTelDis);
                     }
                     message = ": " + finalTelDis;
                     text = text.copy().append(" ").append(Text.translatable("text.magnetcraft.message.teleport").append(message));

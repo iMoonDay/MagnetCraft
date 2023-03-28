@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:maglev_rail",
+    "magnetcraft:maglev_powered_rail",
+    "magnetcraft:maglev_detector_rail",
+    "magnetcraft:maglev_activator_rail"
+  ]
+}

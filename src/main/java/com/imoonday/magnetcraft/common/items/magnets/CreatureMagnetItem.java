@@ -124,7 +124,7 @@ public class CreatureMagnetItem extends AbstractSwitchableItem {
         return ActionResult.SUCCESS;
     }
 
-    public static void followAttractOwner(LivingEntity followingEntity, LivingEntity attractingEntity, boolean usingMagnet) {
+    public static void followAttractOwner(Entity followingEntity, LivingEntity attractingEntity, boolean usingMagnet) {
         if (attractingEntity.world.isClient || followingEntity.world.isClient || !attractingEntity.isAlive() || !followingEntity.isAlive()) {
             return;
         }
@@ -132,7 +132,9 @@ public class CreatureMagnetItem extends AbstractSwitchableItem {
         if (followingEntity.horizontalCollision) {
             vec = vec.multiply(1, 0, 1).add(0, 0.25, 0);
         }
-        followingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
+        if (followingEntity instanceof LivingEntity livingEntity) {
+            livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.GLOWING, 2, 0, false, false));
+        }
         followingEntity.lookAt(EntityAnchorArgumentType.EntityAnchor.EYES, attractingEntity.getEyePos());
         if (followingEntity.getPos().isInRange(attractingEntity.getPos(), 1) || followingEntity.collidesWith(attractingEntity) || followingEntity.getBoundingBox().intersects(attractingEntity.getBoundingBox().expand(0.1))) {
             vec = Vec3d.ZERO;
@@ -176,7 +178,7 @@ public class CreatureMagnetItem extends AbstractSwitchableItem {
         return 16;
     }
 
-    public static void followingCheck(LivingEntity entity) {
+    public static void followingCheck(Entity entity) {
         double creatureDis = ModConfig.getValue().creatureMagnetAttractDis;
         PlayerEntity playerByUuid = entity.world.getPlayerByUuid(entity.getAttractOwner());
         boolean hasAttractOwner = !entity.getAttractOwner().equals(CreatureMagnetItem.EMPTY_UUID);

@@ -30,7 +30,7 @@ public class MagneticIronArmorItem extends ArmorItem {
                 .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         if (stack.getNbt() != null && stack.getNbt().contains(USED_TICK)) {
             int usedTick = stack.getOrCreateNbt().getInt(USED_TICK);
-            tooltip.add(Text.translatable("enchantment.magnetcraft.magnetic_levitation.tooltop", usedTick / 12)
+            tooltip.add(Text.translatable("enchantment.magnetcraft.magnetic_levitation.tooltip", usedTick / 12)
                     .formatted(Formatting.GRAY).formatted(Formatting.BOLD));
         }
     }

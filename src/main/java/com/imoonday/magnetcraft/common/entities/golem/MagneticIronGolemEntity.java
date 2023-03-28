@@ -197,7 +197,7 @@ public class MagneticIronGolemEntity extends IronGolemEntity implements Implemen
         } else if (player.world != null && !player.world.isClient && this.dataTracker.get(HAS_LODESTONE)) {
             player.openHandledScreen(new SimpleNamedScreenHandlerFactory((syncId, inv, player1) -> GenericContainerScreenHandler.createGeneric9x3(syncId, inv, this), MagneticIronGolemEntity.this.getDisplayName()));
         }
-        return ActionResult.success(this.world.isClient && this.dataTracker.get(HAS_LODESTONE));
+        return this.dataTracker.get(HAS_LODESTONE) ? ActionResult.SUCCESS : ActionResult.PASS;
     }
 
     @Override

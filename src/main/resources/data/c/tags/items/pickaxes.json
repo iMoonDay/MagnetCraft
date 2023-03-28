@@ -2,6 +2,7 @@
   "replace": false,
   "values": [
     "magnetcraft:magnetic_iron_pickaxe",
-    "magnetcraft:netherite_magnetic_iron_pickaxe"
+    "magnetcraft:netherite_magnetic_iron_pickaxe",
+    "magnetcraft:magnetic_wrench"
   ]
 }

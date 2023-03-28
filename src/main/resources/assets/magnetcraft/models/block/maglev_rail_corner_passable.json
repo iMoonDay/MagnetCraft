@@ -1,0 +1,6 @@
+{
+  "parent": "magnetcraft:block/maglev_rail_curved_passable",
+  "textures": {
+    "rail": "magnetcraft:block/maglev_rail_corner_passable"
+  }
+}

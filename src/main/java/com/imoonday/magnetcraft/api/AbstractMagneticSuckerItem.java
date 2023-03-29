@@ -37,7 +37,6 @@ public abstract class AbstractMagneticSuckerItem extends Item {
     public static final String POWER = "power";
     public static final String POS = "Pos";
 
-
     public AbstractMagneticSuckerItem(Settings settings) {
         super(settings);
     }

@@ -84,7 +84,7 @@ public class MagneticWrenchItem extends CustomPickaxeItem implements Vanishable 
             int lvl = stack.getEnchantmentLvl(EnchantmentRegistries.ACCUMULATOR_ENCHANTMENT);
             float speedMultiplier = MathHelper.clamp((float) i / 20, 0.0f, 1.0f + lvl * 0.05f);
             float damageMultiplier = MathHelper.clamp((float) i / 20, 0.0f, 1.0f + lvl * 0.25f);
-            wrenchEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw(), 0.0f, SPEED * speedMultiplier, 1.0f);
+            wrenchEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw(), 0f, SPEED * speedMultiplier, 1.0f);
             if (playerEntity.getAbilities().creativeMode) {
                 wrenchEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
             }

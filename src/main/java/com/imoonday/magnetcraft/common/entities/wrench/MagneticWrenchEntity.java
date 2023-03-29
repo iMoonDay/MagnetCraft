@@ -41,7 +41,7 @@ public class MagneticWrenchEntity extends PersistentProjectileEntity {
         super(entityType, world);
     }
 
-    public MagneticWrenchEntity(World world, LivingEntity owner, ItemStack stack,boolean criticalHit) {
+    public MagneticWrenchEntity(World world, LivingEntity owner, ItemStack stack, boolean criticalHit) {
         super(EntityRegistries.MAGNETIC_WRENCH, owner, world);
         this.wrenchStack = stack.copy();
         this.dataTracker.set(ENCHANTED, stack.hasGlint());
@@ -155,7 +155,12 @@ public class MagneticWrenchEntity extends PersistentProjectileEntity {
         if (hitEntity instanceof LivingEntity livingEntity) {
             damage += EnchantmentHelper.getAttackDamage(this.wrenchStack, livingEntity.getGroup());
             damage *= this.damageMultiplier;
-            damage *= this.isCriticalHit() ? 1.5f : 1.0f;
+            if (this.isCriticalHit()) {
+                damage *= 1.5f;
+            }
+        }
+        if (this.isCriticalHit()) {
+            this.setGlowing(true);
         }
         Entity owner = this.getOwner();
         DamageSource damageSource = this.getDamageSources().thrown(this, owner == null ? this : owner);
@@ -174,9 +179,6 @@ public class MagneticWrenchEntity extends PersistentProjectileEntity {
             }
         }
         this.setVelocity(this.getVelocity().multiply(-0.01, -0.1, -0.01));
-        if (this.isCriticalHit()) {
-            soundEvent = SoundEvents.ENTITY_PLAYER_ATTACK_CRIT;
-        }
         this.playSound(soundEvent, 1.0f, 1.0f);
     }
 

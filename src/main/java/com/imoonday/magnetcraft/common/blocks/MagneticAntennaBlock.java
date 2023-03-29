@@ -22,10 +22,12 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.ToIntFunction;
 import java.util.stream.IntStream;
 
 public class MagneticAntennaBlock extends RodBlock implements Waterloggable {
@@ -179,4 +181,10 @@ public class MagneticAntennaBlock extends RodBlock implements Waterloggable {
         }
         return state.get(POWERED) ? state.get(POWER) : 0;
     }
+
+    @NotNull
+    public static ToIntFunction<BlockState> getLuminance() {
+        return state -> state.get(ACTIVATED) ? 15 : (state.get(POWERED) ? 8 : 0);
+    }
+
 }

@@ -75,7 +75,8 @@ public class BlockRegistries {
     public static final VerticalRepeaterBlock VERTICAL_REPEATER_BLOCK = register("vertical_repeater", new VerticalRepeaterBlock(FabricBlockSettings.copy(Blocks.OBSERVER)), false);
     public static final CircularRepeaterBlock CIRCULAR_REPEATER_BLOCK = register("circular_repeater", new CircularRepeaterBlock(FabricBlockSettings.copy(Blocks.REPEATER)), true);
     public static final ElectromagneticRelayBlock ELECTROMAGNETIC_RELAY_BLOCK = register("electromagnetic_relay", new ElectromagneticRelayBlock(FabricBlockSettings.copy(Blocks.COMPARATOR)), true);
-    public static final MagneticAntennaBlock MAGNETIC_ANTENNA_BLOCK = register("magnetic_antenna", new MagneticAntennaBlock(FabricBlockSettings.copy(Blocks.LIGHTNING_ROD)), true);
+    public static final MagneticAntennaBlock MAGNETIC_ANTENNA_BLOCK = register("magnetic_antenna", new MagneticAntennaBlock(FabricBlockSettings.copy(Blocks.LIGHTNING_ROD).luminance(MagneticAntennaBlock.getLuminance())), true);
+
     public static final Map<Item, CauldronBehavior> MAGNETIC_FLUID_CAULDRON_BEHAVIOR = CauldronBehavior.createMap();
     public static final Block MAGNETIC_FLUID_CAULDRON = registerBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(AbstractBlock.Settings.copy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR), true);
 

@@ -41,6 +41,11 @@ public class SmallMagneticSuckerItem extends AbstractMagneticSuckerItem {
     }
 
     @Override
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return ingredient.isOf(ItemRegistries.MAGNETIC_IRON_INGOT);
+    }
+
+    @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
         NbtCompound nbt = stack.getNbt();
         NbtCompound block = stack.getSubNbt(BLOCK);

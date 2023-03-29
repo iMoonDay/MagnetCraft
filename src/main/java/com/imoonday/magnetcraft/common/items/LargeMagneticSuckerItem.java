@@ -2,6 +2,7 @@ package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.api.AbstractMagneticSuckerItem;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -10,6 +11,7 @@ import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
@@ -57,6 +59,11 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
 
     public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.LARGE_MAGNETIC_SUCKER_ITEM, new Identifier("contains"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getNbt() == null || !itemStack.getNbt().contains(BLOCKS) ? 0.0F : 1.0F);
+    }
+
+    @Override
+    public boolean canRepair(ItemStack stack, ItemStack ingredient) {
+        return ingredient.isOf(Item.fromBlock(BlockRegistries.MAGNET_BLOCK));
     }
 
     @Override

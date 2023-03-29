@@ -141,6 +141,9 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
                 }
                 Block block = state.getBlock();
                 ItemStack blockStack = new ItemStack(block);
+                if (blockStack.isEmpty()) {
+                    continue;
+                }
                 NbtCompound blocks = new NbtCompound();
                 NbtCompound itemNbt = getItemNbt(world, pos, state, blockStack);
                 blocks.put(BLOCK, itemNbt);
@@ -150,10 +153,13 @@ public class LargeMagneticSuckerItem extends AbstractMagneticSuckerItem {
                 breakBlock(stack, world, player, pos, state, block);
             }
         }
+        stack.getNbt().remove(POS);
+        if (list.isEmpty()) {
+            return stack;
+        }
         stack.getOrCreateNbt().put(BLOCKS, list);
         Direction horizontalFacing = player.getHorizontalFacing();
         stack.getOrCreateNbt().putInt(DIRECTION, horizontalFacing.getId());
-        stack.getNbt().remove(POS);
         player.getInventory().markDirty();
         player.getItemCooldownManager().set(this, 20);
         return stack;

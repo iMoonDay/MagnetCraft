@@ -9,6 +9,7 @@
     "magnetcraft:attract_sensor",
     "magnetcraft:advanced_grindstone",
     "magnetcraft:vertical_repeater",
-    "magnetcraft:magnetic_antenna"
+    "magnetcraft:magnetic_antenna",
+    "magnetcraft:magnetic_fluid_cauldron"
   ]
 }

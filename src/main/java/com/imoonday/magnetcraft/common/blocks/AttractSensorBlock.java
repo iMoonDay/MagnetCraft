@@ -63,6 +63,9 @@ public class AttractSensorBlock extends BlockWithEntity {
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        if (!player.getStackInHand(hand).isEmpty()) {
+            return ActionResult.PASS;
+        }
         if (world.isClient) {
             return ActionResult.SUCCESS;
         }

@@ -34,10 +34,9 @@ public class EnchantmentHelperMixin {
             if (enchantment.isTreasure() && !treasureAllowed || !enchantment.isAvailableForRandomSelection() || !enchantment.target.isAcceptableItem(item) && !bl) {
                 continue;
             }
-            Enchantment[] enchantments = {EnchantmentRegistries.FASTER_COOLDOWN_ENCHANTMENT, EnchantmentRegistries.ACCUMULATOR_ENCHANTMENT};
-            boolean isNotAcceptable = Arrays.stream(enchantments).anyMatch(enchantment1 -> isNotAcceptableItemStack(stack, enchantment, enchantment1));
-            boolean isMagnet = enchantment == Enchantments.UNBREAKING && (stack.isOf(ItemRegistries.POLAR_MAGNET_ITEM) || stack.isOf(ItemRegistries.PERMANENT_MAGNET_ITEM) || stack.isOf(ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM));
-            if (isNotAcceptable || isMagnet) {
+            boolean isNotAcceptable = EnchantmentRegistries.CHECK_ENCHANTMENTS.stream().anyMatch(enchantment1 -> isNotAcceptableItemStack(stack, enchantment, enchantment1));
+            boolean isExcludedItem = isExcludedItem(enchantment, stack, Enchantments.UNBREAKING, ItemRegistries.POLAR_MAGNET_ITEM, ItemRegistries.PERMANENT_MAGNET_ITEM, ItemRegistries.PORTABLE_DEMAGNETIZER_ITEM);
+            if (isNotAcceptable || isExcludedItem) {
                 continue;
             }
             for (int i = enchantment.getMaxLevel(); i > enchantment.getMinLevel() - 1; --i) {
@@ -54,4 +53,10 @@ public class EnchantmentHelperMixin {
     private static boolean isNotAcceptableItemStack(ItemStack stack, Enchantment enchantment, Enchantment testEnchantment) {
         return enchantment == testEnchantment && !testEnchantment.isAcceptableItem(stack);
     }
+
+    @SuppressWarnings("SameParameterValue")
+    private static boolean isExcludedItem(Enchantment enchantment, ItemStack stack, Enchantment checkEnchantment, Item... items) {
+        return enchantment == checkEnchantment && Arrays.stream(items).anyMatch(stack::isOf);
+    }
+
 }

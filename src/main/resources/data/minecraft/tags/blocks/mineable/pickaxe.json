@@ -8,10 +8,12 @@
     "magnetcraft:raw_magnet_block",
     "magnetcraft:lodestone",
     "magnetcraft:magnetic_pressure_plate",
+    "magnetcraft:maglev_iron_door",
     "magnetcraft:demagnetizer",
     "magnetcraft:attract_sensor",
     "magnetcraft:advanced_grindstone",
     "magnetcraft:vertical_repeater",
-    "magnetcraft:magnetic_antenna"
+    "magnetcraft:magnetic_antenna",
+    "magnetcraft:magnetic_fluid_cauldron"
   ]
 }

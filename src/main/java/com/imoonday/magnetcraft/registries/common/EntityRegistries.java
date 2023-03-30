@@ -17,7 +17,7 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 public class EntityRegistries {
 
     public static final EntityType<MagneticIronGolemEntity> MAGNETIC_IRON_GOLEM = register("magnetic_iron_golem", EntityType.Builder.create(MagneticIronGolemEntity::new, SpawnGroup.MISC).setDimensions(1.4f, 2.7f).maxTrackingRange(15));
-    public static final Item MAGNETIC_IRON_GOLEM_SPAWN_EGG = ItemRegistries.register("magnetic_iron_golem_spawn_egg", (Item) new SpawnEggItem(MAGNETIC_IRON_GOLEM, 10063810, 7643954, new Item.Settings()));
+    public static final Item MAGNETIC_IRON_GOLEM_SPAWN_EGG = ItemRegistries.register("magnetic_iron_golem_spawn_egg", (Item) new SpawnEggItem(MAGNETIC_IRON_GOLEM, 10063810, 7643954, ItemRegistries.settings()));
     public static final EntityType<MagneticWrenchEntity> MAGNETIC_WRENCH = register("magnetic_wrench", FabricEntityTypeBuilder.<MagneticWrenchEntity>create(SpawnGroup.MISC, MagneticWrenchEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(20).build());
 
     @SuppressWarnings("SameParameterValue")

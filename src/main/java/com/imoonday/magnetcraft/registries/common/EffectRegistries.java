@@ -21,8 +21,7 @@ public class EffectRegistries {
     }
 
     static <T extends StatusEffect> T register(String id, T effect) {
-        Registry.register(Registries.STATUS_EFFECT, id(id), effect);
-        return effect;
+        return Registry.register(Registries.STATUS_EFFECT, id(id), effect);
     }
 
 }

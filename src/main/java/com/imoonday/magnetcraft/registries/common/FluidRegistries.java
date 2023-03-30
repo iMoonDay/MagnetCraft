@@ -2,7 +2,6 @@ package com.imoonday.magnetcraft.registries.common;
 
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
-import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.DispenserBlock;
@@ -22,16 +21,16 @@ public class FluidRegistries {
 
     public static final FlowableFluid STILL_MAGNETIC_FLUID = register("magnetic_fluid", new MagneticFluid.Still());
     public static final FlowableFluid FLOWING_MAGNETIC_FLUID = register("flowing_magnetic_fluid", new MagneticFluid.Flowing());
-    public static final Item MAGNETIC_FLUID_BUCKET = ItemRegistries.register("magnetic_fluid_bucket", new BucketItem(STILL_MAGNETIC_FLUID, new Item.Settings().recipeRemainder(Items.BUCKET).maxCount(1)));
-    public static final Block MAGNETIC_FLUID = BlockRegistries.registerBlock("magnetic_fluid", new FluidBlock(STILL_MAGNETIC_FLUID, FabricBlockSettings.copy(Blocks.WATER)) {
-    }, false);
+    public static final Item MAGNETIC_FLUID_BUCKET = ItemRegistries.register("magnetic_fluid_bucket", new BucketItem(STILL_MAGNETIC_FLUID, ItemRegistries.nonStackable().recipeRemainder(Items.BUCKET)));
+    public static final Block MAGNETIC_FLUID = BlockRegistries.registerBlock("magnetic_fluid", new FluidBlock(STILL_MAGNETIC_FLUID, BlockRegistries.settingCopy(Blocks.WATER)) {
+    });
 
     public static void register() {
-        itemDispenserBehaviorRegister();
+        registerItemDispenserBehavior();
         MagnetCraft.LOGGER.info("FluidRegistries.class Loaded");
     }
 
-    private static void itemDispenserBehaviorRegister() {
+    private static void registerItemDispenserBehavior() {
         ItemDispenserBehavior dispenserBehavior = new ItemDispenserBehavior() {
             private final ItemDispenserBehavior fallbackBehavior = new ItemDispenserBehavior();
 
@@ -51,8 +50,7 @@ public class FluidRegistries {
     }
 
     static <T extends FlowableFluid> T register(String id, T fluid) {
-        Registry.register(Registries.FLUID, id(id), fluid);
-        return fluid;
+        return Registry.register(Registries.FLUID, id(id), fluid);
     }
 
 }

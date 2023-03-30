@@ -24,7 +24,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "BuiltinModelItemRendererMixin",
     "ClientPlayerEntityMixin"
   ]
 }

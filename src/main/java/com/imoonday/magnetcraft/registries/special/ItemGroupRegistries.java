@@ -1,12 +1,14 @@
 package com.imoonday.magnetcraft.registries.special;
 
 import com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem;
+import com.imoonday.magnetcraft.registries.common.PotionRegistries;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemGroups;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.PotionUtil;
 import net.minecraft.text.Text;
 
 import static com.imoonday.magnetcraft.registries.common.BlockRegistries.*;
@@ -18,9 +20,17 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 @SuppressWarnings("CodeBlock2Expr")
 public class ItemGroupRegistries {
 
-    public static final ItemGroup MAGNETS = FabricItemGroup.builder(id("magnet"))
-            .displayName(Text.translatable("group.magnetcraft.magnet"))
+    public static final ItemGroup MAGNET_ITEMS = FabricItemGroup.builder(id("magnet_item"))
+            .displayName(Text.translatable("group.magnetcraft.magnet_item"))
             .icon(() -> new ItemStack(ELECTROMAGNET_ITEM)).build();
+
+    public static final ItemGroup MAGNET_BLOCKS = FabricItemGroup.builder(id("magnet_block"))
+            .displayName(Text.translatable("group.magnetcraft.magnet_block"))
+            .icon(() -> new ItemStack(NETHERITE_MAGNET_BLOCK)).build();
+
+    public static final ItemGroup MAGNET_OHTERS = FabricItemGroup.builder(id("magnet_other"))
+            .displayName(Text.translatable("group.magnetcraft.magnet_other"))
+            .icon(() -> PotionUtil.setPotion(new ItemStack(Items.TIPPED_ARROW), PotionRegistries.ATTRACT_POTION)).build();
 
     @SuppressWarnings("AlibabaMethodTooLong")
     public static void register() {

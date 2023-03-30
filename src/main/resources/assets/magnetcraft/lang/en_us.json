@@ -222,6 +222,8 @@
   "text.magnetcraft.message.automatic_levitation.on": "Automatic Levitation: On",
   "text.magnetcraft.message.automatic_levitation.off": "Automatic Levitation: Off",
   "text.magnetcraft.message.unattract_zone": "You've entered the unattractive zone",
+  "text.magnetcraft.message.update": "[Magnet Craft] Discover the new version: v%d",
+  "text.magnetcraft.message.http": "Click me to go to the download link",
   "text.magnetcraft.screen.compare.nbt": "Compare NBT",
   "text.magnetcraft.screen.compare.damage": "Compare Damage",
   "text.magnetcraft.screen.enable": "Enable",

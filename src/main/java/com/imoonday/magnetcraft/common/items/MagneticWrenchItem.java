@@ -70,7 +70,7 @@ public class MagneticWrenchItem extends CustomPickaxeItem implements Vanishable 
 
     @Override
     public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (!(user instanceof PlayerEntity playerEntity)) {
+        if (!(user instanceof PlayerEntity player)) {
             return;
         }
         int i = this.getMaxUseTime(stack) - remainingUseTicks;
@@ -78,23 +78,23 @@ public class MagneticWrenchItem extends CustomPickaxeItem implements Vanishable 
             return;
         }
         if (!world.isClient) {
-            stack.damage(1, playerEntity, p -> p.sendToolBreakStatus(user.getActiveHand()));
+            stack.damage(1, player, p -> p.sendToolBreakStatus(user.getActiveHand()));
             boolean criticalHit = world.getRandom().nextFloat() < 0.33f;
-            MagneticWrenchEntity wrenchEntity = new MagneticWrenchEntity(world, playerEntity, stack, criticalHit);
+            MagneticWrenchEntity wrenchEntity = new MagneticWrenchEntity(world, player, stack, criticalHit);
             int lvl = stack.getEnchantmentLvl(EnchantmentRegistries.ACCUMULATOR_ENCHANTMENT);
             float speedMultiplier = MathHelper.clamp((float) i / 20, 0.0f, 1.0f + lvl * 0.05f);
             float damageMultiplier = MathHelper.clamp((float) i / 20, 0.0f, 1.0f + lvl * 0.25f);
-            wrenchEntity.setVelocity(playerEntity, playerEntity.getPitch(), playerEntity.getYaw(), 0f, SPEED * speedMultiplier, 1.0f);
-            if (playerEntity.getAbilities().creativeMode) {
+            wrenchEntity.setVelocity(player, player.getPitch(), player.getYaw(), 0f, SPEED * speedMultiplier, 1.0f);
+            if (player.getAbilities().creativeMode) {
                 wrenchEntity.pickupType = PersistentProjectileEntity.PickupPermission.CREATIVE_ONLY;
             }
             world.spawnEntity(wrenchEntity.withDamageMultiplier(damageMultiplier));
             world.playSoundFromEntity(null, wrenchEntity, SoundEvents.ITEM_TRIDENT_THROW, SoundCategory.PLAYERS, 1.0f, 1.0f);
-            if (!playerEntity.getAbilities().creativeMode) {
-                playerEntity.getInventory().removeOne(stack);
+            if (!player.getAbilities().creativeMode) {
+                player.getInventory().removeOne(stack);
             }
         }
-        playerEntity.incrementStat(Stats.USED.getOrCreateStat(this));
+        player.incrementStat(Stats.USED.getOrCreateStat(this));
     }
 
     @Override

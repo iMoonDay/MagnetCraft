@@ -11,6 +11,7 @@ public class MagnetCraft implements ModInitializer {
 
     public static final String MOD_ID = "magnetcraft";
     public static final Logger LOGGER = LoggerFactory.getLogger("MagnetCraft");
+    public static final String VERSION = "v1.6";
 
     @Override
     public void onInitialize() {
@@ -28,6 +29,7 @@ public class MagnetCraft implements ModInitializer {
         CommandRegistries.register();
         ScreenRegistries.register();
         RecipeRegistries.register();
+        CallbackRegistries.register();
     }
 
 }

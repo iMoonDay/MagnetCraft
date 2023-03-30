@@ -186,8 +186,6 @@ public abstract class AbstractFilterableItem extends AbstractSwitchableItem impl
         stack.getOrCreateNbt().put(SHULKER_BOX, list);
     }
 
-    public boolean canTeleportItems() {
-        return false;
-    }
+    public abstract boolean canTeleportItems();
 
 }

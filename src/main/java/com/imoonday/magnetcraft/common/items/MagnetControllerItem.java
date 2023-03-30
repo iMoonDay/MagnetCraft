@@ -124,6 +124,11 @@ public class MagnetControllerItem extends AbstractFilterableItem {
     }
 
     @Override
+    public boolean canTeleportItems() {
+        return false;
+    }
+
+    @Override
     public int getEnchantability() {
         return 14;
     }

@@ -80,6 +80,11 @@ public class PolorMagnetItem extends AbstractFilterableItem {
     }
 
     @Override
+    public boolean canTeleportItems() {
+        return false;
+    }
+
+    @Override
     public boolean isDamageable() {
         return true;
     }

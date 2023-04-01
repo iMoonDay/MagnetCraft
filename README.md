@@ -84,7 +84,7 @@
 
 **矿物磁铁**：合成时存储的矿物为空，可将磁铁与矿石产物(例如煤炭、粗铁、粗金、金粒、钻石等矿石默认掉落物)进行合成以增加某个矿石的查找能力，使用时查找以玩家为中心 20 * 20 * 20 范围内的矿物并自动挖掘放进背包，每次使用消耗5级经验，并根据不同矿物消耗不同耐久，同时进入冷却，耐久576，用绿宝石修复。
 
-**磁铁控制器**：控制自身的全部吸引功能，可消耗1点耐久临时获取1分钟消磁效果，耐久100，用燧石修复。**快捷键：默认R。**
+**磁铁控制器**：控制自身的全部吸引功能，可消耗1点耐久临时获取1分钟消磁效果，耐久100，用燧石修复。**快捷键：默认R**
 
 **作物磁铁**：与矿物磁铁类似，查找以玩家为中心 30 * 30 * 30 范围内的作物，每次使用消耗饱食度，并根据数量消耗耐久，同时进入冷却，耐久2048，用金胡萝卜修复。
 
@@ -240,7 +240,7 @@
 
 ## Module introduction
 
-This module is a module of a series of functional props made with the theme of magnets and extended and expanded.
+This module is a module of a series of functional props made with the theme of magnets and extended.
 
 ## Introduction of items
 
@@ -291,11 +291,11 @@ This module is a module of a series of functional props made with the theme of m
 
 **Creature Magnet**: Right-click mob can forcibly attract mobs, consuming 1 durability/stick every 30 seconds, and consuming durability at a shorter interval of 300 when multiple at the same time, repaired with golden apples, attraction range 30.
 
-**Mineral Magnet**: The mineral stored during synthesis is empty, the magnet can be synthesized with ore products (such as coal, crude iron, crude gold, gold grains, diamonds and other ore default drops) to increase the search ability of a certain ore, when used to find minerals in the range of 20 * 20 * 20 * 20 centered on the player and automatically dig into the backpack, each use costs 5 levels of experience, and consumes different durability according to different minerals, while entering cooling, durability 576, repaired with emerald.
+**Mineral Magnet**: The mineral stored during synthesis is empty, the magnet can be synthesized with ore products (such as coal, crude iron, crude gold, gold grains, diamonds and other ore default drops) to increase the search ability of a certain ore, when used to find minerals in the range of 20 * 20 * 20 centered on the player and automatically dig into the backpack, each use costs 5 levels of experience, and consumes different durability according to different minerals, while entering cooling, durability 576, repaired with emerald.
 
-**Magnet Controller**: Control all the attraction functions of itself, can consume 1 point of durability to temporarily obtain 1 minute demagnetization effect, durability 100, repair with flint. **Shortcut: Default R. **
+**Magnet Controller**: Control all the attraction functions of itself, can consume 1 point of durability to temporarily obtain 1 minute demagnetization effect, durability 100, repair with flint. **Shortcut: Default R**
 
-**Crop Magnet**: Similar to the mineral magnet, find crops in the 30*30*30 range centered on the player, consume satiety per use, and consume durability according to the quantity, while going into cooling, durability 2048, repaired with golden carrots.
+**Crop Magnet**: Similar to the mineral magnet, find crops in the 30 * 30 * 30 range centered on the player, consume satiety per use, and consume durability according to the quantity, while going into cooling, durability 2048, repaired with golden carrots.
 
 **Portable Demagnetizer**: Fits inside a backpack to prevent attraction from non-player entities within a certain range.
 

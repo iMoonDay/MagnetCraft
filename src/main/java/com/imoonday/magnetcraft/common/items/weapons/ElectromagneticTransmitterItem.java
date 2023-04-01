@@ -4,6 +4,7 @@ import com.imoonday.magnetcraft.common.entities.bomb.ElectromagneticPulseBombEnt
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
+import net.minecraft.client.item.TooltipContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,10 +16,13 @@ import net.minecraft.screen.slot.Slot;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.stat.Stats;
+import net.minecraft.text.Text;
 import net.minecraft.util.*;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.function.Predicate;
 
 public class ElectromagneticTransmitterItem extends Item implements Vanishable {
@@ -33,6 +37,12 @@ public class ElectromagneticTransmitterItem extends Item implements Vanishable {
 
     public ElectromagneticTransmitterItem(Settings settings) {
         super(settings);
+    }
+
+    @Override
+    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        String key = stack.getTranslationKey() + ".tooltip";
+        tooltip.add(Text.translatable(key).formatted(Formatting.GRAY).formatted(Formatting.BOLD));
     }
 
     @Override
@@ -104,6 +114,7 @@ public class ElectromagneticTransmitterItem extends Item implements Vanishable {
         if (!itemStack.isDamaged() && user.isSneaking() && !user.getAbilities().creativeMode) {
             itemStack.setDamage(itemStack.getMaxDamage());
             user.getInventory().offerOrDrop(new ItemStack(ItemRegistries.MAGNETIC_BATTERY));
+            user.playSoundIfNotSilent(SoundEvents.BLOCK_BEACON_DEACTIVATE);
             return TypedActionResult.success(itemStack);
         }
         if (itemStack.isDamaged() && noBattery(user)) {
@@ -118,13 +129,10 @@ public class ElectromagneticTransmitterItem extends Item implements Vanishable {
         if (world.isClient) {
             return;
         }
-        if (!entity.canAttract()) {
-            return;
-        }
         if (stack.isDamaged()) {
-            if (entity.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
+            if (entity.isSubmergedIn(FluidTags.MAGNETIC_FLUID) && entity.canAttract()) {
                 this.repairTick += 3;
-            } else if (entity.isAttracting() && (selected || entity instanceof PlayerEntity player && player.getOffHandStack().equals(stack))) {
+            } else if (entity.isAttracting() && entity.canAttract() && (selected || entity instanceof PlayerEntity player && ItemStack.areEqual(player.getOffHandStack(), stack))) {
                 this.repairTick++;
             } else {
                 if (world.random.nextFloat() < 0.05f) {

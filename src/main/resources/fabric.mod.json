@@ -7,7 +7,11 @@
   "authors": [
     "iMoonDay"
   ],
-  "contact": {},
+  "contact": {
+    "issues": "https://github.com/iMoonDay/MagnetCraft/issues",
+    "sources": "https://github.com/iMoonDay/MagnetCraft",
+    "homepage": "https://www.curseforge.com/minecraft/mc-mods/magnet-craft"
+  },
   "license": "MIT",
   "icon": "assets/magnetcraft/icon.png",
   "environment": "*",
@@ -31,7 +35,16 @@
     "minecraft": "1.19.4"
   },
   "accessWidener": "magnetcraft.accesswidener",
+  "suggests": {
+    "modmenu": "*"
+  },
   "custom": {
+    "modmenu": {
+      "links": {
+        "modmenu.modrinth": "https://modrinth.com/mod/magnet-craft",
+        "modmenu.curseforge": "https://www.curseforge.com/minecraft/mc-mods/magnet-craft"
+      }
+    },
     "loom:injected_interfaces": {
       "net/minecraft/class_1297": [
         "com/imoonday/magnetcraft/api/MagnetCraftEntity"

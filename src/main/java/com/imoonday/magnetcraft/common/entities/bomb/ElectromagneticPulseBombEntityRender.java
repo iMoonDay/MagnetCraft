@@ -17,8 +17,7 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 
 public class ElectromagneticPulseBombEntityRender extends EntityRenderer<ElectromagneticPulseBombEntity> {
 
-    private static final Identifier TEXTURE = id("textures/entity/electromagnetic_pulse_bomb.png");
-    private static final RenderLayer LAYER = RenderLayer.getEntityCutoutNoCull(TEXTURE);
+    private static final Identifier TEXTURE = id("textures/entity/electromagnetic_pulse_bomb_0.png");
 
     public ElectromagneticPulseBombEntityRender(EntityRendererFactory.Context context) {
         super(context);
@@ -38,17 +37,19 @@ public class ElectromagneticPulseBombEntityRender extends EntityRenderer<Electro
         MatrixStack.Entry entry = matrixStack.peek();
         Matrix4f matrix4f = entry.getPositionMatrix();
         Matrix3f matrix3f = entry.getNormalMatrix();
-        VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(LAYER);
-        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 0, 0, 1);
-        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 1.0f, 0, 1, 1);
-        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 1.0f, 1, 1, 0);
-        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 1, 0, 0);
+        String id = "textures/entity/electromagnetic_pulse_bomb_" + getTextRenderer().random.nextBetween(0, 7) + ".png";
+        RenderLayer layer = RenderLayer.getEntityCutoutNoCull(id(id));
+        VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(layer);
+        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 0, 0, 1, entity.isFlash());
+        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 1.0f, 0, 1, 1, entity.isFlash());
+        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 1.0f, 1, 1, 0, entity.isFlash());
+        produceVertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 1, 0, 0, entity.isFlash());
         matrixStack.pop();
         super.render(entity, f, g, matrixStack, vertexConsumerProvider, i);
     }
 
-    private static void produceVertex(VertexConsumer vertexConsumer, Matrix4f positionMatrix, Matrix3f normalMatrix, int light, float x, int y, int textureU, int textureV) {
-        vertexConsumer.vertex(positionMatrix, x - 0.5f, (float)y - 0.25f, 0.0f).color(255, 255, 255, 255).texture(textureU, textureV).overlay(OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
+    private static void produceVertex(VertexConsumer vertexConsumer, Matrix4f positionMatrix, Matrix3f normalMatrix, int light, float x, int y, int textureU, int textureV, boolean drawFlash) {
+        vertexConsumer.vertex(positionMatrix, x - 0.5f, (float) y - 0.25f, 0.0f).color(255, 255, 255, 255).texture(textureU, textureV).overlay(drawFlash ? OverlayTexture.packUv(OverlayTexture.getU(1.0f), 10) : OverlayTexture.DEFAULT_UV).light(light).normal(normalMatrix, 0.0f, 1.0f, 0.0f).next();
     }
 
     @Override

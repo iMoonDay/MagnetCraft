@@ -4,11 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayConnectionEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableEvents;
 import net.fabricmc.fabric.api.loot.v2.LootTableSource;
 import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.loot.LootManager;
 import net.minecraft.loot.LootPool;
 import net.minecraft.loot.LootTable;
@@ -17,12 +19,10 @@ import net.minecraft.loot.entry.ItemEntry;
 import net.minecraft.loot.function.SetCountLootFunction;
 import net.minecraft.loot.provider.number.UniformLootNumberProvider;
 import net.minecraft.resource.ResourceManager;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.server.network.ServerPlayNetworkHandler;
-import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.text.ClickEvent;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Identifier;
 
 import java.io.ByteArrayOutputStream;
@@ -35,12 +35,12 @@ public class CallbackRegistries {
     public static final String OWNER = "iMoonDay";
     public static final String NAME = "MagnetCraft";
 
-    private volatile static boolean updated = false;
-
     public static void register() {
-        ServerLifecycleEvents.SERVER_STOPPED.register(server -> updated = false);
-        ServerPlayConnectionEvents.JOIN.register(CallbackRegistries::updateCheck);
         LootTableEvents.MODIFY.register(CallbackRegistries::modifyLootTable);
+    }
+
+    public static void registerClient() {
+        ClientPlayConnectionEvents.JOIN.register(CallbackRegistries::updateCheck);
     }
 
     private static float getLatestVersion() {
@@ -64,22 +64,6 @@ public class CallbackRegistries {
         }
     }
 
-    private static void updateCheck(ServerPlayNetworkHandler handler, PacketSender sender, MinecraftServer server) {
-        ServerPlayerEntity player = handler.player;
-        if (player.hasPermissionLevel(3) && !updated) {
-            updated = true;
-            float latestVersion = getLatestVersion();
-            float currentVersion = Float.parseFloat(MagnetCraft.VERSION.substring(1));
-            if (latestVersion != -1 && currentVersion < latestVersion) {
-                player.sendMessage(Text.translatable("text.magnetcraft.message.update", latestVersion));
-                String http = "https://www.curseforge.com/minecraft/mc-mods/magnet-craft/files";
-                MutableText text = Text.translatable("text.magnetcraft.message.http");
-                text.setStyle(text.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, http)));
-                player.sendMessage(text);
-            }
-        }
-    }
-
     private static void modifyLootTable(ResourceManager resourceManager, LootManager lootManager, Identifier id, LootTable.Builder tableBuilder, LootTableSource source) {
         if (source.isBuiltin() && LootTables.BURIED_TREASURE_CHEST.equals(id)) {
             LootPool.Builder builder = LootPool.builder()
@@ -88,5 +72,25 @@ public class CallbackRegistries {
                             .weight(5));
             tableBuilder.pool(builder);
         }
+    }
+
+    private static void updateCheck(ClientPlayNetworkHandler handler, PacketSender sender, MinecraftClient client) {
+        ClientPlayerEntity player = client.player;
+        if (player != null) {
+            float latestVersion = getLatestVersion();
+            float currentVersion = Float.parseFloat(MagnetCraft.VERSION.substring(1));
+            if (latestVersion != -1 && currentVersion < latestVersion) {
+                MutableText github = getText("Github", "https://github.com/iMoonDay/MagnetCraft");
+                MutableText curseforge = getText("Curseforge", "https://www.curseforge.com/minecraft/mc-mods/magnet-craft");
+                MutableText modrinth = getText("Modrinth", "https://modrinth.com/mod/magnet-craft");
+                player.sendMessage(Text.translatable("text.magnetcraft.message.update", latestVersion).formatted(Formatting.BOLD).append(" ").append(github).append(" ").append(curseforge).append(" ").append(modrinth));
+            }
+        }
+    }
+
+    private static MutableText getText(String content, String website) {
+        MutableText text = Text.literal(content).formatted(Formatting.UNDERLINE).formatted(Formatting.GREEN).formatted(Formatting.BOLD);
+        text.setStyle(text.getStyle().withClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, website)));
+        return text;
     }
 }

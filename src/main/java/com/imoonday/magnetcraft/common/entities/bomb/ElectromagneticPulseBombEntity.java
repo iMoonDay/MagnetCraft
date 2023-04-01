@@ -31,6 +31,7 @@ public class ElectromagneticPulseBombEntity extends ExplosiveProjectileEntity {
     public static final int EXPLOSION_TICK = 60;
     private boolean damaged;
     private static final TrackedData<Boolean> EXPLOSIVE = DataTracker.registerData(ElectromagneticPulseBombEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+    private static final TrackedData<Boolean> FLASH = DataTracker.registerData(ElectromagneticPulseBombEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private ItemStack userStack;
 
     public ElectromagneticPulseBombEntity(EntityType<? extends ExplosiveProjectileEntity> entityType, World world) {
@@ -53,20 +54,30 @@ public class ElectromagneticPulseBombEntity extends ExplosiveProjectileEntity {
     protected void initDataTracker() {
         super.initDataTracker();
         this.dataTracker.startTracking(EXPLOSIVE, false);
+        this.dataTracker.startTracking(FLASH, false);
     }
 
     public void setExplosive(boolean explosive) {
         this.dataTracker.set(EXPLOSIVE, explosive);
     }
 
+    public void setFlash(boolean flash) {
+        this.dataTracker.set(FLASH, flash);
+    }
+
     public boolean isExplosive() {
         return this.dataTracker.get(EXPLOSIVE);
+    }
+
+    public boolean isFlash() {
+        return this.dataTracker.get(FLASH);
     }
 
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
         nbt.putBoolean("explosive", this.isExplosive());
+        nbt.putBoolean("flash", this.isFlash());
     }
 
     @Override
@@ -74,6 +85,9 @@ public class ElectromagneticPulseBombEntity extends ExplosiveProjectileEntity {
         super.readCustomDataFromNbt(nbt);
         if (nbt.contains("explosive")) {
             this.setExplosive(nbt.getBoolean("explosive"));
+        }
+        if (nbt.contains("flash")) {
+            this.setFlash(nbt.getBoolean("flash"));
         }
     }
 
@@ -83,6 +97,7 @@ public class ElectromagneticPulseBombEntity extends ExplosiveProjectileEntity {
         if (this.damaged) {
             this.discard();
         }
+        this.setFlash(this.age / 5 % 2 == 0);
         if (!this.isExplosive() && this.age >= EXPLOSION_TICK) {
             this.world.addParticle(ParticleTypes.EXPLOSION_EMITTER, this.getX(), this.getY(), this.getZ(), 0.0, 0.0, 0.0);
             this.world.getOtherEntities(null, this.getBoundingBox().expand(DIS), entity -> entity instanceof LivingEntity livingEntity && livingEntity.isInRange(this, DIS)).stream().map(entity -> (LivingEntity) entity).forEach(entity -> {

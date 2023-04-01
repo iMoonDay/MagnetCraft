@@ -41,7 +41,7 @@ public class CropMagnetItem extends AbstractFilterableItem {
     }
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.CROP_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && player.getItemCooldownManager().isCoolingDown(ItemRegistries.CROP_MAGNET_ITEM) ? 0.0F : itemStack.isBroken() ? 0.0F : 1.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.CROP_MAGNET_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && (player.getItemCooldownManager().isCoolingDown(ItemRegistries.CROP_MAGNET_ITEM) || itemStack.isBroken()) ? 0.0F : 1.0F);
     }
 
     @Override

@@ -26,6 +26,7 @@ public class EnchantmentRegistries {
     public static final FasterCooldownEnchantment FASTER_COOLDOWN_ENCHANTMENT = registerSpecial("faster_cooldown", new FasterCooldownEnchantment());
     public static final MagneticLevitationEnchantment MAGNETIC_LEVITATION_ENCHANTMENT = register("magnetic_levitation", new MagneticLevitationEnchantment());
     public static final AccumulatorEnchantment ACCUMULATOR_ENCHANTMENT = registerSpecial("accumulator", new AccumulatorEnchantment());
+    public static final ElectromagneticProtectionEnchantment ELECTROMAGNETIC_PROTECTION_ENCHANTMENT = register("electromagnetic_protection", new ElectromagneticProtectionEnchantment());
 
     public static void register() {
         MagnetCraft.LOGGER.info("EnchantmentRegistries.class Loaded");

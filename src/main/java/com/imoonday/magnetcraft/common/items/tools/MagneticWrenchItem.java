@@ -1,8 +1,7 @@
-package com.imoonday.magnetcraft.common.items;
+package com.imoonday.magnetcraft.common.items.tools;
 
 import com.imoonday.magnetcraft.common.blocks.maglev.MaglevRailBlock;
 import com.imoonday.magnetcraft.common.entities.wrench.MagneticWrenchEntity;
-import com.imoonday.magnetcraft.common.items.tools.CustomPickaxeItem;
 import com.imoonday.magnetcraft.common.tags.BlockTags;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;

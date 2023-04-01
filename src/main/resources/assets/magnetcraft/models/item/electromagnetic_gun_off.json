@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "magnetcraft:item/electromagnetic_gun_off"
+  }
+}

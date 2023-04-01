@@ -30,6 +30,7 @@ public class MagnetCraft implements ModInitializer {
         ScreenRegistries.register();
         RecipeRegistries.register();
         CallbackRegistries.register();
+        TradeRegistries.register();
     }
 
 }

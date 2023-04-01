@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:electromagnetic_transmitter"
+    },
+    {
+      "item": "magnetcraft:magnetic_battery"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:electromagnetic_transmitter"
+  }
+}

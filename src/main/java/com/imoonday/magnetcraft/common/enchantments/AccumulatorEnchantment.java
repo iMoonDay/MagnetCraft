@@ -1,6 +1,6 @@
 package com.imoonday.magnetcraft.common.enchantments;
 
-import com.imoonday.magnetcraft.common.items.MagneticWrenchItem;
+import com.imoonday.magnetcraft.common.items.tools.MagneticWrenchItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;

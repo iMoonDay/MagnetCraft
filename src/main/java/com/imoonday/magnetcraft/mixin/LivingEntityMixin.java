@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.common.entities.bomb.ElectromagneticPulseBombEntity;
 import com.imoonday.magnetcraft.common.entities.wrench.MagneticWrenchEntity;
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
 import com.imoonday.magnetcraft.common.items.armors.MagneticIronArmorItem;
@@ -26,6 +27,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -77,6 +80,12 @@ public class LivingEntityMixin extends EntityMixin {
     }
 
     @Override
+    public boolean hasEnchantmentOnArmor(Enchantment enchantment) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        return entity.getEnchantmentLvlOnArmor(enchantment) > 0;
+    }
+
+    @Override
     public boolean hasEnchantment(Enchantment enchantment) {
         LivingEntity entity = (LivingEntity) (Object) this;
         return entity.getEnchantmentLvl(enchantment) > 0;
@@ -86,6 +95,13 @@ public class LivingEntityMixin extends EntityMixin {
     public int getEnchantmentLvl(EquipmentSlot equipmentSlot, Enchantment enchantment) {
         LivingEntity entity = (LivingEntity) (Object) this;
         return EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(equipmentSlot));
+    }
+
+    @Override
+    public int getEnchantmentLvlOnArmor(Enchantment enchantment) {
+        LivingEntity entity = (LivingEntity) (Object) this;
+        EquipmentSlot[] equipmentSlots = {EquipmentSlot.HEAD, EquipmentSlot.CHEST, EquipmentSlot.LEGS, EquipmentSlot.FEET};
+        return Arrays.stream(equipmentSlots).mapToInt(slot -> EnchantmentHelper.getLevel(enchantment, entity.getEquippedStack(slot))).sum();
     }
 
     @Override
@@ -126,6 +142,8 @@ public class LivingEntityMixin extends EntityMixin {
                     stack = tridentEntity.asItemStack();
                 } else if (sourceEntity instanceof MagneticWrenchEntity wrench) {
                     stack = wrench.asItemStack();
+                } else if (sourceEntity instanceof ElectromagneticPulseBombEntity bomb) {
+                    stack = bomb.getUserStack();
                 } else {
                     stack = player.getMainHandStack();
                 }
@@ -160,6 +178,13 @@ public class LivingEntityMixin extends EntityMixin {
         if (entity.ignoreFallDamage() && source.isOf(DamageTypes.FALL) && !entity.world.isClient) {
             entity.setIgnoreFallDamage(false);
             cir.setReturnValue(false);
+        }
+        if (entity.hasEnchantmentOnArmor(EnchantmentRegistries.ELECTROMAGNETIC_PROTECTION_ENCHANTMENT) && source.isIndirect()) {
+            int lvl = entity.getEnchantmentLvlOnArmor(EnchantmentRegistries.ELECTROMAGNETIC_PROTECTION_ENCHANTMENT);
+            if (entity.getRandom().nextFloat() < lvl / 32.0f) {
+                entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ITEM_SHIELD_BLOCK, SoundCategory.VOICE, 1.0f, 1.0f);
+                cir.setReturnValue(false);
+            }
         }
     }
 

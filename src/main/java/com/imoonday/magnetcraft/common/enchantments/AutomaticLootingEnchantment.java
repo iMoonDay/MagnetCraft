@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.common.enchantments;
 
-import com.imoonday.magnetcraft.common.items.MagneticWrenchItem;
+import com.imoonday.magnetcraft.common.items.tools.MagneticWrenchItem;
+import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticTransmitterItem;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentTarget;
 import net.minecraft.entity.EquipmentSlot;
@@ -23,11 +24,6 @@ public class AutomaticLootingEnchantment extends Enchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    @Override
     public boolean isAcceptableItem(ItemStack stack) {
         Item item = stack.getItem();
         return item instanceof SwordItem
@@ -35,6 +31,7 @@ public class AutomaticLootingEnchantment extends Enchantment {
                 || item instanceof TridentItem
                 || item instanceof BowItem
                 || item instanceof CrossbowItem
-                || item instanceof MagneticWrenchItem;
+                || item instanceof MagneticWrenchItem
+                || item instanceof ElectromagneticTransmitterItem;
     }
 }

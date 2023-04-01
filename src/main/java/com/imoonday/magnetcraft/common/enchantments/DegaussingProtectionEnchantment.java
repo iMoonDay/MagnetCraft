@@ -19,8 +19,4 @@ public class DegaussingProtectionEnchantment extends Enchantment {
         return super.getMinPower(level) + 50;
     }
 
-    @Override
-    public int getMaxLevel() {
-        return 1;
-    }
 }

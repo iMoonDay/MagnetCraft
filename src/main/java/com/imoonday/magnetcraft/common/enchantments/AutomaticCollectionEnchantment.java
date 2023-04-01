@@ -24,11 +24,6 @@ public class AutomaticCollectionEnchantment extends Enchantment {
     }
 
     @Override
-    public int getMaxLevel() {
-        return 1;
-    }
-
-    @Override
     public boolean isAcceptableItem(ItemStack stack) {
         return stack.getItem() instanceof MiningToolItem || stack.isOf(Items.SHEARS);
     }

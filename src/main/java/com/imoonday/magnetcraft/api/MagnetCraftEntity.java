@@ -26,11 +26,19 @@ public interface MagnetCraftEntity {
         return false;
     }
 
+    default boolean hasEnchantmentOnArmor(Enchantment enchantment) {
+        return false;
+    }
+
     default boolean hasEnchantment(Enchantment enchantment) {
         return false;
     }
 
     default int getEnchantmentLvl(EquipmentSlot equipmentSlot, Enchantment enchantment) {
+        return 0;
+    }
+
+    default int getEnchantmentLvlOnArmor(Enchantment enchantment) {
         return 0;
     }
 

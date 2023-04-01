@@ -1,0 +1,25 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "343",
+    "131"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnetic_suspended_powder"
+    },
+    "2": {
+      "item": "magnetcraft:netherite_magnetic_iron_ingot"
+    },
+    "3": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    },
+    "4": {
+      "item": "magnetcraft:magnetic_battery"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:electromagnetic_gun"
+  }
+}

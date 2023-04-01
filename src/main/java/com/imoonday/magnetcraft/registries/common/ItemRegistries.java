@@ -9,10 +9,9 @@ import com.imoonday.magnetcraft.common.items.materials.MagneticIronArmorMaterial
 import com.imoonday.magnetcraft.common.items.materials.MagneticIronToolMaterial;
 import com.imoonday.magnetcraft.common.items.materials.NetheriteMagneticIronArmorMaterial;
 import com.imoonday.magnetcraft.common.items.materials.NetheriteMagneticIronToolMaterial;
-import com.imoonday.magnetcraft.common.items.tools.CustomAxeItem;
-import com.imoonday.magnetcraft.common.items.tools.CustomHoeItem;
-import com.imoonday.magnetcraft.common.items.tools.CustomPickaxeItem;
-import com.imoonday.magnetcraft.common.items.tools.CustomShovelItem;
+import com.imoonday.magnetcraft.common.items.tools.*;
+import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticGunItem;
+import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticTransmitterItem;
 import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
 import net.minecraft.item.ArmorItem;
@@ -48,7 +47,7 @@ public class ItemRegistries {
     public static final CraftingModuleItem ADSORPTION_MAGNET_CRAFTING_MODULE_ITEM = registerModule("adsorption_magnet_crafting_module");
 
     //其他模块
-    public static final Item RESTORE_MODULE_ITEM = registerItem("restore_module",16);
+    public static final Item RESTORE_MODULE_ITEM = registerItem("restore_module", 16);
     public static final Item FILTER_MODULE_ITEM = registerItem("filter_module", 16);
     public static final Item EXTRACTION_MODULE_ITEM = registerItem("extraction_module", 16);
     public static final Item DEMAGNETIZE_MODULE_ITEM = registerItem("demagnetize_module", 16);
@@ -72,15 +71,21 @@ public class ItemRegistries {
     public static final SmallMagneticSuckerItem SMALL_MAGNETIC_SUCKER_ITEM = register("small_magnetic_sucker", new SmallMagneticSuckerItem(nonStackable(100)));
     public static final LargeMagneticSuckerItem LARGE_MAGNETIC_SUCKER_ITEM = register("large_magnetic_sucker", new LargeMagneticSuckerItem(nonStackable(300).fireproof()));
 
+    //电磁武器
+    public static final ElectromagneticTransmitterItem ELECTROMAGNETIC_TRANSMITTER_ITEM = register("electromagnetic_transmitter", new ElectromagneticTransmitterItem(nonStackable(100)));
+    public static final ElectromagneticGunItem ELECTROMAGNETIC_GUN_ITEM = register("electromagnetic_gun", new ElectromagneticGunItem(nonStackable(100)));
+
+    public static final Item MAGNETIC_BATTERY = registerItem("magnetic_battery",16);
+
+    //磁扳手
+    public static final MagneticWrenchItem MAGNETIC_WRENCH_ITEM = register("magnetic_wrench", new MagneticWrenchItem(settings()));
+
     //磁铁工具
     public static final SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, settings()));
     public static final CustomPickaxeItem MAGNETIC_IRON_PICKAXE = register("magnetic_iron_pickaxe", new CustomPickaxeItem(MagneticIronToolMaterial.INSTANCE, 1, -2.8f, settings()));
     public static final CustomAxeItem MAGNETIC_IRON_AXE = register("magnetic_iron_axe", new CustomAxeItem(MagneticIronToolMaterial.INSTANCE, 5.5f, -3.0f, settings()));
     public static final CustomShovelItem MAGNETIC_IRON_SHOVEL = register("magnetic_iron_shovel", new CustomShovelItem(MagneticIronToolMaterial.INSTANCE, 1.5f, -3.0f, settings()));
     public static final CustomHoeItem MAGNETIC_IRON_HOE = register("magnetic_iron_hoe", new CustomHoeItem(MagneticIronToolMaterial.INSTANCE, -2, -1.0f, settings()));
-
-    //磁扳手
-    public static final MagneticWrenchItem MAGNETIC_WRENCH_ITEM = register("magnetic_wrench", new MagneticWrenchItem(settings()));
 
     //下界磁铁工具
     public static final SwordItem NETHERITE_MAGNETIC_IRON_SWORD = register("netherite_magnetic_iron_sword", new SwordItem(NetheriteMagneticIronToolMaterial.INSTANCE, 4, -2.4f, fireproof()));
@@ -113,7 +118,7 @@ public class ItemRegistries {
     static FabricItemSettings fireproof() {
         return settings().fireproof();
     }
-    
+
     public static void register() {
         addSpecialStackInGroup();
         MagnetCraft.LOGGER.info("ItemRegistries.class Loaded");
@@ -151,7 +156,7 @@ public class ItemRegistries {
     static FabricItemSettings nonStackable() {
         return settings().maxCount(1);
     }
-    
+
     static FabricItemSettings nonStackable(int maxDamage) {
         return settings().maxCount(1).maxDamage(maxDamage);
     }

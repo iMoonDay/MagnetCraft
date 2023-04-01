@@ -119,6 +119,8 @@ public class ItemGroupRegistries {
             content.addAfter(NETHERITE_MAGNETIC_IRON_CHESTPLATE, NETHERITE_MAGNETIC_IRON_LEGGINGS);
             content.addAfter(NETHERITE_MAGNETIC_IRON_LEGGINGS, NETHERITE_MAGNETIC_IRON_BOOTS);
             content.addAfter(Items.IRON_HORSE_ARMOR, MAGNETIC_IRON_HORSE_ARMOR);
+            content.add(ELECTROMAGNETIC_TRANSMITTER_ITEM);
+            content.add(ELECTROMAGNETIC_GUN_ITEM);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {

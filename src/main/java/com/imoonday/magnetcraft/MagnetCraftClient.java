@@ -6,6 +6,8 @@ import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
 import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
 import com.imoonday.magnetcraft.common.items.SmallMagneticSuckerItem;
 import com.imoonday.magnetcraft.common.items.magnets.*;
+import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticGunItem;
+import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticTransmitterItem;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRendererRegistries;
 import com.imoonday.magnetcraft.registries.special.GlobalReceiverRegistries;
@@ -37,5 +39,7 @@ public class MagnetCraftClient implements ClientModInitializer {
         AdsorptionMagnetItem.registerClient();
         SmallMagneticSuckerItem.registerClient();
         LargeMagneticSuckerItem.registerClient();
+        ElectromagneticTransmitterItem.registerClient();
+        ElectromagneticGunItem.registerClient();
     }
 }

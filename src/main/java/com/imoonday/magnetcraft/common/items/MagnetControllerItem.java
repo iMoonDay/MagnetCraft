@@ -37,7 +37,7 @@ public class MagnetControllerItem extends AbstractFilterableItem {
 
     @Override
     public boolean canRepair(ItemStack stack, ItemStack ingredient) {
-        return ingredient.isOf(ItemRegistries.DEMAGNETIZED_POWDER_ITEM) || super.canRepair(stack, ingredient);
+        return ingredient.isOf(ItemRegistries.DEMAGNETIZED_POWDER_ITEM);
     }
 
     @Override

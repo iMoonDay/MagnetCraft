@@ -71,6 +71,11 @@ public class AdsorptionMagnetItem extends Item {
         return removeOrGet(world, user, hand);
     }
 
+    @Override
+    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+        return false;
+    }
+
     @NotNull
     private static TypedActionResult<ItemStack> removeOrGet(World world, PlayerEntity user, Hand hand) {
         if (user.isSneaking()) {

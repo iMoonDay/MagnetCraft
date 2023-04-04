@@ -14,4 +14,5 @@ public class MaglevRepeaterBlock extends RepeaterBlock {
     public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
         return true;
     }
+
 }

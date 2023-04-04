@@ -138,6 +138,11 @@ public class ItemRegistries {
         return Registry.register(Registries.ITEM, id(id), blockItem);
     }
 
+    static <T extends Item> T registerItemWithBlock(String id, T blockItem) {
+        ItemGroupEvents.modifyEntriesEvent(MAGNET_ITEMS).register(content -> content.add(blockItem.getDefaultStack()));
+        return Registry.register(Registries.ITEM, id(id), blockItem);
+    }
+
     static Item registerItem(String id) {
         Item item = new Item(settings());
         return register(id, item);

@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,hanging=false": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack",
+      "y": 270
+    },
+    "facing=east,hanging=true": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack_hanging",
+      "y": 270
+    },
+    "facing=north,hanging=false": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack",
+      "y": 180
+    },
+    "facing=north,hanging=true": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack_hanging",
+      "y": 180
+    },
+    "facing=south,hanging=false": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack"
+    },
+    "facing=south,hanging=true": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack_hanging"
+    },
+    "facing=west,hanging=false": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack",
+      "y": 90
+    },
+    "facing=west,hanging=true": {
+      "model": "magnetcraft:block/magnetic_shulker_backpack_hanging",
+      "y": 90
+    }
+  }
+}

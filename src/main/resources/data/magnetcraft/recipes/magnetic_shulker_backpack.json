@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "434",
+    "121"
+  ],
+  "key": {
+    "1": {
+      "item": "minecraft:light_blue_dye"
+    },
+    "2": {
+      "item": "minecraft:shulker_shell"
+    },
+    "3": {
+      "item": "magnetcraft:lodestone"
+    },
+    "4": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:magnetic_shulker_backpack",
+    "count": 1
+  }
+}

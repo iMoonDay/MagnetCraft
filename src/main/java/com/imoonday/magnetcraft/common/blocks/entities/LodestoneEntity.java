@@ -155,7 +155,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
         return Text.empty();
     }
 
-    @org.jetbrains.annotations.Nullable
+    @Nullable
     @Override
     public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
         return new LodestoneScreenHandler(syncId, inv, this, propertyDelegate, ScreenHandlerContext.create(world, pos));
@@ -168,42 +168,58 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
 
     public static void putItemEntityIn(World world, BlockPos blockPos, LodestoneEntity blockEntity, Direction direction) {
         world.getOtherEntities(null, Box.from(new BlockBox(blockPos.offset(direction))), entity -> entity instanceof ItemEntity).stream().map(entity -> (ItemEntity) entity).forEach(entity -> {
-            DefaultedList<ItemStack> inventory = blockEntity.inventory;
-            ItemStack stack = entity.getStack();
             ArrayList<Item> allowedItems = blockEntity.getItems().stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
-            if (!blockEntity.filter || allowedItems.contains(stack.getItem())) {
-                boolean hasEmptySlot = false;
-                boolean hasSameStack = false;
-                boolean overflow = false;
-                int overflowCount = 0;
-                int slot = -1;
-                for (int i = 0; i < inventory.size(); i++) {
-                    ItemStack inventoryStack = inventory.get(i);
-                    hasEmptySlot = inventoryStack.isEmpty();
-                    hasSameStack = ItemStack.canCombine(stack, inventoryStack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
-                    overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
-                    if (hasEmptySlot || hasSameStack) {
-                        slot = i;
-                        if (overflow) {
-                            overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
-                        }
-                        break;
-                    }
-                }
-                if (hasEmptySlot) {
-                    inventory.set(slot, stack);
-                    entity.kill();
-                } else if (hasSameStack) {
-                    if (overflow) {
-                        inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
-                        stack.setCount(overflowCount);
-                    } else {
-                        stack.increment(inventory.get(slot).getCount());
-                        inventory.set(slot, stack);
-                        entity.kill();
-                    }
-                }
+            if (blockEntity.filter) {
+                insertItemIntoInventoryFilterly(entity, blockEntity.inventory, allowedItems);
+            } else {
+                insertItemIntoInventory(entity, blockEntity.inventory);
             }
         });
+    }
+
+    public static void insertItemIntoInventoryFilterly(ItemEntity entity, DefaultedList<ItemStack> inventory, ArrayList<Item> allowedItems) {
+        ItemStack stack = entity.getStack();
+        if (allowedItems.contains(stack.getItem())) {
+            insert(entity, inventory);
+        }
+    }
+
+    public static void insertItemIntoInventory(ItemEntity entity, DefaultedList<ItemStack> inventory) {
+        insert(entity, inventory);
+    }
+
+    private static void insert(ItemEntity entity, DefaultedList<ItemStack> inventory) {
+        ItemStack stack = entity.getStack();
+        boolean hasEmptySlot = false;
+        boolean hasSameStack = false;
+        boolean overflow = false;
+        int overflowCount = 0;
+        int slot = -1;
+        for (int i = 0; i < inventory.size(); i++) {
+            ItemStack inventoryStack = inventory.get(i);
+            hasEmptySlot = inventoryStack.isEmpty();
+            hasSameStack = ItemStack.canCombine(stack, inventoryStack) && inventoryStack.getCount() < inventoryStack.getMaxCount();
+            overflow = inventoryStack.getCount() + stack.getCount() > stack.getMaxCount();
+            if (hasEmptySlot || hasSameStack) {
+                slot = i;
+                if (overflow) {
+                    overflowCount = inventoryStack.getCount() + stack.getCount() - stack.getMaxCount();
+                }
+                break;
+            }
+        }
+        if (hasEmptySlot) {
+            inventory.set(slot, stack);
+            entity.kill();
+        } else if (hasSameStack) {
+            if (overflow) {
+                inventory.set(slot, stack.copy().copyWithCount(stack.getMaxCount()));
+                stack.setCount(overflowCount);
+            } else {
+                stack.increment(inventory.get(slot).getCount());
+                inventory.set(slot, stack);
+                entity.kill();
+            }
+        }
     }
 }

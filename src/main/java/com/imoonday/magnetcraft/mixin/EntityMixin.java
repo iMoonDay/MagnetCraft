@@ -229,7 +229,7 @@ public class EntityMixin implements MagnetCraftEntity {
     @Override
     public void setAttracting(boolean attracting, double dis) {
         setAttracting(attracting);
-        setAttractDis(dis);
+        this.attractData.putDouble(ATTRACT_DIS, attracting ? dis : 0);
     }
 
     @Override

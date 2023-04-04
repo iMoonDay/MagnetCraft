@@ -62,7 +62,7 @@ public class FilterableMagnetScreenHandler extends ScreenHandler {
     }
 
     public ItemStack getStack() {
-        return slot != -1 ? player.getInventory().getStack(slot) : player.getOffHandStack();
+        return player.getInventory().getStack(slot);
     }
 
     public Inventory getShulkerBoxSlots() {

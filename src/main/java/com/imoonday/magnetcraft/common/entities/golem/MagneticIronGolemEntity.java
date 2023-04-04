@@ -29,9 +29,9 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.ItemScatterer;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
 import net.minecraft.world.SpawnHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldView;
@@ -82,12 +82,11 @@ public class MagneticIronGolemEntity extends IronGolemEntity implements Implemen
     @Override
     protected void dropInventory() {
         super.dropInventory();
-        this.getItems().forEach(this::dropStack);
+        ItemScatterer.spawn(world, this, this);
         if (this.isHasLodestone()) {
-            Random random = this.random;
             int percent = ModConfig.getGolemValue().lodestoneDropProbability;
-            if (random.nextBetween(1, 100) <= percent) {
-                dropStack(new ItemStack(BlockRegistries.LODESTONE_BLOCK_ITEM));
+            if (this.random.nextBetween(1, 100) <= percent) {
+                dropStack(new ItemStack(BlockRegistries.LODESTONE_BLOCK));
             }
         }
     }

@@ -130,7 +130,7 @@ public class MineralMagnetItem extends Item {
         ItemStack stackInHand = user.getStackInHand(hand);
         if (stackInHand.getOrCreateNbt().getBoolean(FILTERABLE) && user.isSneaky() && !user.getAbilities().flying) {
             if (!user.world.isClient) {
-                int slot = hand == Hand.MAIN_HAND ? user.getInventory().selectedSlot : -1;
+                int slot = hand == Hand.MAIN_HAND ? user.getInventory().selectedSlot : 40;
                 user.openHandledScreen(new ExtendedScreenHandlerFactory() {
                     @Override
                     public void writeScreenOpeningData(ServerPlayerEntity serverPlayerEntity, PacketByteBuf buf) {
@@ -165,6 +165,11 @@ public class MineralMagnetItem extends Item {
         if (user instanceof PlayerEntity player && user.isSpectator() && player.getItemCooldownManager().isCoolingDown(this)) {
             player.getItemCooldownManager().remove(this);
         }
+    }
+
+    @Override
+    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+        return false;
     }
 
     public static int searchMineral(PlayerEntity player, Hand hand) {

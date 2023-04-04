@@ -130,7 +130,7 @@ public class MineralMagnetScreen extends HandledScreen<MineralMagnetScreenHandle
     }
 
     public boolean canDestory(Item requiredItem) {
-        ItemStack stack = this.handler.getSlot() != -1 ? this.handler.getInventory().getStack(this.handler.getSlot()) : this.handler.getInventory().player.getOffHandStack();
+        ItemStack stack = this.handler.getInventory().getStack(this.handler.getSlot());
         if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean(FILTERABLE)) {
             String item = Registries.ITEM.getId(requiredItem).toString();
             NbtList list = stack.getNbt().getList(CORES, NbtElement.COMPOUND_TYPE);

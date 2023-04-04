@@ -23,8 +23,7 @@ import java.util.List;
 @Mixin(EnchantmentHelper.class)
 public class EnchantmentHelperMixin {
 
-    @SuppressWarnings("AlibabaAvoidComplexCondition")
-    @Inject(method = "getPossibleEntries", at = @At(value = "HEAD"), cancellable = true)
+    @Inject(method = "getPossibleEntries", at = @At("HEAD"), cancellable = true)
     private static void getPossibleEntries(int power, ItemStack stack, boolean treasureAllowed, CallbackInfoReturnable<List<EnchantmentLevelEntry>> cir) {
         ArrayList<EnchantmentLevelEntry> list = Lists.newArrayList();
         Item item = stack.getItem();

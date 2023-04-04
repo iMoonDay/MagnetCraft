@@ -48,7 +48,7 @@ public class MineralMagnetScreenHandler extends ScreenHandler {
         super(ScreenRegistries.MINERAL_MAGNET_SCREEN_HANDLER, syncId);
         this.inventory = inventory;
         this.slot = slot;
-        ItemStack stack = getSlot() != -1 ? getInventory().getStack(getSlot()) : getInventory().player.getOffHandStack();
+        ItemStack stack = getInventory().getStack(this.slot);
         NbtList list = stack.getOrCreateNbt().getList(SHULKER_BOX, NbtElement.COMPOUND_TYPE);
         for (int i = 0; i < list.size(); i++) {
             ItemStack itemstackFromNbt = ItemStack.fromNbt(list.getCompound(i));

@@ -93,7 +93,7 @@ public abstract class AbstractFilterableItem extends AbstractSwitchableItem impl
 
     public void openScreen(PlayerEntity player, Hand hand, AbstractFilterableItem filterableMagnetItem) {
         ItemStack stack = player.getStackInHand(hand);
-        int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : -1;
+        int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : 40;
         initialize(stack, filterableMagnetItem);
         if (player.world != null && !player.world.isClient) {
             player.openHandledScreen(new ExtendedScreenHandlerFactory() {
@@ -143,8 +143,7 @@ public abstract class AbstractFilterableItem extends AbstractSwitchableItem impl
 
     public static void setFilterItems(ItemStack stack, ArrayList<ItemStack> stacks) {
         filterCheck(stack);
-        NbtList list = stack.getOrCreateNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
-        list.clear();
+        NbtList list = new NbtList();
         for (ItemStack otherStack : stacks) {
             NbtCompound otherStackNbt = otherStack.writeNbt(new NbtCompound());
             if (otherStack.isOf(AIR)) {

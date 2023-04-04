@@ -48,6 +48,11 @@ public abstract class AbstractSwitchableItem extends Item {
         }
     }
 
+    @Override
+    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+        return false;
+    }
+
     public boolean getSwitchable() {
         return true;
     }

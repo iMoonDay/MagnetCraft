@@ -74,11 +74,6 @@ public class CircularRepeaterBlock extends RepeaterBlock {
     }
 
     @Override
-    public int getStrongRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
-        return state.getWeakRedstonePower(world, pos, direction);
-    }
-
-    @Override
     public int getWeakRedstonePower(BlockState state, BlockView world, BlockPos pos, Direction direction) {
         if (!state.get(POWERED)) {
             return 0;

@@ -1,16 +1,16 @@
 {
-  "overrides": [
-    {
-      "predicate": {
-        "contains": 0
-      },
-      "model": "magnetcraft:item/small_magnetic_sucker_without_block"
-    },
-    {
-      "predicate": {
-        "contains": 1
-      },
-      "model": "magnetcraft:item/small_magnetic_sucker_with_block"
-    }
-  ]
+	"overrides": [
+		{
+			"predicate": {
+				"contains": 0
+			},
+			"model": "magnetcraft:item/small_magnetic_sucker_without_block"
+		},
+		{
+			"predicate": {
+				"contains": 1
+			},
+			"model": "magnetcraft:item/small_magnetic_sucker_with_block"
+		}
+	]
 }

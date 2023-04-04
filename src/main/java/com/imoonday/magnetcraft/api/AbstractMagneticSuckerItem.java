@@ -53,7 +53,12 @@ public abstract class AbstractMagneticSuckerItem extends Item {
             stack.getOrCreateNbt().putIntArray(POS, new int[]{blockPos.getX(), blockPos.getY(), blockPos.getZ()});
             player.setCurrentHand(hand);
         }
-        return ActionResult.FAIL;
+        return ActionResult.CONSUME;
+    }
+
+    @Override
+    public boolean allowNbtUpdateAnimation(PlayerEntity player, Hand hand, ItemStack oldStack, ItemStack newStack) {
+        return false;
     }
 
     @Override
@@ -62,7 +67,7 @@ public abstract class AbstractMagneticSuckerItem extends Item {
     }
 
     @NotNull
-    protected static NbtCompound getItemNbt(World world, BlockPos pos, BlockState state, ItemStack blockStack) {
+    public static NbtCompound getItemNbt(World world, BlockPos pos, BlockState state, ItemStack blockStack) {
         NbtCompound itemNbt = blockStack.writeNbt(new NbtCompound());
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity != null) {

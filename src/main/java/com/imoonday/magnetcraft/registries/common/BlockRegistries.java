@@ -5,8 +5,9 @@ import com.imoonday.magnetcraft.common.blocks.*;
 import com.imoonday.magnetcraft.common.blocks.entities.AttractSensorEntity;
 import com.imoonday.magnetcraft.common.blocks.entities.DemagnetizerEntity;
 import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
+import com.imoonday.magnetcraft.common.blocks.entities.MagneticShulkerBackpackEntity;
 import com.imoonday.magnetcraft.common.blocks.maglev.*;
-import com.imoonday.magnetcraft.common.items.LodestoneBlockItem;
+import com.imoonday.magnetcraft.common.items.armors.MagneticShulkerBackpackItem;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
 import net.fabricmc.fabric.api.biome.v1.BiomeSelectors;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -37,7 +38,7 @@ import java.util.Map;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "UnusedReturnValue"})
 public class BlockRegistries {
 
     private static final ArrayList<Block> BLOCKS = new ArrayList<>();
@@ -50,8 +51,7 @@ public class BlockRegistries {
     public static final Block MAGNET_BLOCK = register("magnet_block", blockCopy(Blocks.IRON_BLOCK));
     public static final Block NETHERITE_MAGNET_BLOCK = register("netherite_magnet_block", blockCopy(Blocks.NETHERITE_BLOCK));
     public static final Block RAW_MAGNET_BLOCK = register("raw_magnet_block", blockCopy(Blocks.RAW_IRON_BLOCK));
-    public static final LodestoneBlock LODESTONE_BLOCK = registerBlock("lodestone", new LodestoneBlock(settingCopy(Blocks.LODESTONE)));
-    public static final LodestoneBlockItem LODESTONE_BLOCK_ITEM = registerBlockItem("lodestone", new LodestoneBlockItem(LODESTONE_BLOCK, ItemRegistries.settings()));
+    public static final LodestoneBlock LODESTONE_BLOCK = register("lodestone", new LodestoneBlock(settingCopy(Blocks.LODESTONE)));
     public static final BlockEntityType<LodestoneEntity> LODESTONE_ENTITY = registerBlockEntity("lodestone", LodestoneEntity::new, LODESTONE_BLOCK);
     public static final MaglevRailBlock MAGLEV_RAIL_BLOCK = registerNonOpaque("maglev_rail", new MaglevRailBlock(settingCopy(Blocks.RAIL)));
     public static final MaglevPoweredRailBlock MAGLEV_POWERED_RAIL_BLOCK = registerNonOpaque("maglev_powered_rail", new MaglevPoweredRailBlock(settingCopy(Blocks.POWERED_RAIL)));
@@ -76,6 +76,9 @@ public class BlockRegistries {
     public static final MagneticAntennaBlock MAGNETIC_ANTENNA_BLOCK = registerNonOpaque("magnetic_antenna", new MagneticAntennaBlock(settingCopy(Blocks.LIGHTNING_ROD).luminance(MagneticAntennaBlock.getLuminance())));
     public static final Map<Item, CauldronBehavior> MAGNETIC_FLUID_CAULDRON_BEHAVIOR = CauldronBehavior.createMap();
     public static final Block MAGNETIC_FLUID_CAULDRON = registerNonOpaqueBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(settingCopy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));
+    public static final MagneticShulkerBackpackBlock MAGNETIC_SHULKER_BACKPACK_BLOCK = registerNonOpaqueBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackBlock(FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).strength(5.0f, 6.0f).sounds(BlockSoundGroup.METAL).nonOpaque()));
+    public static final BlockEntityType<MagneticShulkerBackpackEntity> MAGNETIC_SHULKER_BACKPACK_ENTITY = registerBlockEntity("magnetic_shulker_backpack", MagneticShulkerBackpackEntity::new, MAGNETIC_SHULKER_BACKPACK_BLOCK);
+    public static final MagneticShulkerBackpackItem MAGNETIC_SHULKER_BACKPACK_ITEM = registerItemWithBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackItem(ItemRegistries.nonStackable()));
 
     public static void register() {
         registerCauldronBehavior();
@@ -129,7 +132,7 @@ public class BlockRegistries {
         });
     }
 
-    static RegistryKey<PlacedFeature> registerFeature(String id){
+    static RegistryKey<PlacedFeature> registerFeature(String id) {
         RegistryKey<PlacedFeature> key = RegistryKey.of(RegistryKeys.PLACED_FEATURE, id(id));
         BiomeModifications.addFeature(BiomeSelectors.foundInOverworld(), GenerationStep.Feature.UNDERGROUND_ORES, key);
         return key;
@@ -156,6 +159,11 @@ public class BlockRegistries {
 
     static <T extends BlockItem> T registerBlockItem(String id, T blockItem) {
         return ItemRegistries.registerBlockItem(id, blockItem);
+    }
+
+    @SuppressWarnings("SameParameterValue")
+    static <T extends BlockItem> T registerItemWithBlock(String id, T blockItem) {
+        return ItemRegistries.registerItemWithBlock(id, blockItem);
     }
 
     static <T extends BlockEntity> BlockEntityType<T> registerBlockEntity(String id, FabricBlockEntityTypeBuilder.Factory<T> factory, Block block) {

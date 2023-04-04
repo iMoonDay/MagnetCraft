@@ -52,6 +52,8 @@ public class ModConfig implements ConfigData {
         public int arrowAttractDis = 10;
         @ConfigEntry.BoundedDiscrete(max = 100)
         public int droppedMagnetAttractDis = 10;
+        @ConfigEntry.BoundedDiscrete(max = 150)
+        public int backpackAttractDis = 15;
         @ConfigEntry.BoundedDiscrete(max = 300)
         public int lodestoneMaxDis = 30;
         //传送距离

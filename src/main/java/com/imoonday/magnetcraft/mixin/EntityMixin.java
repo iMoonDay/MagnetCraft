@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
+import com.imoonday.magnetcraft.common.blocks.MagneticFilterLayerBlock;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
@@ -31,7 +32,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 @Mixin(Entity.class)
-public class EntityMixin implements MagnetCraftEntity {
+public abstract class EntityMixin implements MagnetCraftEntity {
 
     private static final String WHITELIST = "Whitelist";
     private static final String TAG = "tag";
@@ -113,17 +114,17 @@ public class EntityMixin implements MagnetCraftEntity {
                 boolean hasDegaussingPlayer = !targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
                 pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && StackListPass && !hasDegaussingPlayer;
             }
-            if (pass) {
+            if (pass && targetEntity.canBeAttractedTo(entity.getEyePos())) {
                 boolean hasNearerPlayer;
                 boolean hasNearerEntity = false;
                 if (entity instanceof PlayerEntity) {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, MagnetCraftEntity::isAttracting) != entity;
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, entity1 -> entity1.isAttracting() && targetEntity.canBeAttractedTo(entity1.getEyePos())) != entity;
                 } else {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, MagnetCraftEntity::isAttracting) != null;
-                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && otherEntity.isAttracting() && otherEntity.getEnable() && otherEntity.isAlive())).isEmpty();
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, entity1 -> entity1.isAttracting() && targetEntity.canBeAttractedTo(entity1.getEyePos())) != null;
+                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && otherEntity.isAttracting() && otherEntity.getEnable() && otherEntity.isAlive() && targetEntity.canBeAttractedTo(otherEntity.getEyePos()))).isEmpty();
                 }
                 if (!hasNearerPlayer && !hasNearerEntity) {
-                    Vec3d vec = entity.getPos().add(0, 0.5, 0).subtract(targetEntity.getPos()).multiply(0.05);
+                    Vec3d vec = entity.getEyePos().subtract(targetEntity.getPos()).multiply(0.05);
                     targetEntity.setVelocity(targetEntity.horizontalCollision ? vec.multiply(1, 0, 1).add(0, 0.25, 0) : vec);
                     PlayerLookup.tracking(targetEntity).forEach(serverPlayer -> serverPlayer.networkHandler.sendPacket(new EntityVelocityUpdateS2CPacket(targetEntity)));
                 }
@@ -141,10 +142,7 @@ public class EntityMixin implements MagnetCraftEntity {
         String item = Registries.ITEM.getId(entity.getStack().getItem()).toString();
         boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString(ID).equals(item));
         if (stack.getNbt().getBoolean(COMPARE_DAMAGE) && inList) {
-            stackDamagePass = list.stream()
-                    .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString(ID).equals(item))
-                    .map(nbtElement -> (NbtCompound) nbtElement)
-                    .anyMatch(NbtCompound -> NbtCompound.getInt(DAMAGE) == entity.getStack().getDamage());
+            stackDamagePass = list.stream().filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString(ID).equals(item)).map(nbtElement -> (NbtCompound) nbtElement).anyMatch(NbtCompound -> NbtCompound.getInt(DAMAGE) == entity.getStack().getDamage());
         }
         if (stack.getNbt().getBoolean(COMPARE_NBT) && inList) {
             NbtCompound nbt = entity.getStack().getNbt();
@@ -154,14 +152,16 @@ public class EntityMixin implements MagnetCraftEntity {
                 nbtWithoutDamage.remove(DAMAGE);
             }
             NbtCompound finalNbt = nbtWithoutDamage;
-            stackNbtPass = list.stream()
-                    .filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString(ID).equals(item))
-                    .map(nbtElement -> (NbtCompound) nbtElement)
-                    .peek(NbtCompound -> NbtCompound.getCompound(TAG).remove(DAMAGE))
-                    .anyMatch(NbtCompound -> NbtCompound.getCompound(TAG).equals(finalNbt));
+            stackNbtPass = list.stream().filter(nbtElement -> nbtElement instanceof NbtCompound nbtCompound && nbtCompound.getString(ID).equals(item)).map(nbtElement -> (NbtCompound) nbtElement).peek(NbtCompound -> NbtCompound.getCompound(TAG).remove(DAMAGE)).anyMatch(NbtCompound -> NbtCompound.getCompound(TAG).equals(finalNbt));
         }
         boolean isWhitelist = stack.getNbt().getBoolean(WHITELIST);
         return (!isWhitelist || inList && stackDamagePass && stackNbtPass) && (isWhitelist || !inList || !stackDamagePass || !stackNbtPass);
+    }
+
+    @Override
+    public boolean canBeAttractedTo(Vec3d pos) {
+        Entity entity = (Entity) (Object) this;
+        return MagneticFilterLayerBlock.canBeAttractedTo(entity, pos);
     }
 
     @Inject(method = "tick", at = @At(value = "TAIL"))

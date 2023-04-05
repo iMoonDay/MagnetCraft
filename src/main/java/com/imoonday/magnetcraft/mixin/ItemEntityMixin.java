@@ -1,18 +1,24 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.common.items.armors.MagneticShulkerBackpackItem;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.FluidRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @SuppressWarnings("AlibabaUndefineMagicConstant")
@@ -56,4 +62,18 @@ public class ItemEntityMixin extends EntityMixin {
             }
         }
     }
+
+    @Redirect(method = "onPlayerCollision",at=@At(value = "INVOKE",target = "Lnet/minecraft/entity/player/PlayerInventory;insertStack(Lnet/minecraft/item/ItemStack;)Z"))
+    public boolean insertStack(PlayerInventory instance, ItemStack stack){
+        PlayerEntity player = instance.player;
+        ItemStack armorStack = player.getEquippedStack(EquipmentSlot.CHEST);
+        if (armorStack.isOf(BlockRegistries.MAGNETIC_SHULKER_BACKPACK_ITEM)) {
+            if (MagneticShulkerBackpackItem.insertStack(player, 38, armorStack, stack, MagneticShulkerBackpackItem.getItems(armorStack))) {
+                instance.markDirty();
+                return true;
+            }
+        }
+        return instance.insertStack(stack);
+    }
+
 }

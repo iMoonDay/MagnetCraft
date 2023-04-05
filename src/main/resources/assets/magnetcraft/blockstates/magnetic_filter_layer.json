@@ -1,0 +1,30 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "magnetcraft:block/magnetic_filter_layer",
+      "y": 270,
+      "x": 90
+    },
+    "facing=north": {
+      "model": "magnetcraft:block/magnetic_filter_layer",
+      "y": 180,
+      "x": 90
+    },
+    "facing=west": {
+      "model": "magnetcraft:block/magnetic_filter_layer",
+      "y": 90,
+      "x": 90
+    },
+    "facing=south": {
+      "model": "magnetcraft:block/magnetic_filter_layer",
+      "x": 90
+    },
+    "facing=up": {
+      "model": "magnetcraft:block/magnetic_filter_layer",
+      "x": 180
+    },
+    "facing=down": {
+      "model": "magnetcraft:block/magnetic_filter_layer"
+    }
+  }
+}

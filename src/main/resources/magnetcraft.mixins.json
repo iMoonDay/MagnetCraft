@@ -16,7 +16,6 @@
     "ItemStackMixin",
     "LivingEntityMixin",
     "PlayerEntityMixin",
-    "PlayerInventoryMixin",
     "TridentEntityMixin",
     "VillagerEntityMixin",
     "WorldMixin"

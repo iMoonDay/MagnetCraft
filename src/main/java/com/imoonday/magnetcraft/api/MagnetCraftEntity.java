@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 
 import java.util.UUID;
 
@@ -47,6 +48,10 @@ public interface MagnetCraftEntity {
     }
 
     default void tryLevitation() {}
+
+    default boolean canBeAttractedTo(Vec3d pos){
+        return true;
+    }
 
     default NbtCompound getAttractData() {
         return null;

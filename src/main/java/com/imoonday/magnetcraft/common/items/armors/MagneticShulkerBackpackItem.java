@@ -11,6 +11,7 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.StackReference;
 import net.minecraft.item.ArmorItem;
 import net.minecraft.item.BlockItem;
@@ -68,9 +69,10 @@ public class MagneticShulkerBackpackItem extends BlockItem implements Implemente
         tooltip.add(Text.translatable("block.magnetcraft.magnetic_shulker_backpack.tooltip").formatted(Formatting.BOLD).formatted(Formatting.GRAY).append(slot));
     }
 
-    private void readNbt(ItemStack stack) {
+    private Inventory getInventory(ItemStack stack) {
         this.inventory.clear();
         Inventories.readNbt(getBackpackNbt(stack), this.inventory);
+        return this;
     }
 
     @Override
@@ -177,7 +179,6 @@ public class MagneticShulkerBackpackItem extends BlockItem implements Implemente
 
     public void openScreen(PlayerEntity player, ItemStack stack, int slot) {
         if (player.world != null && !player.world.isClient) {
-            readNbt(stack);
             player.openHandledScreen(new ExtendedScreenHandlerFactory() {
 
                 @Override
@@ -192,7 +193,7 @@ public class MagneticShulkerBackpackItem extends BlockItem implements Implemente
 
                 @Override
                 public @NotNull ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
-                    return new MagneticShulkerBackpackScreenHandler(syncId, inv, MagneticShulkerBackpackItem.this, slot);
+                    return new MagneticShulkerBackpackScreenHandler(syncId, inv, getInventory(stack), slot);
                 }
 
             });

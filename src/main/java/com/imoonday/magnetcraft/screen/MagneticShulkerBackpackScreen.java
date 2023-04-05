@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.screen;
 
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.screen.handler.MagneticShulkerBackpackScreenHandler;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -15,6 +16,14 @@ public class MagneticShulkerBackpackScreen extends HandledScreen<MagneticShulker
 
     public MagneticShulkerBackpackScreen(MagneticShulkerBackpackScreenHandler handler, PlayerInventory inventory, Text title) {
         super(handler, inventory, title);
+    }
+
+    @Override
+    protected void handledScreenTick() {
+        super.handledScreenTick();
+        if (!this.handler.getStack().isOf(BlockRegistries.MAGNETIC_SHULKER_BACKPACK_ITEM)) {
+            close();
+        }
     }
 
     @Override

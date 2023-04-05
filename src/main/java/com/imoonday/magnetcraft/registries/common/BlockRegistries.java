@@ -79,6 +79,7 @@ public class BlockRegistries {
     public static final MagneticShulkerBackpackBlock MAGNETIC_SHULKER_BACKPACK_BLOCK = registerNonOpaqueBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackBlock(FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).strength(5.0f, 6.0f).sounds(BlockSoundGroup.METAL).nonOpaque()));
     public static final BlockEntityType<MagneticShulkerBackpackEntity> MAGNETIC_SHULKER_BACKPACK_ENTITY = registerBlockEntity("magnetic_shulker_backpack", MagneticShulkerBackpackEntity::new, MAGNETIC_SHULKER_BACKPACK_BLOCK);
     public static final MagneticShulkerBackpackItem MAGNETIC_SHULKER_BACKPACK_ITEM = registerItemWithBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackItem(ItemRegistries.nonStackable()));
+    public static final MagneticFilterLayerBlock MAGNETIC_FILTER_LAYER_BLOCK = registerNonOpaque("magnetic_filter_layer", new MagneticFilterLayerBlock(settingCopyNoCollision(Blocks.GLASS_PANE)));
 
     public static void register() {
         registerCauldronBehavior();

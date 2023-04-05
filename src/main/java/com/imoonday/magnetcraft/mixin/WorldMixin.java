@@ -1,8 +1,10 @@
 package com.imoonday.magnetcraft.mixin;
 
-import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.api.MagnetCraftWorld;
+import com.imoonday.magnetcraft.common.blocks.DemagnetizerBlock;
+import com.imoonday.magnetcraft.common.blocks.entities.DemagnetizerEntity;
 import com.imoonday.magnetcraft.config.ModConfig;
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.entity.ExperienceOrbEntity;
@@ -29,7 +31,8 @@ public class WorldMixin implements MagnetCraftWorld {
         int degaussingDis = ModConfig.getValue().degaussingDis;
         if (!world.isClient) {
             boolean blockCanAttract = world.getOtherEntities(null, Box.from(pos).expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && pos.isInRange(otherEntity.getPos(), degaussingDis) && !otherEntity.isSpectator())).isEmpty();
-            if (blockCanAttract) {
+            boolean noDegaussingBlock = DemagnetizerBlock.DEGAUSSING_POS.stream().filter(blockPos -> world.getBlockState(blockPos).isOf(BlockRegistries.DEMAGNETIZER_BLOCK) && world.getBlockEntity(blockPos) instanceof DemagnetizerEntity && world.isReceivingRedstonePower(blockPos)).noneMatch(blockPos -> pos.isInRange(blockPos.toCenterPos(), world.getReceivedRedstonePower(blockPos) * 2));
+            if (blockCanAttract && noDegaussingBlock) {
                 tryAttract(world, pos, dis, filter, allowedItems);
             }
         }
@@ -52,9 +55,9 @@ public class WorldMixin implements MagnetCraftWorld {
                 boolean noDegaussingEntity = targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity && ((LivingEntity) otherEntity).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
                 pass = (!whitelistEnable || whitelist.contains(item)) && (!blacklistEnable || !blacklist.contains(item)) && noDegaussingEntity && (!filter || allowedItems.contains(itemEntity.getStack().getItem()));
             }
-            if (pass && !world.isClient) {
-                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && (otherEntity.isAttracting()))).isEmpty();
-                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, MagnetCraftEntity::isAttracting) != null;
+            if (pass && !world.isClient && targetEntity.canBeAttractedTo(pos)) {
+                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, Box.from(pos).expand(dis), otherEntity -> !(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && otherEntity.isAttracting() && targetEntity.canBeAttractedTo(otherEntity.getPos())).isEmpty();
+                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, entity -> entity.isAttracting() && targetEntity.canBeAttractedTo(entity.getPos())) != null;
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = pos.subtract(targetEntity.getPos()).multiply(0.05);
                     targetEntity.setVelocity(targetEntity.horizontalCollision ? vec.multiply(1, 0, 1).add(0, 0.25, 0) : vec);
@@ -63,4 +66,5 @@ public class WorldMixin implements MagnetCraftWorld {
             }
         });
     }
+
 }

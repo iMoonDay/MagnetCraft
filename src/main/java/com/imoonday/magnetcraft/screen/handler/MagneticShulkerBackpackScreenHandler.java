@@ -13,6 +13,8 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.util.collection.DefaultedList;
 
+import java.util.stream.IntStream;
+
 public class MagneticShulkerBackpackScreenHandler extends ScreenHandler {
 
     private final Inventory inventory;
@@ -55,9 +57,7 @@ public class MagneticShulkerBackpackScreenHandler extends ScreenHandler {
         super.onContentChanged(inventory);
         if (inventory == this.inventory) {
             DefaultedList<ItemStack> stacks = DefaultedList.ofSize(27, ItemStack.EMPTY);
-            for (int i = 0; i < inventory.size(); i++) {
-                stacks.set(i, inventory.getStack(i));
-            }
+            IntStream.range(0, inventory.size()).forEach(i -> stacks.set(i, inventory.getStack(i)));
             Inventories.writeNbt(MagneticShulkerBackpackItem.getBackpackNbt(getStack()), stacks);
         }
         this.sendContentUpdates();
@@ -72,9 +72,7 @@ public class MagneticShulkerBackpackScreenHandler extends ScreenHandler {
         if (stacks.size() != this.inventory.size()) {
             return;
         }
-        for (int i = 0; i < stacks.size(); i++) {
-            this.inventory.setStack(i, stacks.get(i));
-        }
+        IntStream.range(0, stacks.size()).forEach(i -> this.inventory.setStack(i, stacks.get(i)));
     }
 
     @SuppressWarnings("ConstantValue")

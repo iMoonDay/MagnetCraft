@@ -160,6 +160,7 @@
   "block.magnetcraft.magnetic_antenna": "磁天线",
   "block.magnetcraft.magnetic_shulker_backpack": "磁力潜影背包",
   "block.magnetcraft.magnetic_shulker_backpack.tooltip": "空余容量: ",
+  "block.magnetcraft.magnetic_filter_layer": "磁性过滤层",
   "entity.magnetcraft.magnetic_iron_golem": "磁傀儡",
   "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "装备磁石的磁傀儡",
   "entity.magnetcraft.magnetic_wrench": "磁扳手",

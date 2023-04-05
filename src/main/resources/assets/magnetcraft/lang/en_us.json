@@ -160,6 +160,7 @@
   "block.magnetcraft.magnetic_antenna": "Magnetic Antenna",
   "block.magnetcraft.magnetic_shulker_backpack": "Magnetic Shulker Backpack",
   "block.magnetcraft.magnetic_shulker_backpack.tooltip": "Empty slots: ",
+  "block.magnetcraft.magnetic_filter_layer": "Magnetic Filter Layer",
   "entity.magnetcraft.magnetic_iron_golem": "Magnetic Iron Golem",
   "entity.magnetcraft.magnetic_iron_golem.with_lodestone": "Magnetic Iron Golem with Lodestone",
   "entity.magnetcraft.magnetic_wrench": "Magnetic Wrench",

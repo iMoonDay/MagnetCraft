@@ -1,0 +1,23 @@
+{
+	"texture_size": [16, 17],
+	"textures": {
+		"particle": "magnetcraft:block/magnetic_filter_layer",
+		"main": "magnetcraft:block/magnetic_filter_layer"
+	},
+	"elements": [
+		{
+			"name": "layer",
+			"from": [0, 0, 0],
+			"to": [16, 1, 16],
+			"faces": {
+				"north": {"uv": [0, 15.05882, 16, 16], "texture": "#main"},
+				"east": {"uv": [0, 15.05882, 16, 16], "texture": "#main"},
+				"south": {"uv": [0, 15.05882, 16, 16], "texture": "#main"},
+				"west": {"uv": [0, 15.05882, 16, 16], "texture": "#main"},
+				"up": {"uv": [16, 15.05882, 0, 0], "texture": "#main"},
+				"down": {"uv": [16, 0, 0, 15.05882], "texture": "#main"}
+			}
+		}
+	],
+	"display": {}
+}

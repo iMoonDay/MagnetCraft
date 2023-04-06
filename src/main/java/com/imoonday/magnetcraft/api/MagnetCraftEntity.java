@@ -49,7 +49,7 @@ public interface MagnetCraftEntity {
 
     default void tryLevitation() {}
 
-    default boolean canBeAttractedTo(Vec3d pos){
+    default boolean canReachTo(Vec3d pos){
         return true;
     }
 

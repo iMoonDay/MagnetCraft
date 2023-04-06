@@ -52,9 +52,9 @@ public class WorldMixin implements MagnetCraftWorld {
                 boolean noDegaussingEntity = targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity && ((LivingEntity) otherEntity).hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
                 pass = (!whitelistEnable || whitelist.contains(item)) && (!blacklistEnable || !blacklist.contains(item)) && noDegaussingEntity && (!filter || allowedItems.contains(itemEntity.getStack().getItem()));
             }
-            if (pass && !world.isClient && targetEntity.canBeAttractedTo(pos)) {
-                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, new Box(BlockPos.ofFloored(pos)).expand(dis), otherEntity -> !(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && otherEntity.isAttracting() && targetEntity.canBeAttractedTo(otherEntity.getPos())).isEmpty();
-                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, entity -> entity.isAttracting() && targetEntity.canBeAttractedTo(entity.getPos())) != null;
+            if (pass && !world.isClient && targetEntity.canReachTo(pos)) {
+                boolean hasNearerEntity = !world.getOtherEntities(targetEntity, new Box(BlockPos.ofFloored(pos)).expand(dis), otherEntity -> !(otherEntity instanceof PlayerEntity) && otherEntity.getPos().isInRange(targetEntity.getPos(), blockDistanceTo) && otherEntity.isAttracting() && targetEntity.canReachTo(otherEntity.getPos())).isEmpty();
+                boolean hasNearerPlayer = world.getClosestPlayer(pos.getX(), pos.getY(), pos.getZ(), dis, entity -> entity.isAttracting() && targetEntity.canReachTo(entity.getPos())) != null;
                 boolean hasNearerBlock = false;
                 Vec3d otherBlockPos = targetEntity.getAttractSource();
                 if (otherBlockPos != null) {

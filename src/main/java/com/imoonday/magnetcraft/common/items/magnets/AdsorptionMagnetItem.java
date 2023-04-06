@@ -227,11 +227,14 @@ public class AdsorptionMagnetItem extends Item {
         if (entity.world.isClient) {
             return;
         }
+        Vec3d pos = blockPos.toCenterPos();
+        if (!entity.canReachTo(pos)) {
+            return;
+        }
         if (entity.world.getBlockState(blockPos).isAir()) {
             entity.setAdsorbedByBlock(false);
             return;
         }
-        Vec3d pos = blockPos.toCenterPos();
         Vec3d vec = pos.subtract(entity.getPos()).multiply(0.05);
         if (entity.horizontalCollision) {
             vec = entity.getPos().isInRange(pos, 1) || entity.getBoundingBox().intersects(new Box(blockPos).expand(0.5, 0, 0.5)) ? Vec3d.ZERO : vec.multiply(1, 0, 1).add(0, 0.25, 0);

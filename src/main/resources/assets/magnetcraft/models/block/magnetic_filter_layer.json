@@ -1,7 +1,7 @@
 {
 	"texture_size": [16, 17],
 	"textures": {
-		"particle": "magnetcraft:block/magnetic_filter_layer",
+		"particle": "minecraft:block/glass",
 		"main": "magnetcraft:block/magnetic_filter_layer"
 	},
 	"elements": [

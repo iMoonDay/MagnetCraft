@@ -1,27 +1,37 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
-import com.imoonday.magnetcraft.common.blocks.MagneticFilterLayerBlock;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
+import com.imoonday.magnetcraft.common.tags.BlockTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.util.function.BooleanBiFunction;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -29,6 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Mixin(Entity.class)
@@ -114,14 +125,14 @@ public abstract class EntityMixin implements MagnetCraftEntity {
                 boolean hasDegaussingPlayer = !targetEntity.world.getOtherEntities(targetEntity, targetEntity.getBoundingBox().expand(degaussingDis), otherEntity -> (otherEntity instanceof LivingEntity livingEntity && livingEntity.hasStatusEffect(EffectRegistries.DEGAUSSING_EFFECT) && targetEntity.getPos().isInRange(otherEntity.getPos(), degaussingDis))).isEmpty();
                 pass = (!whitelistEnable || whitelistPass) && (!blacklistEnable || blacklistPass) && StackListPass && !hasDegaussingPlayer;
             }
-            if (pass && targetEntity.canBeAttractedTo(entity.getEyePos())) {
+            if (pass && targetEntity.canReachTo(entity.getEyePos())) {
                 boolean hasNearerPlayer;
                 boolean hasNearerEntity = false;
                 if (entity instanceof PlayerEntity) {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, entity1 -> entity1.isAttracting() && targetEntity.canBeAttractedTo(entity1.getEyePos())) != entity;
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, entity1 -> entity1.isAttracting() && targetEntity.canReachTo(entity1.getEyePos())) != entity;
                 } else {
-                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, entity1 -> entity1.isAttracting() && targetEntity.canBeAttractedTo(entity1.getEyePos())) != null;
-                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && otherEntity.isAttracting() && otherEntity.getEnable() && otherEntity.isAlive() && targetEntity.canBeAttractedTo(otherEntity.getEyePos()))).isEmpty();
+                    hasNearerPlayer = targetEntity.world.getClosestPlayer(entity.getX(), entity.getY(), entity.getZ(), dis, entity1 -> entity1.isAttracting() && targetEntity.canReachTo(entity1.getEyePos())) != null;
+                    hasNearerEntity = !targetEntity.world.getOtherEntities(targetEntity, entity.getBoundingBox().expand(dis), otherEntity -> (!(otherEntity instanceof PlayerEntity) && otherEntity.distanceTo(targetEntity) < entity.distanceTo(targetEntity) && otherEntity.isAttracting() && otherEntity.getEnable() && otherEntity.isAlive() && targetEntity.canReachTo(otherEntity.getEyePos()))).isEmpty();
                 }
                 if (!hasNearerPlayer && !hasNearerEntity) {
                     Vec3d vec = entity.getEyePos().subtract(targetEntity.getPos()).multiply(0.05);
@@ -159,9 +170,65 @@ public abstract class EntityMixin implements MagnetCraftEntity {
     }
 
     @Override
-    public boolean canBeAttractedTo(Vec3d pos) {
+    public boolean canReachTo(Vec3d pos) {
         Entity entity = (Entity) (Object) this;
-        return MagneticFilterLayerBlock.canBeAttractedTo(entity, pos);
+        for (double d = 0; d <= 1; d += 0.01) {
+            Vec3d newPos = entity.getPos().add(pos.subtract(entity.getPos()).multiply(d));
+            Vec3d offset = newPos.subtract(entity.getPos());
+            Box newBox = entity.getBoundingBox().offset(offset);
+            List<BlockPos> posList = BlockPos.stream(newBox).toList();
+            for (BlockPos blockPos : posList) {
+                BlockState blockState = entity.world.getBlockState(blockPos);
+                if (!blockState.isIn(BlockTags.BLOCK_ATTRACT_BLOCKS)) {
+                    VoxelShape voxelShape2 = VoxelShapes.empty();
+                    for (Direction direction : Direction.values()) {
+                        BlockPos neighborBlockPos = blockPos.offset(direction);
+                        BlockState neighborBlockState = entity.world.getBlockState(neighborBlockPos);
+                        if (neighborBlockState.isIn(BlockTags.BLOCK_ATTRACT_BLOCKS)) {
+                            VoxelShape voxelShape = blockState.getOutlineShape(entity.world, neighborBlockPos, createHoldingShapeContext());
+                            voxelShape2 = VoxelShapes.union(voxelShape2, voxelShape.offset(neighborBlockPos.getX(), neighborBlockPos.getY(), neighborBlockPos.getZ()));
+                        }
+                    }
+                    boolean collide = VoxelShapes.matchesAnywhere(voxelShape2, VoxelShapes.cuboid(newBox), BooleanBiFunction.AND);
+                    if (collide) {
+                        return false;
+                    }
+                    continue;
+                }
+                VoxelShape voxelShape = blockState.getOutlineShape(entity.world, blockPos, createHoldingShapeContext());
+                VoxelShape voxelShape2 = voxelShape.offset(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+                boolean collide = VoxelShapes.matchesAnywhere(voxelShape2, VoxelShapes.cuboid(newBox), BooleanBiFunction.AND);
+                if (collide) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    @NotNull
+    private static ShapeContext createHoldingShapeContext() {
+        return new ShapeContext() {
+            @Override
+            public boolean isDescending() {
+                return false;
+            }
+
+            @Override
+            public boolean isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue) {
+                return false;
+            }
+
+            @Override
+            public boolean isHolding(Item item) {
+                return true;
+            }
+
+            @Override
+            public boolean canWalkOnFluid(FluidState stateAbove, FluidState state) {
+                return false;
+            }
+        };
     }
 
     @Inject(method = "tick", at = @At(value = "TAIL"))

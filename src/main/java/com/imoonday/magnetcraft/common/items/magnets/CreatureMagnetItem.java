@@ -125,7 +125,7 @@ public class CreatureMagnetItem extends AbstractSwitchableItem {
     }
 
     public static void followAttractOwner(Entity followingEntity, LivingEntity attractingEntity, boolean usingMagnet) {
-        if (attractingEntity.world.isClient || followingEntity.world.isClient || !attractingEntity.isAlive() || !followingEntity.isAlive()) {
+        if (attractingEntity.world.isClient || followingEntity.world.isClient || !attractingEntity.isAlive() || !followingEntity.isAlive() || !followingEntity.canReachTo(attractingEntity.getPos())) {
             return;
         }
         Vec3d vec = attractingEntity.getPos().subtract(followingEntity.getPos()).multiply(0.05);

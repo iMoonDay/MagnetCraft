@@ -91,7 +91,7 @@ public class LodestoneEntity extends BlockEntity implements ExtendedScreenHandle
                 };
                 centerPos = direction != null ? centerPos.offset(direction, 1) : centerPos;
                 ArrayList<Item> allowedItems = entity.getItems().stream().map(ItemStack::getItem).collect(Collectors.toCollection(ArrayList::new));
-                world.attractItems(centerPos, dis <= maxDis ? dis : maxDis, entity.filter, allowedItems);
+                world.attractItems(centerPos, Math.min(dis, maxDis), entity.filter, allowedItems);
                 if (direction != null) {
                     putItemEntityIn(world, pos, entity, direction);
                 } else {

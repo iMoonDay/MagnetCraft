@@ -13,6 +13,7 @@ import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,6 +25,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 @SuppressWarnings("AlibabaUndefineMagicConstant")
 @Mixin(ItemEntity.class)
 public class ItemEntityMixin extends EntityMixin {
+
+    protected Vec3d attractSource;
 
     @Inject(at = @At(value = "HEAD"), method = "tick")
     public void checkAttract(CallbackInfo info) {
@@ -60,11 +63,14 @@ public class ItemEntityMixin extends EntityMixin {
                     }
                 }
             }
+            if (this.getAttractSource() != null && entity.isOnGround()) {
+                this.setAttractSource(null);
+            }
         }
     }
 
-    @Redirect(method = "onPlayerCollision",at=@At(value = "INVOKE",target = "Lnet/minecraft/entity/player/PlayerInventory;insertStack(Lnet/minecraft/item/ItemStack;)Z"))
-    public boolean insertStack(PlayerInventory instance, ItemStack stack){
+    @Redirect(method = "onPlayerCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;insertStack(Lnet/minecraft/item/ItemStack;)Z"))
+    public boolean insertStack(PlayerInventory instance, ItemStack stack) {
         PlayerEntity player = instance.player;
         ItemStack armorStack = player.getEquippedStack(EquipmentSlot.CHEST);
         if (armorStack.isOf(BlockRegistries.MAGNETIC_SHULKER_BACKPACK_ITEM)) {
@@ -74,6 +80,16 @@ public class ItemEntityMixin extends EntityMixin {
             }
         }
         return instance.insertStack(stack);
+    }
+
+    @Override
+    public Vec3d getAttractSource() {
+        return this.attractSource;
+    }
+
+    @Override
+    public void setAttractSource(Vec3d pos) {
+        this.attractSource = pos;
     }
 
 }

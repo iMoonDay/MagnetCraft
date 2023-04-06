@@ -15,11 +15,9 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-
 public class DemagnetizerBlock extends BlockWithEntity {
 
-    public static final HashSet<BlockPos> DEGAUSSING_POS = new HashSet<>();
+//    public static final HashSet<BlockPos> DEGAUSSING_POS = new HashSet<>();
 
     public DemagnetizerBlock(Settings settings) {
         super(settings);
@@ -45,20 +43,20 @@ public class DemagnetizerBlock extends BlockWithEntity {
     @Override
     public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
         super.onPlaced(world, pos, state, placer, itemStack);
-        DEGAUSSING_POS.add(pos);
+//        DEGAUSSING_POS.add(pos);
     }
 
     @Override
     public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         super.onBreak(world, pos, state, player);
-        DEGAUSSING_POS.remove(pos);
+//        DEGAUSSING_POS.remove(pos);
     }
 
     @Override
     public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
         super.onStateReplaced(state, world, pos, newState, moved);
         if (!state.isOf(newState.getBlock())) {
-            DEGAUSSING_POS.remove(pos);
+//            DEGAUSSING_POS.remove(pos);
         }
     }
 }

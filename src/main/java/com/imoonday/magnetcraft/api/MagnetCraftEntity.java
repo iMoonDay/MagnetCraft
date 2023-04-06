@@ -145,4 +145,10 @@ public interface MagnetCraftEntity {
 
     default void setAdsorptionBlockPos(BlockPos pos, boolean clear) {}
 
+    default Vec3d getAttractSource(){
+        return null;
+    }
+
+    default void setAttractSource(Vec3d pos){}
+
 }

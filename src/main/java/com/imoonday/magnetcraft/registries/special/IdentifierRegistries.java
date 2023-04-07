@@ -12,6 +12,7 @@ public class IdentifierRegistries {
     public static final Identifier MAGNETIC_LEVITATION_MODE_PACKET_ID = id("magnetic_levitation_mode");
     public static final Identifier JUMPING_PACKET_ID = id("jumping");
     public static final Identifier AUTOMATIC_LEVITATION_PACKET_ID = id("automatic_levitation");
+    public static final Identifier OPEN_BACKPACK = id("open_backpack");
 
     public static Identifier id(String id) {
         return new Identifier(MOD_ID, id);

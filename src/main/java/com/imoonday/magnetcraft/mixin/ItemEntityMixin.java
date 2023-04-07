@@ -71,15 +71,18 @@ public class ItemEntityMixin extends EntityMixin {
 
     @Redirect(method = "onPlayerCollision", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/PlayerInventory;insertStack(Lnet/minecraft/item/ItemStack;)Z"))
     public boolean insertStack(PlayerInventory instance, ItemStack stack) {
+        if (instance.insertStack(stack)) {
+            instance.markDirty();
+            return true;
+        }
         PlayerEntity player = instance.player;
         ItemStack armorStack = player.getEquippedStack(EquipmentSlot.CHEST);
         if (armorStack.isOf(BlockRegistries.MAGNETIC_SHULKER_BACKPACK_ITEM)) {
-            if (MagneticShulkerBackpackItem.insertStack(player, 38, armorStack, stack, MagneticShulkerBackpackItem.getItems(armorStack))) {
-                instance.markDirty();
-                return true;
-            }
+            boolean insertStack = MagneticShulkerBackpackItem.insertStack(player, 38, armorStack, stack, MagneticShulkerBackpackItem.getItems(armorStack));
+            instance.markDirty();
+            return insertStack;
         }
-        return instance.insertStack(stack);
+        return false;
     }
 
     @Override

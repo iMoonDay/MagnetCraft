@@ -9,5 +9,5 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 public class BlockTags {
     public static final TagKey<Block> MAGNETITE_ORES = TagKey.of(RegistryKeys.BLOCK, id("magnetite_ores"));
     public static final TagKey<Block> MAGLEV_RAILS = TagKey.of(RegistryKeys.BLOCK,id("maglev_rails"));
-    public static final TagKey<Block> BLOCK_ATTRACT_BLOCKS = TagKey.of(RegistryKeys.BLOCK,id("cannot_through_blocks"));
+    public static final TagKey<Block> BLOCK_ATTRACT_BLOCKS = TagKey.of(RegistryKeys.BLOCK,id("block_attract_blocks"));
 }

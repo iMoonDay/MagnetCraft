@@ -12,6 +12,8 @@ import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.fluid.FluidState;
+import net.minecraft.fluid.Fluids;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.loot.context.LootContext;
@@ -38,20 +40,21 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class MagneticShulkerBackpackBlock extends BlockWithEntity {
+public class MagneticShulkerBackpackBlock extends BlockWithEntity implements Waterloggable {
 
     public static final DirectionProperty FACING = Properties.HORIZONTAL_FACING;
     public static final BooleanProperty HANGING = BooleanProperty.of("hanging");
+    public static final BooleanProperty WATERLOGGED = Properties.WATERLOGGED;
     public static final Identifier CONTENTS = new Identifier("contents");
 
     public MagneticShulkerBackpackBlock(Settings settings) {
         super(settings);
-        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH).with(HANGING, false));
+        this.setDefaultState(this.stateManager.getDefaultState().with(FACING, Direction.NORTH).with(HANGING, false).with(WATERLOGGED, false));
     }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
-        builder.add(FACING, HANGING);
+        builder.add(FACING, HANGING, WATERLOGGED);
     }
 
     @Nullable
@@ -327,21 +330,25 @@ public class MagneticShulkerBackpackBlock extends BlockWithEntity {
     @Nullable
     @Override
     public BlockState getPlacementState(ItemPlacementContext ctx) {
-        BlockState blockState = super.getPlacementState(ctx);
         Direction opposite = ctx.getHorizontalPlayerFacing().getOpposite();
         Direction side = ctx.getSide();
         BlockPos blockPos = ctx.getBlockPos().offset(side.getOpposite());
         World world = ctx.getWorld();
         BlockState state = world.getBlockState(blockPos);
         boolean hanging = side != Direction.UP && side != Direction.DOWN && state.isSideSolidFullSquare(world, blockPos, side);
-        if (blockState != null) {
-            return blockState.with(FACING, hanging ? side : opposite).with(HANGING, hanging);
-        }
-        return super.getPlacementState(ctx);
+        return this.getDefaultState().with(FACING, hanging ? side : opposite).with(HANGING, hanging).with(WATERLOGGED, ctx.getWorld().getFluidState(ctx.getBlockPos()).getFluid() == Fluids.WATER);
+    }
+
+    @Override
+    public FluidState getFluidState(BlockState state) {
+        return state.get(WATERLOGGED) ? Fluids.WATER.getStill(false) : super.getFluidState(state);
     }
 
     @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
+        if (state.get(WATERLOGGED)) {
+            world.scheduleFluidTick(pos, Fluids.WATER, Fluids.WATER.getTickRate(world));
+        }
         if (state.get(HANGING) && direction == state.get(FACING).getOpposite()) {
             return state.with(HANGING, neighborState.isSideSolidFullSquare(world, neighborPos, direction.getOpposite()));
         }

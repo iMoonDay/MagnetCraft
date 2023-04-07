@@ -1,0 +1,11 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "ingredients": [
+    {
+      "item": "magnetcraft:magnetic_suspended_powder"
+    }
+  ],
+  "result": {
+    "item": "magnetcraft:demagnetized_powder"
+  }
+}

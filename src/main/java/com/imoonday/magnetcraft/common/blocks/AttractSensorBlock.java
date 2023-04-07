@@ -21,6 +21,7 @@ import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("ALL")
 public class AttractSensorBlock extends BlockWithEntity {
+
     public AttractSensorBlock(Settings settings) {
         super(settings);
     }
@@ -79,4 +80,5 @@ public class AttractSensorBlock extends BlockWithEntity {
         }
         return super.onUse(state, world, pos, player, hand, hit);
     }
+
 }

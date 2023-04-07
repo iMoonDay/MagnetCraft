@@ -1,6 +1,7 @@
 package com.imoonday.magnetcraft.mixin;
 
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
+import com.imoonday.magnetcraft.common.blocks.entities.AttractSensorEntity;
 import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.common.tags.BlockTags;
 import com.imoonday.magnetcraft.config.ModConfig;
@@ -9,15 +10,12 @@ import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
@@ -31,7 +29,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
-import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -173,8 +170,9 @@ public abstract class EntityMixin implements MagnetCraftEntity {
     public boolean canReachTo(Vec3d pos) {
         Entity entity = (Entity) (Object) this;
         for (double d = 0; d <= 1; d += 0.01) {
-            Vec3d newPos = entity.getPos().add(pos.subtract(entity.getPos()).multiply(d));
-            Vec3d offset = newPos.subtract(entity.getPos());
+            Vec3d entityPos = entity.getEyePos();
+            Vec3d newPos = entityPos.add(pos.subtract(entityPos).multiply(d));
+            Vec3d offset = newPos.subtract(entityPos);
             Box newBox = entity.getBoundingBox().offset(offset);
             List<BlockPos> posList = BlockPos.stream(newBox).toList();
             for (BlockPos blockPos : posList) {
@@ -185,7 +183,7 @@ public abstract class EntityMixin implements MagnetCraftEntity {
                         BlockPos neighborBlockPos = blockPos.offset(direction);
                         BlockState neighborBlockState = entity.world.getBlockState(neighborBlockPos);
                         if (neighborBlockState.isIn(BlockTags.BLOCK_ATTRACT_BLOCKS)) {
-                            VoxelShape voxelShape = blockState.getOutlineShape(entity.world, neighborBlockPos, createHoldingShapeContext());
+                            VoxelShape voxelShape = blockState.getOutlineShape(entity.world, neighborBlockPos, AttractSensorEntity.createHoldingShapeContext());
                             voxelShape2 = VoxelShapes.union(voxelShape2, voxelShape.offset(neighborBlockPos.getX(), neighborBlockPos.getY(), neighborBlockPos.getZ()));
                         }
                     }
@@ -195,7 +193,7 @@ public abstract class EntityMixin implements MagnetCraftEntity {
                     }
                     continue;
                 }
-                VoxelShape voxelShape = blockState.getOutlineShape(entity.world, blockPos, createHoldingShapeContext());
+                VoxelShape voxelShape = blockState.getOutlineShape(entity.world, blockPos, AttractSensorEntity.createHoldingShapeContext());
                 VoxelShape voxelShape2 = voxelShape.offset(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                 boolean collide = VoxelShapes.matchesAnywhere(voxelShape2, VoxelShapes.cuboid(newBox), BooleanBiFunction.AND);
                 if (collide) {
@@ -204,31 +202,6 @@ public abstract class EntityMixin implements MagnetCraftEntity {
             }
         }
         return true;
-    }
-
-    @NotNull
-    private static ShapeContext createHoldingShapeContext() {
-        return new ShapeContext() {
-            @Override
-            public boolean isDescending() {
-                return false;
-            }
-
-            @Override
-            public boolean isAbove(VoxelShape shape, BlockPos pos, boolean defaultValue) {
-                return false;
-            }
-
-            @Override
-            public boolean isHolding(Item item) {
-                return true;
-            }
-
-            @Override
-            public boolean canWalkOnFluid(FluidState stateAbove, FluidState state) {
-                return false;
-            }
-        };
     }
 
     @Inject(method = "tick", at = @At(value = "TAIL"))

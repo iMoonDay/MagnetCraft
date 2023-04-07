@@ -107,15 +107,15 @@ public class MagneticAntennaBlock extends RodBlock implements Waterloggable {
     }
 
     private boolean hasStrongActivatedBlock(ServerWorld world, BlockPos pos, Direction direction) {
-        return IntStream.rangeClosed(1, 30).mapToObj(i -> pos.offset(direction, i)).anyMatch(pos1 -> isActivatedBlock(world, direction, pos1) && getMagnetBlockState(world, pos1).isOf(BlockRegistries.NETHERITE_MAGNET_BLOCK));
+        return IntStream.rangeClosed(1, 30).mapToObj(i -> pos.offset(direction, i)).takeWhile(blockPos -> notBlocked(world, blockPos, direction)).anyMatch(blockPos -> isActivatedBlock(world, direction, blockPos) && getMagnetBlockState(world, blockPos).isOf(BlockRegistries.NETHERITE_MAGNET_BLOCK));
     }
 
     private int getPower(ServerWorld world, BlockPos pos, Direction direction, boolean powered, boolean strongPowered) {
         AtomicInteger power = new AtomicInteger();
         if (strongPowered) {
-            IntStream.rangeClosed(1, 30).mapToObj(i -> pos.offset(direction, i)).filter(pos1 -> isActivatedBlock(world, direction, pos1) && getMagnetBlockState(world, pos1).isOf(BlockRegistries.NETHERITE_MAGNET_BLOCK)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
+            IntStream.rangeClosed(1, 30).mapToObj(i -> pos.offset(direction, i)).takeWhile(blockPos -> notBlocked(world, blockPos, direction)).filter(blockPos -> isActivatedBlock(world, direction, blockPos) && getMagnetBlockState(world, blockPos).isOf(BlockRegistries.NETHERITE_MAGNET_BLOCK)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
         } else {
-            IntStream.rangeClosed(1, 15).mapToObj(i -> pos.offset(direction, i)).filter(pos1 -> isActivatedBlock(world, direction, pos1)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
+            IntStream.rangeClosed(1, 15).mapToObj(i -> pos.offset(direction, i)).takeWhile(blockPos -> notBlocked(world, blockPos, direction)).filter(blockPos -> isActivatedBlock(world, direction, blockPos)).findFirst().ifPresentOrElse(pos1 -> power.set(getRedstonePower(world, powered, pos1)), () -> power.set(0));
         }
         return power.intValue();
     }
@@ -133,7 +133,12 @@ public class MagneticAntennaBlock extends RodBlock implements Waterloggable {
     }
 
     private boolean hasActivatedBlock(ServerWorld world, BlockPos pos, Direction direction) {
-        return IntStream.rangeClosed(1, 15).mapToObj(i -> pos.offset(direction, i)).anyMatch(pos1 -> isActivatedBlock(world, direction, pos1));
+        return IntStream.rangeClosed(1, 15).mapToObj(i -> pos.offset(direction, i)).takeWhile(blockPos -> notBlocked(world, blockPos, direction)).anyMatch(pos1 -> isActivatedBlock(world, direction, pos1));
+    }
+
+    private static boolean notBlocked(ServerWorld world, BlockPos blockPos, Direction direction) {
+        BlockState state = world.getBlockState(blockPos);
+        return !state.isOf(BlockRegistries.MAGNETIC_FILTER_GlASS_BLOCK) && (!state.isOf(BlockRegistries.MAGNETIC_FILTER_LAYER_BLOCK) || !state.get(MagneticFilterLayerBlock.FACING).equals(direction) && !state.get(MagneticFilterLayerBlock.FACING).equals(direction.getOpposite()));
     }
 
     private boolean isFirst(BlockState state, ServerWorld world, BlockPos pos, Direction direction) {

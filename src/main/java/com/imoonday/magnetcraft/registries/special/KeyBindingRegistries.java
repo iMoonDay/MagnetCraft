@@ -42,9 +42,15 @@ public class KeyBindingRegistries {
                         CATEGORY));
 
         KeyBinding changeAutomaticLevitation = KeyBindingHelper.registerKeyBinding(
-                new KeyBinding("key.magnetcraft.automaticLevitation",
+                new KeyBinding("key.magnetcraft.automatic_levitation",
                         InputUtil.Type.KEYSYM,
                         GLFW.GLFW_KEY_RIGHT_ALT,
+                        CATEGORY));
+
+        KeyBinding openBackpack = KeyBindingHelper.registerKeyBinding(
+                new KeyBinding("key.magnetcraft.open_backpack",
+                        InputUtil.Type.KEYSYM,
+                        GLFW.GLFW_KEY_B,
                         CATEGORY));
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
@@ -67,6 +73,9 @@ public class KeyBindingRegistries {
             }
             while (changeAutomaticLevitation.wasPressed()) {
                 ClientPlayNetworking.send(AUTOMATIC_LEVITATION_PACKET_ID, PacketByteBufs.empty());
+            }
+            while (openBackpack.wasPressed()) {
+                ClientPlayNetworking.send(OPEN_BACKPACK, PacketByteBufs.empty());
             }
         });
     }

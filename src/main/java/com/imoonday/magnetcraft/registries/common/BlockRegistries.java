@@ -53,33 +53,34 @@ public class BlockRegistries {
     public static final Block RAW_MAGNET_BLOCK = register("raw_magnet_block", blockCopy(Blocks.RAW_IRON_BLOCK));
     public static final LodestoneBlock LODESTONE_BLOCK = register("lodestone", new LodestoneBlock(settingCopy(Blocks.LODESTONE)));
     public static final BlockEntityType<LodestoneEntity> LODESTONE_ENTITY = registerBlockEntity("lodestone", LodestoneEntity::new, LODESTONE_BLOCK);
-    public static final MaglevRailBlock MAGLEV_RAIL_BLOCK = registerNonOpaque("maglev_rail", new MaglevRailBlock(settingCopy(Blocks.RAIL)));
-    public static final MaglevPoweredRailBlock MAGLEV_POWERED_RAIL_BLOCK = registerNonOpaque("maglev_powered_rail", new MaglevPoweredRailBlock(settingCopy(Blocks.POWERED_RAIL)));
-    public static final MaglevDetectorRailBlock MAGLEV_DETECTOR_RAIL_BLOCK = registerNonOpaque("maglev_detector_rail", new MaglevDetectorRailBlock(settingCopy(Blocks.DETECTOR_RAIL)));
-    public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = registerNonOpaque("maglev_activator_rail", new MaglevPoweredRailBlock(settingCopy(Blocks.ACTIVATOR_RAIL)));
-    public static final MaglevLeverBlock MAGLEV_LEVER_BLOCK = registerNonOpaque("maglev_lever", new MaglevLeverBlock(settingCopyNoCollision(Blocks.LEVER)));
-    public static final MaglevButtonBlock MAGLEV_STONE_BUTTON_BLOCK = registerNonOpaque("maglev_stone_button", new MaglevButtonBlock(settingCopyNoCollision(Blocks.STONE_BUTTON), BlockSetType.STONE, 20, false));
-    public static final MaglevButtonBlock MAGLEV_OAK_BUTTON_BLOCK = registerNonOpaque("maglev_oak_button", new MaglevButtonBlock(settingCopyNoCollision(Blocks.STONE_BUTTON), BlockSetType.OAK, 30, true));
-    public static final MaglevDoorBlock MAGLEV_IRON_DOOR_BLOCK = registerNonOpaque("maglev_iron_door", new MaglevDoorBlock(settingCopyNonOpaque(Blocks.IRON_DOOR), BlockSetType.IRON));
-    public static final MaglevDoorBlock MAGLEV_OAK_DOOR_BLOCK = registerNonOpaque("maglev_oak_door", new MaglevDoorBlock(settingCopyNonOpaque(Blocks.OAK_DOOR), BlockSetType.OAK));
-    public static final MaglevRepeaterBlock MAGLEV_REPEATER_BLOCK = registerNonOpaque("maglev_repeater", new MaglevRepeaterBlock(settingCopyNonOpaque(Blocks.REPEATER)));
-    public static final MaglevComparatorBlock MAGLEV_COMPARATOR_BLOCK = registerNonOpaque("maglev_comparator", new MaglevComparatorBlock(settingCopyNonOpaque(Blocks.COMPARATOR)));
-    public static final MagneticPressurePlateBlock MAGNETIC_PRESSURE_PLATE = registerNonOpaque("magnetic_pressure_plate", new MagneticPressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.METAL).requiresTool().noCollision().strength(0.5f).sounds(BlockSoundGroup.METAL), BlockSetType.IRON));
+    public static final MaglevRailBlock MAGLEV_RAIL_BLOCK = register("maglev_rail", new MaglevRailBlock(settingCopy(Blocks.RAIL)));
+    public static final MaglevPoweredRailBlock MAGLEV_POWERED_RAIL_BLOCK = register("maglev_powered_rail", new MaglevPoweredRailBlock(settingCopy(Blocks.POWERED_RAIL)));
+    public static final MaglevDetectorRailBlock MAGLEV_DETECTOR_RAIL_BLOCK = register("maglev_detector_rail", new MaglevDetectorRailBlock(settingCopy(Blocks.DETECTOR_RAIL)));
+    public static final MaglevPoweredRailBlock MAGLEV_ACTIVATOR_RAIL_BLOCK = register("maglev_activator_rail", new MaglevPoweredRailBlock(settingCopy(Blocks.ACTIVATOR_RAIL)));
+    public static final MaglevLeverBlock MAGLEV_LEVER_BLOCK = register("maglev_lever", new MaglevLeverBlock(settingCopyNoCollision(Blocks.LEVER)));
+    public static final MaglevButtonBlock MAGLEV_STONE_BUTTON_BLOCK = register("maglev_stone_button", new MaglevButtonBlock(settingCopyNoCollision(Blocks.STONE_BUTTON), BlockSetType.STONE, 20, false));
+    public static final MaglevButtonBlock MAGLEV_OAK_BUTTON_BLOCK = register("maglev_oak_button", new MaglevButtonBlock(settingCopyNoCollision(Blocks.STONE_BUTTON), BlockSetType.OAK, 30, true));
+    public static final MaglevDoorBlock MAGLEV_IRON_DOOR_BLOCK = register("maglev_iron_door", new MaglevDoorBlock(settingCopyNonOpaque(Blocks.IRON_DOOR), BlockSetType.IRON));
+    public static final MaglevDoorBlock MAGLEV_OAK_DOOR_BLOCK = register("maglev_oak_door", new MaglevDoorBlock(settingCopyNonOpaque(Blocks.OAK_DOOR), BlockSetType.OAK));
+    public static final MaglevRepeaterBlock MAGLEV_REPEATER_BLOCK = register("maglev_repeater", new MaglevRepeaterBlock(settingCopyNonOpaque(Blocks.REPEATER)));
+    public static final MaglevComparatorBlock MAGLEV_COMPARATOR_BLOCK = register("maglev_comparator", new MaglevComparatorBlock(settingCopyNonOpaque(Blocks.COMPARATOR)));
+    public static final MagneticPressurePlateBlock MAGNETIC_PRESSURE_PLATE = register("magnetic_pressure_plate", new MagneticPressurePlateBlock(PressurePlateBlock.ActivationRule.MOBS, AbstractBlock.Settings.of(Material.METAL).requiresTool().noCollision().strength(0.5f).sounds(BlockSoundGroup.METAL), BlockSetType.IRON));
     public static final DemagnetizerBlock DEMAGNETIZER_BLOCK = register("demagnetizer", new DemagnetizerBlock(settingCopy(MAGNET_BLOCK)));
     public static final BlockEntityType<DemagnetizerEntity> DEMAGNETIZER_ENTITY = registerBlockEntity("demagnetizer", DemagnetizerEntity::new, DEMAGNETIZER_BLOCK);
     public static final AttractSensorBlock ATTRACT_SENSOR_BLOCK = register("attract_sensor", new AttractSensorBlock(settingCopy(MAGNET_BLOCK)));
     public static final BlockEntityType<AttractSensorEntity> ATTRACT_SENSOR_ENTITY = registerBlockEntity("attract_sensor", AttractSensorEntity::new, ATTRACT_SENSOR_BLOCK);
-    public static final AdvancedGrindstoneBlock ADVANCED_GRINDSTONE_BLOCK = registerNonOpaque("advanced_grindstone", new AdvancedGrindstoneBlock(settingCopy(Blocks.GRINDSTONE)));
+    public static final AdvancedGrindstoneBlock ADVANCED_GRINDSTONE_BLOCK = register("advanced_grindstone", new AdvancedGrindstoneBlock(settingCopy(Blocks.GRINDSTONE)));
     public static final VerticalRepeaterBlock VERTICAL_REPEATER_BLOCK = register("vertical_repeater", new VerticalRepeaterBlock(settingCopy(Blocks.OBSERVER)));
-    public static final CircularRepeaterBlock CIRCULAR_REPEATER_BLOCK = registerNonOpaque("circular_repeater", new CircularRepeaterBlock(settingCopy(Blocks.REPEATER)));
-    public static final ElectromagneticRelayBlock ELECTROMAGNETIC_RELAY_BLOCK = registerNonOpaque("electromagnetic_relay", new ElectromagneticRelayBlock(settingCopy(Blocks.COMPARATOR)));
-    public static final MagneticAntennaBlock MAGNETIC_ANTENNA_BLOCK = registerNonOpaque("magnetic_antenna", new MagneticAntennaBlock(settingCopy(Blocks.LIGHTNING_ROD).luminance(MagneticAntennaBlock.getLuminance())));
+    public static final CircularRepeaterBlock CIRCULAR_REPEATER_BLOCK = register("circular_repeater", new CircularRepeaterBlock(settingCopy(Blocks.REPEATER)));
+    public static final ElectromagneticRelayBlock ELECTROMAGNETIC_RELAY_BLOCK = register("electromagnetic_relay", new ElectromagneticRelayBlock(settingCopy(Blocks.COMPARATOR)));
+    public static final MagneticAntennaBlock MAGNETIC_ANTENNA_BLOCK = register("magnetic_antenna", new MagneticAntennaBlock(settingCopy(Blocks.LIGHTNING_ROD).luminance(MagneticAntennaBlock.getLuminance())));
     public static final Map<Item, CauldronBehavior> MAGNETIC_FLUID_CAULDRON_BEHAVIOR = CauldronBehavior.createMap();
-    public static final Block MAGNETIC_FLUID_CAULDRON = registerNonOpaqueBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(settingCopy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));
-    public static final MagneticShulkerBackpackBlock MAGNETIC_SHULKER_BACKPACK_BLOCK = registerNonOpaqueBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackBlock(FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).strength(5.0f, 6.0f).sounds(BlockSoundGroup.METAL).nonOpaque()));
+    public static final Block MAGNETIC_FLUID_CAULDRON = registerBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(settingCopy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));
+    public static final MagneticShulkerBackpackBlock MAGNETIC_SHULKER_BACKPACK_BLOCK = registerBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackBlock(FabricBlockSettings.of(Material.METAL, MapColor.IRON_GRAY).strength(5.0f, 6.0f).sounds(BlockSoundGroup.METAL).nonOpaque()));
     public static final BlockEntityType<MagneticShulkerBackpackEntity> MAGNETIC_SHULKER_BACKPACK_ENTITY = registerBlockEntity("magnetic_shulker_backpack", MagneticShulkerBackpackEntity::new, MAGNETIC_SHULKER_BACKPACK_BLOCK);
     public static final MagneticShulkerBackpackItem MAGNETIC_SHULKER_BACKPACK_ITEM = registerItemWithBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackItem(ItemRegistries.nonStackable()));
-    public static final MagneticFilterLayerBlock MAGNETIC_FILTER_LAYER_BLOCK = registerNonOpaque("magnetic_filter_layer", new MagneticFilterLayerBlock(settingCopyNoCollision(Blocks.GLASS_PANE)));
+    public static final MagneticFilterLayerBlock MAGNETIC_FILTER_LAYER_BLOCK = register("magnetic_filter_layer", new MagneticFilterLayerBlock(settingCopyNoCollision(Blocks.GLASS_PANE)));
+    public static final GlassBlock MAGNETIC_FILTER_GlASS_BLOCK = register("magnetic_filter_glass",new GlassBlock(settingCopy(Blocks.GLASS)));
 
     public static void register() {
         registerCauldronBehavior();
@@ -144,17 +145,10 @@ public class BlockRegistries {
         return registerBlock(id, block);
     }
 
-    static <T extends Block> T registerNonOpaque(String id, T block) {
-        registerBlockItem(id, new BlockItem(block, ItemRegistries.settings()));
-        return registerNonOpaqueBlock(id, block);
-    }
-
     static <T extends Block> T registerBlock(String id, T block) {
-        return Registry.register(Registries.BLOCK, id(id), block);
-    }
-
-    static <T extends Block> T registerNonOpaqueBlock(String id, T block) {
-        BLOCKS.add(block);
+        if (!block.getDefaultState().isOpaque()) {
+            BLOCKS.add(block);
+        }
         return Registry.register(Registries.BLOCK, id(id), block);
     }
 

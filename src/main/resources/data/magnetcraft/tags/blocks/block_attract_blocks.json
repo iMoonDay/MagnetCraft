@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "magnetcraft:magnetic_filter_layer",
+    "magnetcraft:magnetic_filter_glass"
+  ]
+}

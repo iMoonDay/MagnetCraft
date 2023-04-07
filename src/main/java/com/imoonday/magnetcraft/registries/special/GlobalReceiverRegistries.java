@@ -28,14 +28,13 @@ public class GlobalReceiverRegistries {
     public static final String BLOCK_ENTITY_TAG = "BlockEntityTag";
     public static final String ITEMS = "Items";
     public static final String ID = "id";
-    public static final int PERMISSION_LEVEL_4 = 4;
     public static final String ON = "on";
     public static final String OFF = "off";
 
     public static void serverPlayNetworkingRegister() {
         registerServer(KEYBINDINGS_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             if (!player.getItemCooldownManager().isCoolingDown(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
-                boolean contains = player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock) && stack.getNbt() != null && stack.getNbt().getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).anyMatch(nbtCompound -> nbtCompound.getString(ID).equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString()))));
+                boolean contains = player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock || stack.getItem() instanceof MagneticShulkerBackpackItem) && stack.getNbt() != null && stack.getNbt().getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).anyMatch(nbtCompound -> nbtCompound.getString(ID).equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString()))));
                 if (contains) {
                     PacketByteBuf newBuf = PacketByteBufs.create();
                     newBuf.writeBoolean(!player.getEnable());
@@ -47,13 +46,13 @@ public class GlobalReceiverRegistries {
         }));
 
         registerServer(BLACKLIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
-            if (player.hasPermissionLevel(PERMISSION_LEVEL_4)) {
+            if (player.hasPermissionLevel(3)) {
                 CommandRegistries.itemListHandling(player, null, CommandRegistries.ListType.BLACKLIST, null);
             }
         }));
 
         registerServer(WHITELIST_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
-            if (player.hasPermissionLevel(PERMISSION_LEVEL_4)) {
+            if (player.hasPermissionLevel(3)) {
                 CommandRegistries.itemListHandling(player, null, CommandRegistries.ListType.WHITELIST, null);
             }
         }));

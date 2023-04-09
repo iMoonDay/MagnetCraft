@@ -27,6 +27,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import net.minecraft.world.WorldAccess;
@@ -131,13 +132,28 @@ public class ElectromagneticShuttleBlock extends BlockWithEntity {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof ElectromagneticShuttleEntity shuttleEntity) {
             BlockPos blockPos = shuttleEntity.getTeleportPos();
-            if (!shuttleEntity.isValid() || !world.getBlockState(blockPos).isOf(this) || !world.getBlockState(blockPos).get(POWERED) || !entity.doesNotCollide(blockPos.toCenterPos().x, blockPos.up().getY(), blockPos.toCenterPos().z)) {
+            if (!shuttleEntity.isValid() || !world.getBlockState(blockPos).isOf(this) || !world.getBlockState(blockPos).get(POWERED)) {
                 return;
             }
-            if (entity.hasControllingPassenger()) {
+            if (!entity.doesNotCollide(blockPos.toCenterPos().x, blockPos.up().getY(), blockPos.toCenterPos().z)) {
                 return;
             }
-            entity.teleport(blockPos.toCenterPos().x, blockPos.up().getY(), blockPos.toCenterPos().z);
+            if (entity.hasPassengers()) {
+                return;
+            }
+            boolean noClip = entity.noClip;
+            entity.noClip = true;
+            Vec3d start = entity.getPos();
+            Vec3d end = new Vec3d(blockPos.toCenterPos().x, blockPos.up().toCenterPos().y, blockPos.toCenterPos().z);
+//            entity.setVelocity(Vec3d.ZERO);
+//            for (double d = 0; d <= 1; d += 0.01) {
+//                entity.refreshPositionAfterTeleport(start.add(end.subtract(start).multiply(d)));
+//                entity.teleport(blockPos.toCenterPos().x, blockPos.up().getY(), blockPos.toCenterPos().z);
+//            }
+            for (int i = 0; i < 20; i++) {
+                entity.setVelocity(end.subtract(start).multiply(0.05));
+            }
+            entity.noClip = noClip;
             world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.VOICE);
         }
     }

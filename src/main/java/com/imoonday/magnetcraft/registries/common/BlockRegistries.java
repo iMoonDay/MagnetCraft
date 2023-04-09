@@ -2,10 +2,7 @@ package com.imoonday.magnetcraft.registries.common;
 
 import com.imoonday.magnetcraft.MagnetCraft;
 import com.imoonday.magnetcraft.common.blocks.*;
-import com.imoonday.magnetcraft.common.blocks.entities.AttractSensorEntity;
-import com.imoonday.magnetcraft.common.blocks.entities.DemagnetizerEntity;
-import com.imoonday.magnetcraft.common.blocks.entities.LodestoneEntity;
-import com.imoonday.magnetcraft.common.blocks.entities.MagneticShulkerBackpackEntity;
+import com.imoonday.magnetcraft.common.blocks.entities.*;
 import com.imoonday.magnetcraft.common.blocks.maglev.*;
 import com.imoonday.magnetcraft.common.items.armors.MagneticShulkerBackpackItem;
 import net.fabricmc.fabric.api.biome.v1.BiomeModifications;
@@ -80,7 +77,9 @@ public class BlockRegistries {
     public static final BlockEntityType<MagneticShulkerBackpackEntity> MAGNETIC_SHULKER_BACKPACK_ENTITY = registerBlockEntity("magnetic_shulker_backpack", MagneticShulkerBackpackEntity::new, MAGNETIC_SHULKER_BACKPACK_BLOCK);
     public static final MagneticShulkerBackpackItem MAGNETIC_SHULKER_BACKPACK_ITEM = registerItemWithBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackItem(ItemRegistries.nonStackable()));
     public static final MagneticFilterLayerBlock MAGNETIC_FILTER_LAYER_BLOCK = register("magnetic_filter_layer", new MagneticFilterLayerBlock(settingCopyNoCollision(Blocks.GLASS_PANE)));
-    public static final GlassBlock MAGNETIC_FILTER_GlASS_BLOCK = register("magnetic_filter_glass",new GlassBlock(settingCopy(Blocks.GLASS)));
+    public static final GlassBlock MAGNETIC_FILTER_GlASS_BLOCK = register("magnetic_filter_glass", new GlassBlock(settingCopy(Blocks.GLASS)));
+    public static final ElectromagneticShuttleBlock ELECTROMAGNETIC_SHUTTLE_BLOCK = register("electromagnetic_shuttle", new ElectromagneticShuttleBlock(settingCopy(Blocks.OBSIDIAN)));
+    public static final BlockEntityType<ElectromagneticShuttleEntity> ELECTROMAGNETIC_SHUTTLE_ENTITY = registerBlockEntity("electromagnetic_shuttle", ElectromagneticShuttleEntity::new, ELECTROMAGNETIC_SHUTTLE_BLOCK);
 
     public static void register() {
         registerCauldronBehavior();

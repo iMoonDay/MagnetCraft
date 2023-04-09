@@ -1,0 +1,13 @@
+{
+	"parent": "magnetcraft:item/electromagnetic_transmitter_on",
+	"display": {
+		"firstperson_righthand": {
+			"rotation": [20, 10, 5],
+			"translation": [-4.5, -0.5, 0]
+		},
+		"firstperson_lefthand": {
+			"rotation": [20, 10, 5],
+			"translation": [-4.5, -0.5, 0]
+		}
+	}
+}

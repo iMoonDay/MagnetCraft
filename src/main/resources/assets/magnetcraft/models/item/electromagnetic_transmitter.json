@@ -2,15 +2,23 @@
   "overrides": [
     {
       "predicate": {
-        "enabled": 0
+        "enabled": 0,
+        "aiming": 0
       },
       "model": "magnetcraft:item/electromagnetic_transmitter_off"
     },
     {
       "predicate": {
-        "enabled": 1
+        "enabled": 1,
+        "aiming": 0
       },
       "model": "magnetcraft:item/electromagnetic_transmitter_on"
+    },
+    {
+      "predicate": {
+        "aiming": 1
+      },
+      "model": "magnetcraft:item/electromagnetic_transmitter_aiming"
     }
   ]
 }

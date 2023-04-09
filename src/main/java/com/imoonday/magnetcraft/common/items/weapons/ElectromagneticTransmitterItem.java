@@ -32,7 +32,8 @@ public class ElectromagneticTransmitterItem extends Item implements Vanishable {
     protected int repairTick = 0;
 
     public static void registerClient() {
-        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_TRANSMITTER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> livingEntity instanceof PlayerEntity player && (player.getItemCooldownManager().isCoolingDown(ItemRegistries.ELECTROMAGNETIC_TRANSMITTER_ITEM) || itemStack.isBroken()) ? 0.0F : 1.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_TRANSMITTER_ITEM, new Identifier("enabled"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.isDamaged() ? 0.0F : 1.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_TRANSMITTER_ITEM, new Identifier("aiming"), (stack, world, entity, seed) -> entity != null && entity.isUsingItem() && entity.getActiveItem() == stack && !cannotUse(entity, stack) ? 1.0f : 0.0f);
     }
 
     public ElectromagneticTransmitterItem(Settings settings) {
@@ -122,11 +123,15 @@ public class ElectromagneticTransmitterItem extends Item implements Vanishable {
             user.playSoundIfNotSilent(SoundEvents.BLOCK_BEACON_DEACTIVATE);
             return TypedActionResult.success(itemStack);
         }
-        if (itemStack.isDamaged() && noBattery(user)) {
+        if (cannotUse(user, itemStack)) {
             return TypedActionResult.fail(itemStack);
         }
         user.setCurrentHand(hand);
         return TypedActionResult.consume(itemStack);
+    }
+
+    protected static boolean cannotUse(LivingEntity user, ItemStack itemStack) {
+        return user instanceof PlayerEntity player ? itemStack.isDamaged() && noBattery(player) : itemStack.isDamaged();
     }
 
     @Override

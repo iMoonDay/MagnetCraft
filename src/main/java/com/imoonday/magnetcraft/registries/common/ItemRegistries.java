@@ -75,10 +75,13 @@ public class ItemRegistries {
     public static final ElectromagneticTransmitterItem ELECTROMAGNETIC_TRANSMITTER_ITEM = register("electromagnetic_transmitter", new ElectromagneticTransmitterItem(nonStackable(100)));
     public static final ElectromagneticGunItem ELECTROMAGNETIC_GUN_ITEM = register("electromagnetic_gun", new ElectromagneticGunItem(nonStackable(100)));
 
-    public static final Item MAGNETIC_BATTERY = registerItem("magnetic_battery",16);
+    public static final Item MAGNETIC_BATTERY = registerItem("magnetic_battery", 16);
 
     //磁扳手
     public static final MagneticWrenchItem MAGNETIC_WRENCH_ITEM = register("magnetic_wrench", new MagneticWrenchItem(settings()));
+
+    //电磁记录仪
+    public static final ElectromagneticRecorderItem ELECTROMAGNETIC_RECORDER_ITEM = register("electromagnetic_recorder", new ElectromagneticRecorderItem(nonStackable(20 * 30)));
 
     //磁铁工具
     public static final SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, settings()));

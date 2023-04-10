@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.registries.common;
 
+import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntity;
 import com.imoonday.magnetcraft.common.entities.bomb.ElectromagneticPulseBombEntity;
 import com.imoonday.magnetcraft.common.entities.golem.MagneticIronGolemEntity;
 import com.imoonday.magnetcraft.common.entities.wrench.MagneticWrenchEntity;
@@ -21,7 +22,8 @@ public class EntityRegistries {
     public static final Item MAGNETIC_IRON_GOLEM_SPAWN_EGG = ItemRegistries.register("magnetic_iron_golem_spawn_egg", (Item) new SpawnEggItem(MAGNETIC_IRON_GOLEM, 10063810, 7643954, ItemRegistries.settings()));
     public static final EntityType<MagneticWrenchEntity> MAGNETIC_WRENCH = register("magnetic_wrench", FabricEntityTypeBuilder.<MagneticWrenchEntity>create(SpawnGroup.MISC, MagneticWrenchEntity::new).dimensions(EntityDimensions.fixed(0.5f, 0.5f)).trackRangeChunks(4).trackedUpdateRate(20).build());
     public static final EntityType<ElectromagneticPulseBombEntity> ELECTROMAGNETIC_PULSE_BOMB = register("electromagnetic_pulse_bomb", FabricEntityTypeBuilder.<ElectromagneticPulseBombEntity>create(SpawnGroup.MISC, ElectromagneticPulseBombEntity::new).dimensions(EntityDimensions.fixed(1.0f, 1.0f)).trackRangeChunks(8).trackedUpdateRate(10).forceTrackedVelocityUpdates(true).build());
-
+    public static final EntityType<ShuttleEntranceEntity> SHUTTLE_ENTRANCE = register("shuttle_entrance", FabricEntityTypeBuilder.<ShuttleEntranceEntity>create(SpawnGroup.MISC, ShuttleEntranceEntity::new).dimensions(EntityDimensions.fixed(1.0f, 2.0f)).trackRangeChunks(4).trackedUpdateRate(10).build());
+    
     @SuppressWarnings("SameParameterValue")
     private static <T extends Entity> EntityType<T> register(String id, EntityType.Builder<T> type) {
         return Registry.register(Registries.ENTITY_TYPE, id(id), type.build(id));

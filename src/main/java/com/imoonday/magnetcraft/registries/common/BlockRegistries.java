@@ -78,8 +78,8 @@ public class BlockRegistries {
     public static final MagneticShulkerBackpackItem MAGNETIC_SHULKER_BACKPACK_ITEM = registerItemWithBlock("magnetic_shulker_backpack", new MagneticShulkerBackpackItem(ItemRegistries.nonStackable()));
     public static final MagneticFilterLayerBlock MAGNETIC_FILTER_LAYER_BLOCK = register("magnetic_filter_layer", new MagneticFilterLayerBlock(settingCopyNoCollision(Blocks.GLASS_PANE)));
     public static final GlassBlock MAGNETIC_FILTER_GlASS_BLOCK = register("magnetic_filter_glass", new GlassBlock(settingCopy(Blocks.GLASS)));
-    public static final ElectromagneticShuttleBlock ELECTROMAGNETIC_SHUTTLE_BLOCK = register("electromagnetic_shuttle", new ElectromagneticShuttleBlock(settingCopy(Blocks.OBSIDIAN)));
-    public static final BlockEntityType<ElectromagneticShuttleEntity> ELECTROMAGNETIC_SHUTTLE_ENTITY = registerBlockEntity("electromagnetic_shuttle", ElectromagneticShuttleEntity::new, ELECTROMAGNETIC_SHUTTLE_BLOCK);
+    public static final ElectromagneticShuttleBaseBlock ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK = register("electromagnetic_shuttle_base", new ElectromagneticShuttleBaseBlock(settingCopy(Blocks.OBSIDIAN)));
+    public static final BlockEntityType<ElectromagneticShuttleBaseEntity> ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY = registerBlockEntity("electromagnetic_shuttle_base", ElectromagneticShuttleBaseEntity::new, ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK);
 
     public static void register() {
         registerCauldronBehavior();

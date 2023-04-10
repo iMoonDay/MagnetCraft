@@ -14,12 +14,12 @@ import net.minecraft.util.math.RotationAxis;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-public class MagneticWrenchEntityRender extends EntityRenderer<MagneticWrenchEntity> {
+public class MagneticWrenchEntityRenderer extends EntityRenderer<MagneticWrenchEntity> {
 
     public static final Identifier TEXTURE = id("textures/entity/magnetic_wrench.png");
     private final MagneticWrenchEntityModel model;
 
-    public MagneticWrenchEntityRender(EntityRendererFactory.Context context) {
+    public MagneticWrenchEntityRenderer(EntityRendererFactory.Context context) {
         super(context);
         this.model = new MagneticWrenchEntityModel(context.getPart(EntityRendererRegistries.MODEL_MAGNETIC_WRENCH_LAYER));
     }

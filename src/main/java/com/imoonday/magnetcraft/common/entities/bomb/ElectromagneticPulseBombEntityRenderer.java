@@ -15,11 +15,11 @@ import org.joml.Matrix4f;
 
 import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
-public class ElectromagneticPulseBombEntityRender extends EntityRenderer<ElectromagneticPulseBombEntity> {
+public class ElectromagneticPulseBombEntityRenderer extends EntityRenderer<ElectromagneticPulseBombEntity> {
 
-    private static final Identifier TEXTURE = id("textures/entity/electromagnetic_pulse_bomb_0.png");
+    private static final Identifier TEXTURE = id("textures/entity/electromagnetic_pulse_bomb/0.png");
 
-    public ElectromagneticPulseBombEntityRender(EntityRendererFactory.Context context) {
+    public ElectromagneticPulseBombEntityRenderer(EntityRendererFactory.Context context) {
         super(context);
     }
 
@@ -37,7 +37,7 @@ public class ElectromagneticPulseBombEntityRender extends EntityRenderer<Electro
         MatrixStack.Entry entry = matrixStack.peek();
         Matrix4f matrix4f = entry.getPositionMatrix();
         Matrix3f matrix3f = entry.getNormalMatrix();
-        String id = "textures/entity/electromagnetic_pulse_bomb_" + getTextRenderer().random.nextBetween(0, 7) + ".png";
+        String id = "textures/entity/electromagnetic_pulse_bomb/" + getTextRenderer().random.nextBetween(0, 7) + ".png";
         RenderLayer layer = RenderLayer.getEntityCutoutNoCull(id(id));
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(layer);
         produceVertex(vertexConsumer, matrix4f, matrix3f, i, 0.0f, 0, 0, 1, entity.isFlash());

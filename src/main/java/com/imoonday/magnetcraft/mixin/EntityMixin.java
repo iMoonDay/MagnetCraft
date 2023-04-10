@@ -83,6 +83,92 @@ public abstract class EntityMixin implements MagnetCraftEntity {
     protected UUID adsorptionEntityId = CreatureMagnetItem.EMPTY_UUID;
     protected BlockPos adsorptionBlockPos = new BlockPos(0, 0, 0);
 
+    protected boolean shuttling;
+    protected ArrayList<Vec3d> route;
+    protected int currentRouteIndex;
+    protected int shuttleCooldown;
+
+    @Override
+    public void shuttle(ArrayList<Vec3d> route) {
+        Entity entity = (Entity) (Object) this;
+        if (entity.getShuttleCooldown() > 0) {
+            return;
+        }
+        entity.setShuttling(true);
+        entity.setRoute(route);
+        entity.setCurrentRouteIndex(0);
+    }
+
+    private void shuttleTick() {
+        Entity entity = (Entity) (Object) this;
+        if (entity.getShuttleCooldown() > 0) {
+            entity.minusShuttleCooldown();
+        }
+        if (!entity.isShuttling()) {
+            return;
+        }
+        int index = entity.getCurrentRouteIndex();
+        if (index >= entity.getRoute().size()) {
+            entity.setShuttling(false);
+            entity.setRoute(new ArrayList<>());
+            entity.setCurrentRouteIndex(0);
+            entity.setShuttleCooldown(3 * 20);
+            return;
+        }
+        entity.refreshPositionAfterTeleport(entity.getRoute().get(index));
+        entity.addCurrentRouteIndex();
+    }
+
+    @Override
+    public boolean isShuttling() {
+        return this.shuttling;
+    }
+
+    @Override
+    public void setShuttling(boolean shuttling) {
+        this.shuttling = shuttling;
+    }
+
+    @Override
+    public ArrayList<Vec3d> getRoute() {
+        return this.route;
+    }
+
+    @Override
+    public void setRoute(ArrayList<Vec3d> route) {
+        this.route = route;
+    }
+
+    @Override
+    public int getCurrentRouteIndex() {
+        return this.currentRouteIndex;
+    }
+
+    @Override
+    public void setCurrentRouteIndex(int currentRouteIndex) {
+        this.currentRouteIndex = currentRouteIndex;
+    }
+
+    @Override
+    public void addCurrentRouteIndex() {
+        this.currentRouteIndex++;
+    }
+
+    @Override
+    public int getShuttleCooldown() {
+        return this.shuttleCooldown;
+    }
+
+    @Override
+    public void setShuttleCooldown(int shuttleCooldown) {
+        this.shuttleCooldown = shuttleCooldown;
+    }
+
+    @Override
+    public void minusShuttleCooldown() {
+        this.shuttleCooldown--;
+    }
+
     @Override
     public void tryAttract() {
         Entity entity = (Entity) (Object) this;
@@ -221,6 +307,7 @@ public abstract class EntityMixin implements MagnetCraftEntity {
         this.adsorptionBlockPos = this.getAdsorptionBlockPos();
         entity.tryAttract();
         CreatureMagnetItem.followingCheck(entity);
+        shuttleTick();
     }
 
     @Override

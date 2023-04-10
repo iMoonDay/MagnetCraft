@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=true": {
+      "model": "magnetcraft:block/electromagnetic_shuttle_base_powered"
+    },
+    "powered=false": {
+      "model": "magnetcraft:block/electromagnetic_shuttle_base"
+    }
+  }
+}

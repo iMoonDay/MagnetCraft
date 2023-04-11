@@ -192,6 +192,9 @@ public class LivingEntityMixin extends EntityMixin {
                 cir.setReturnValue(false);
             }
         }
+        if (entity.isShuttling()) {
+            cir.setReturnValue(false);
+        }
     }
 
     private void attractTick() {

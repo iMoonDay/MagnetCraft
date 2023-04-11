@@ -6,14 +6,10 @@ import net.minecraft.client.model.*;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-
-import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.id;
 
 @Environment(value= EnvType.CLIENT)
 public class MagneticWrenchEntityModel extends Model {
 
-    public static final Identifier TEXTURE = id("textures/entity/magnetic_wrench.png");
     private final ModelPart root;
 
     public MagneticWrenchEntityModel(ModelPart root) {

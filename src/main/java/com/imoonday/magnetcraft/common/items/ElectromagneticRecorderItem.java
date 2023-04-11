@@ -2,7 +2,9 @@ package com.imoonday.magnetcraft.common.items;
 
 import com.imoonday.magnetcraft.common.blocks.entities.ElectromagneticShuttleBaseEntity;
 import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntity;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
@@ -10,20 +12,30 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class ElectromagneticRecorderItem extends Item {
 
+    public static final String RECORDING = "Recording";
+    public static final String POS = "Pos";
+    public static final String X = "x";
+    public static final String Y = "y";
+    public static final String Z = "z";
+    public static final String SOURCE_POS = "SourcePos";
+
     public ElectromagneticRecorderItem(Settings settings) {
         super(settings);
+    }
+
+    public static void registerClient() {
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM, new Identifier("recording"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getOrCreateNbt().getBoolean(RECORDING) ? 1.0F : 0.0F);
     }
 
     @Override
@@ -36,13 +48,12 @@ public class ElectromagneticRecorderItem extends Item {
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
         ItemStack stack = user.getStackInHand(hand);
-        if (!stack.getOrCreateNbt().contains("Recording")) {
+        if (!stack.getOrCreateNbt().contains(RECORDING)) {
             return TypedActionResult.pass(stack);
         }
-        if (user.isSneaking()) {
-            finishRecording(stack, world, user);
+        if (stack.getOrCreateNbt().getBoolean(RECORDING)) {
             if (!world.isClient) {
-                user.sendMessage(Text.literal("已停止记录"));
+                finishRecording(stack, world, user);
             }
             return TypedActionResult.success(stack);
         }
@@ -54,34 +65,26 @@ public class ElectromagneticRecorderItem extends Item {
         if (world.isClient) {
             return;
         }
-        if (!stack.getOrCreateNbt().contains("Recording")) {
-            stack.getOrCreateNbt().putBoolean("Recording", false);
+        NbtCompound nbt = stack.getOrCreateNbt();
+        if (!nbt.contains(RECORDING)) {
+            nbt.putBoolean(RECORDING, false);
         }
-        if (!stack.getOrCreateNbt().contains("Pos")) {
-            stack.getOrCreateNbt().put("Pos", new NbtList());
+        if (!nbt.contains(POS)) {
+            nbt.put(POS, new NbtList());
         }
-        NbtList list = stack.getOrCreateNbt().getList("Pos", NbtElement.COMPOUND_TYPE);
+        NbtList list = nbt.getList(POS, NbtElement.COMPOUND_TYPE);
         stack.setDamage(list.size());
-        if (stack.getOrCreateNbt().getBoolean("Recording")) {
-            if (!selected) {
-                initializeNbt(stack);
-                if (entity instanceof PlayerEntity player) {
-                    player.sendMessage(Text.literal("请手持记录仪以进行记录"), true);
-                    player.getInventory().markDirty();
-                }
-                return;
-            }
-            if (stack.isBroken()) {
+        if (nbt.getBoolean(RECORDING)) {
+            if (stack.isBroken() || !selected) {
                 finishRecording(stack, world, entity);
-                entity.sendMessage(Text.literal("记录结束"));
                 return;
             }
             boolean recorded = false;
             for (NbtElement element : list) {
                 NbtCompound compound = (NbtCompound) element;
-                double x = compound.getDouble("x");
-                double y = compound.getDouble("y");
-                double z = compound.getDouble("z");
+                double x = compound.getDouble(X);
+                double y = compound.getDouble(Y);
+                double z = compound.getDouble(Z);
                 Vec3d pos = new Vec3d(x, y, z);
                 if (pos.equals(entity.getPos())) {
                     recorded = true;
@@ -90,11 +93,11 @@ public class ElectromagneticRecorderItem extends Item {
             }
             if (!recorded) {
                 NbtCompound compound = new NbtCompound();
-                compound.putDouble("x", entity.getX());
-                compound.putDouble("y", entity.getY());
-                compound.putDouble("z", entity.getZ());
+                compound.putDouble(X, entity.getX());
+                compound.putDouble(Y, entity.getY());
+                compound.putDouble(Z, entity.getZ());
                 list.add(compound);
-                stack.getOrCreateNbt().put("Pos", list);
+                nbt.put(POS, list);
                 stack.addDamage(null, 1, false);
             }
             if (entity instanceof PlayerEntity player) {
@@ -104,34 +107,45 @@ public class ElectromagneticRecorderItem extends Item {
     }
 
     private static void finishRecording(ItemStack stack, World world, Entity entity) {
-        stack.getOrCreateNbt().putBoolean("Recording", false);
-        int[] sourcePos = stack.getOrCreateNbt().getIntArray("SourcePos");
-        stack.getOrCreateNbt().remove("SourcePos");
+        stack.getOrCreateNbt().putBoolean(RECORDING, false);
+        int[] sourcePos = stack.getOrCreateNbt().getIntArray(SOURCE_POS);
+        stack.getOrCreateNbt().remove(SOURCE_POS);
         BlockPos pos = new BlockPos(sourcePos[0], sourcePos[1], sourcePos[2]);
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
             base.setConnecting(true);
             ArrayList<Vec3d> route = new ArrayList<>();
-            NbtList list = stack.getOrCreateNbt().getList("Pos", NbtElement.COMPOUND_TYPE);
+            NbtList list = stack.getOrCreateNbt().getList(POS, NbtElement.COMPOUND_TYPE);
             for (NbtElement element : list) {
                 NbtCompound compound = (NbtCompound) element;
-                double x = compound.getDouble("x");
-                double y = compound.getDouble("y");
-                double z = compound.getDouble("z");
+                double x = compound.getDouble(X);
+                double y = compound.getDouble(Y);
+                double z = compound.getDouble(Z);
                 route.add(new Vec3d(x, y, z));
             }
-            Collections.reverse(route);
             base.setRoute(route);
+            entity.shuttleCooldown();
+            stack.getOrCreateNbt().put(POS, new NbtList());
+            NbtCompound compound = (NbtCompound) list.get(Math.max(list.size() - 1, 0));
+            Vec3d end = new Vec3d(compound.getDouble(X), compound.getDouble(Y), compound.getDouble(Z));
+            spawnEntrances(world, pos, end);
         }
-        ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, pos);
-        ShuttleEntranceEntity connetedEntity = new ShuttleEntranceEntity(world, false, pos);
-        sourceEntity.setConnectedEntity(connetedEntity);
-        connetedEntity.setConnectedEntity(sourceEntity);
-        sourceEntity.refreshPositionAfterTeleport(pos.toCenterPos().add(0, 0.25, 0));
-        connetedEntity.refreshPositionAfterTeleport(entity.getPos());
-        world.spawnEntity(sourceEntity);
-        world.spawnEntity(connetedEntity);
-        stack.getOrCreateNbt().put("Pos", new NbtList());
+    }
+
+    private static void spawnEntrances(World world, BlockPos sourcePos, Vec3d endPos) {
+        BlockEntity blockEntity = world.getBlockEntity(sourcePos);
+        if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
+            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, sourcePos);
+            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, false, sourcePos);
+            sourceEntity.setConnectedEntity(connectedEntity);
+            connectedEntity.setConnectedEntity(sourceEntity);
+            sourceEntity.setPosition(sourcePos.toCenterPos().add(0, 0.25, 0));
+            connectedEntity.setPosition(endPos);
+            base.setSourceEntity(sourceEntity);
+            base.setConnectedEntity(connectedEntity);
+            world.spawnEntity(sourceEntity);
+            world.spawnEntity(connectedEntity);
+        }
     }
 
     @Override
@@ -140,8 +154,8 @@ public class ElectromagneticRecorderItem extends Item {
     }
 
     private static void initializeNbt(ItemStack stack) {
-        stack.getOrCreateNbt().putBoolean("Recording", false);
-        stack.getOrCreateNbt().put("Pos", new NbtList());
+        stack.getOrCreateNbt().putBoolean(RECORDING, false);
+        stack.getOrCreateNbt().put(POS, new NbtList());
     }
 
 }

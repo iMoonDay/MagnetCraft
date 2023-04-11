@@ -17,6 +17,13 @@ public interface MagnetCraftEntity {
     default void shuttle(ArrayList<Vec3d> route) {
     }
 
+    default void shuttleCooldown() {
+    }
+
+    default boolean hasShuttleCooldown() {
+        return false;
+    }
+
     default boolean isShuttling() {
         return false;
     }
@@ -31,14 +38,14 @@ public interface MagnetCraftEntity {
     default void setRoute(ArrayList<Vec3d> route) {
     }
 
-    default int getCurrentRouteIndex() {
+    default int getCurrentRouteTick() {
         return 0;
     }
 
-    default void setCurrentRouteIndex(int currentRouteIndex) {
+    default void setCurrentRouteTick(int currentRouteTick) {
     }
 
-    default void addCurrentRouteIndex() {
+    default void addCurrentRouteTick() {
     }
 
     default int getShuttleCooldown() {
@@ -49,6 +56,41 @@ public interface MagnetCraftEntity {
     }
 
     default void minusShuttleCooldown() {
+    }
+
+    default NbtCompound getShuttleData() {
+        return null;
+    }
+
+    default void setShuttleData(NbtCompound shuttleData) {
+    }
+
+    default boolean wasInvisible() {
+        return false;
+    }
+
+    default void setWasInvisible(boolean wasInvisible) {
+    }
+
+    default boolean wasInvulnerable() {
+        return false;
+    }
+
+    default void setWasInvulnerable(boolean wasInvulnerable) {
+    }
+
+    default boolean wasNoClip() {
+        return false;
+    }
+
+    default void setWasNoClip(boolean wasNoClip) {
+    }
+
+    default boolean wasNoGravity() {
+        return false;
+    }
+
+    default void setWasNoGravity(boolean wasNoGravity) {
     }
 
     default void tryAttract() {

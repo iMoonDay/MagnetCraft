@@ -1,10 +1,7 @@
 package com.imoonday.magnetcraft;
 
 import com.imoonday.magnetcraft.common.fluids.MagneticFluid;
-import com.imoonday.magnetcraft.common.items.LargeMagneticSuckerItem;
-import com.imoonday.magnetcraft.common.items.MagnetControllerItem;
-import com.imoonday.magnetcraft.common.items.PortableDemagnetizerItem;
-import com.imoonday.magnetcraft.common.items.SmallMagneticSuckerItem;
+import com.imoonday.magnetcraft.common.items.*;
 import com.imoonday.magnetcraft.common.items.magnets.*;
 import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticGunItem;
 import com.imoonday.magnetcraft.common.items.weapons.ElectromagneticTransmitterItem;
@@ -43,5 +40,6 @@ public class MagnetCraftClient implements ClientModInitializer {
         ElectromagneticTransmitterItem.registerClient();
         ElectromagneticGunItem.registerClient();
         CallbackRegistries.registerClient();
+        ElectromagneticRecorderItem.registerClient();
     }
 }

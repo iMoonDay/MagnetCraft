@@ -1,0 +1,16 @@
+{
+  "overrides": [
+    {
+      "predicate": {
+        "recording": 0
+      },
+      "model": "magnetcraft:item/electromagnetic_recorder_off"
+    },
+    {
+      "predicate": {
+        "recording": 1
+      },
+      "model": "magnetcraft:item/electromagnetic_recorder_on"
+    }
+  ]
+}

@@ -53,7 +53,7 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY, (world1, pos, state1, entity) -> ElectromagneticShuttleBaseEntity.tick(entity));
+        return checkType(type, BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY, (world1, pos, state1, entity) -> ElectromagneticShuttleBaseEntity.tick(world1, entity));
     }
 
     @Override
@@ -83,6 +83,11 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
     }
 
     @Override
+    public void neighborUpdate(BlockState state, World world, BlockPos pos, Block sourceBlock, BlockPos sourcePos, boolean notify) {
+        world.scheduleBlockTick(pos, this, 1);
+    }
+
+    @Override
     public BlockState getStateForNeighborUpdate(BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos) {
         world.scheduleBlockTick(pos, this, 1);
         return state;
@@ -94,6 +99,7 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
             return ActionResult.SUCCESS;
         }
         ItemStack stack = player.getStackInHand(hand);
+        BlockEntity blockEntity = world.getBlockEntity(pos);
         if (stack.isOf(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM)) {
             if (!player.getBlockPos().equals(pos)) {
                 Vec3d center = new Vec3d(pos.toCenterPos().getX(), state.getCollisionShape(world, pos).offset(pos.getX(), pos.getY(), pos.getZ()).getMax(Direction.Axis.Y), pos.toCenterPos().getZ());
@@ -101,9 +107,22 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
             }
             stack.getOrCreateNbt().putBoolean("Recording", true);
             stack.getOrCreateNbt().putIntArray("SourcePos", new int[]{pos.getX(), pos.getY(), pos.getZ()});
+            if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
+                if (base.isConnecting()) {
+                    base.setConnecting(false);
+                    base.clearEntity(world);
+                }
+            }
             return ActionResult.SUCCESS;
         }
-        player.sendMessage(Text.literal("当前绑定坐标: "), true);
+        if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
+            if (base.isConnecting()) {
+                String string = base.getRoute().get(base.getRoute().size() - 1).toString();
+                player.sendMessage(Text.literal("当前绑定坐标: " + string), true);
+            } else {
+                player.sendMessage(Text.literal("当前未绑定坐标"), true);
+            }
+        }
         return ActionResult.SUCCESS;
     }
 

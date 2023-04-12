@@ -533,9 +533,11 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public void setAttracting(boolean attracting) {
-        setAttractDataBooleanValue(ATTRACTING, attracting);
+        setValue(DataType.ATTRACT_DATA, ATTRACTING, attracting);
+//        setAttractDataBooleanValue(ATTRACTING, attracting);
         if (!attracting) {
-            this.attractData.putDouble(ATTRACT_DIS, 0);
+            setValue(DataType.ATTRACT_DATA, ATTRACT_DIS, (double) 0);
+//            this.attractData.putDouble(ATTRACT_DIS, 0);
         }
     }
 
@@ -715,13 +717,6 @@ public class EntityMixin implements MagnetCraftEntity {
         return this.shuttleData.getBoolean(key);
     }
 
-    private boolean getShuttleDataBooleanKeyWithTrue(String key) {
-        if (!this.shuttleData.contains(key)) {
-            setShuttleDataBooleanValue(key, true);
-        }
-        return this.shuttleData.getBoolean(key);
-    }
-
     private void setShuttleDataBooleanValue(String key, boolean value) {
         this.shuttleData.putBoolean(key, value);
     }
@@ -766,11 +761,23 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putInt(key, value);
     }
 
-    private <T extends Comparable<T>> void setValue(NbtCompound data, String key, T value) {
-        if (value instanceof Integer intValue) {
-            data.putInt(key, intValue);
-        } else if (value instanceof Boolean booleanValue) {
+    private <T> void setValue(DataType dataType, String key, T value) {
+        NbtCompound data = switch (dataType) {
+            case ATTRACT_DATA -> this.attractData;
+            case SHUTTLE_DATA -> this.shuttleData;
+        };
+        if (value instanceof Boolean booleanValue) {
             data.putBoolean(key, booleanValue);
+        } else if (value instanceof Integer intValue) {
+            data.putInt(key, intValue);
+        } else if (value instanceof Double doubleValue) {
+            data.putDouble(key, doubleValue);
+        } else if (value instanceof UUID uuidValue) {
+            data.putUuid(key, uuidValue);
+        } else if (value instanceof int[] ints) {
+            data.putIntArray(key, ints);
+        } else if (value instanceof NbtElement element) {
+            data.put(key, element);
         }
     }
 

@@ -264,4 +264,9 @@ public interface MagnetCraftEntity {
     default void setAttractSource(Vec3d pos) {
     }
 
+    enum DataType {
+        ATTRACT_DATA,
+        SHUTTLE_DATA
+    }
+
 }

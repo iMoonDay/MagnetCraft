@@ -93,7 +93,7 @@ public class ElectromagnetItem extends AbstractFilterableItem {
         }
         double dis = ModConfig.getValue().electromagnetTeleportMinDis;
         if (!world.isClient && !player.isCreative()) {
-            stack.addDamage(user.getRandom(), 1, false);
+            stack.addDamage(1);
         }
         Hand hand = user.getActiveHand();
         teleportItems(world, player, dis, hand);

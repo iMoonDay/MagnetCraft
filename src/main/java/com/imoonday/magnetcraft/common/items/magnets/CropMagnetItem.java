@@ -122,48 +122,49 @@ public class CropMagnetItem extends AbstractFilterableItem {
     }
 
     public static int searchCrops(PlayerEntity player, Hand hand) {
+        if (player.world.isClient) {
+            return 0;
+        }
         int count = 0;
-        if (!player.world.isClient) {
-            player.addDamage(hand, 1, false);
-            broken:
-            for (int x = -15; x <= 15; x++) {
-                for (int y = 15; y >= -15; y--) {
-                    for (int z = -15; z <= 15; z++) {
-                        if (player.isBroken(hand)) {
-                            break broken;
+        player.addDamage(hand, 1, false);
+        broken:
+        for (int x = -15; x <= 15; x++) {
+            for (int y = 15; y >= -15; y--) {
+                for (int z = -15; z <= 15; z++) {
+                    if (player.isBroken(hand)) {
+                        break broken;
+                    }
+                    BlockPos pos = player.getBlockPos().add(x, y, z);
+                    BlockState state = player.world.getBlockState(pos);
+                    ServerWorld world = (ServerWorld) player.world;
+                    BlockEntity blockEntity = world.getBlockEntity(pos);
+                    Block block = state.getBlock();
+                    ItemStack stack = player.getStackInHand(hand);
+                    if (block instanceof CropBlock cropBlock && cropBlock.isMature(state)) {
+                        if (state.isOf(Blocks.WHEAT) && !canBreak(stack, Items.WHEAT) || state.isOf(Blocks.CARROTS) && !canBreak(stack, Items.CARROT) || state.isOf(Blocks.POTATOES) && !canBreak(stack, Items.POTATO) || state.isOf(Blocks.BEETROOTS) && !canBreak(stack, Items.BEETROOT_SEEDS)) {
+                            continue;
                         }
-                        BlockPos pos = player.getBlockPos().add(x, y, z);
-                        BlockState state = player.world.getBlockState(pos);
-                        ServerWorld world = (ServerWorld) player.world;
-                        BlockEntity blockEntity = world.getBlockEntity(pos);
-                        Block block = state.getBlock();
-                        ItemStack stack = player.getStackInHand(hand);
-                        if (block instanceof CropBlock cropBlock && cropBlock.isMature(state)) {
-                            if (state.isOf(Blocks.WHEAT) && !canBreak(stack, Items.WHEAT) || state.isOf(Blocks.CARROTS) && !canBreak(stack, Items.CARROT) || state.isOf(Blocks.POTATOES) && !canBreak(stack, Items.POTATO) || state.isOf(Blocks.BEETROOTS) && !canBreak(stack, Items.BEETROOT_SEEDS)) {
-                                continue;
-                            }
-                            count = getCountAfterBreakAndPlant(player, hand, count, pos, state, world, blockEntity, cropBlock);
-                        } else if ((block instanceof MelonBlock && canBreak(stack, Items.MELON_SEEDS)) || (block instanceof PumpkinBlock && canBreak(stack, Items.PUMPKIN_SEEDS))) {
-                            count = getCountAfterBreakBlock(player, hand, count, pos, state, world, blockEntity);
-                        } else if ((block instanceof CaveVinesHeadBlock || block instanceof CaveVinesBodyBlock) && state.get(BERRIES) && canBreak(stack, Items.GLOW_BERRIES)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
-                            world.setBlockState(pos, state.with(BERRIES, false));
-                            count++;
-                            player.addDamage(hand, 1, true);
-                        } else if ((block instanceof SugarCaneBlock && world.getBlockState(pos.down()).isOf(Blocks.SUGAR_CANE) && canBreak(stack, Items.SUGAR_CANE)) || (block instanceof BambooBlock && world.getBlockState(pos.down()).isOf(Blocks.BAMBOO) && canBreak(stack, Items.BAMBOO)) || (block instanceof CactusBlock && world.getBlockState(pos.down()).isOf(Blocks.CACTUS) && canBreak(stack, Items.CACTUS)) || (block instanceof KelpBlock && world.getBlockState(pos.down()).isOf(Blocks.KELP_PLANT)) && canBreak(stack, Items.KELP)) {
-                            count = getCountAfterBreakBlock(player, hand, count, pos, state, world, blockEntity);
-                        } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) > 1 && canBreak(stack, Items.SWEET_BERRIES)) {
-                            Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
-                            world.setBlockState(pos, state.with(AGE_3, 1));
-                            count++;
-                            player.addDamage(hand, 1, true);
-                        } else if (block instanceof NetherWartBlock && state.get(AGE_3) == 3 && canBreak(stack, Items.NETHER_WART)) {
-                            count = getCountAfterBreakBlock(player, hand, count, pos, state, world, blockEntity);
-                            restoreAge(player, pos, state, world, block, AGE_3);
-                        } else if (block instanceof CocoaBlock && state.get(AGE_2) == 2 && canBreak(stack, Items.COCOA_BEANS)) {
-                            count = getCountAfterBreakBlock(player, hand, count, pos, state, world, blockEntity);
-                            restoreAge(player, pos, state, world, block, AGE_2);
-                        }
+                        count = breakAndPlant(player, hand, count, pos, state, world, blockEntity, cropBlock);
+                    } else if ((block instanceof MelonBlock && canBreak(stack, Items.MELON_SEEDS)) || (block instanceof PumpkinBlock && canBreak(stack, Items.PUMPKIN_SEEDS))) {
+                        count = breakBlock(player, hand, count, pos, state, world, blockEntity);
+                    } else if ((block instanceof CaveVinesHeadBlock || block instanceof CaveVinesBodyBlock) && state.get(BERRIES) && canBreak(stack, Items.GLOW_BERRIES)) {
+                        Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
+                        world.setBlockState(pos, state.with(BERRIES, false));
+                        count++;
+                        player.addDamage(hand, 1, true);
+                    } else if ((block instanceof SugarCaneBlock && world.getBlockState(pos.down()).isOf(Blocks.SUGAR_CANE) && canBreak(stack, Items.SUGAR_CANE)) || (block instanceof BambooBlock && world.getBlockState(pos.down()).isOf(Blocks.BAMBOO) && canBreak(stack, Items.BAMBOO)) || (block instanceof CactusBlock && world.getBlockState(pos.down()).isOf(Blocks.CACTUS) && canBreak(stack, Items.CACTUS)) || (block instanceof KelpBlock && world.getBlockState(pos.down()).isOf(Blocks.KELP_PLANT)) && canBreak(stack, Items.KELP)) {
+                        count = breakBlock(player, hand, count, pos, state, world, blockEntity);
+                    } else if (block instanceof SweetBerryBushBlock && state.get(AGE_3) > 1 && canBreak(stack, Items.SWEET_BERRIES)) {
+                        Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
+                        world.setBlockState(pos, state.with(AGE_3, 1));
+                        count++;
+                        player.addDamage(hand, 1, true);
+                    } else if (block instanceof NetherWartBlock && state.get(AGE_3) == 3 && canBreak(stack, Items.NETHER_WART)) {
+                        count = breakBlock(player, hand, count, pos, state, world, blockEntity);
+                        restoreAge(player, pos, state, world, block, AGE_3);
+                    } else if (block instanceof CocoaBlock && state.get(AGE_2) == 2 && canBreak(stack, Items.COCOA_BEANS)) {
+                        count = breakBlock(player, hand, count, pos, state, world, blockEntity);
+                        restoreAge(player, pos, state, world, block, AGE_2);
                     }
                 }
             }
@@ -171,18 +172,18 @@ public class CropMagnetItem extends AbstractFilterableItem {
         return count;
     }
 
-    private static int getCountAfterBreakAndPlant(PlayerEntity player, Hand hand, int count, BlockPos pos, BlockState state, ServerWorld world, BlockEntity blockEntity, CropBlock cropBlock) {
-        boolean alreadyRemoved = false;
+    private static int breakAndPlant(PlayerEntity player, Hand hand, int count, BlockPos pos, BlockState state, ServerWorld world, BlockEntity blockEntity, CropBlock cropBlock) {
+        boolean removed = false;
         for (ItemStack droppedStacks : Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY)) {
             ItemStack seed = cropBlock.getPickStack(world, pos, state);
-            if (droppedStacks.isItemEqual(seed) && !alreadyRemoved) {
+            if (droppedStacks.isItemEqual(seed) && !removed) {
                 droppedStacks.setCount(droppedStacks.getCount() - 1);
-                alreadyRemoved = true;
+                removed = true;
             }
             tryInsertIntoShulkerBox(player, hand, droppedStacks);
         }
         world.breakBlock(pos, false, player);
-        if (alreadyRemoved) {
+        if (removed) {
             world.setBlockState(pos, cropBlock.withAge(0));
         }
         player.addDamage(hand, 1, true);
@@ -191,13 +192,14 @@ public class CropMagnetItem extends AbstractFilterableItem {
 
     private static void restoreAge(PlayerEntity player, BlockPos pos, BlockState state, ServerWorld world, Block block, IntProperty age) {
         ItemStack seed = block.getPickStack(world, pos, state);
-        if (player.getInventory().contains(seed)) {
-            player.getInventory().removeOne(seed);
-            world.setBlockState(pos, state.with(age, 0));
+        if (!player.getInventory().contains(seed)) {
+            return;
         }
+        player.getInventory().removeOne(seed);
+        world.setBlockState(pos, state.with(age, 0));
     }
 
-    private static int getCountAfterBreakBlock(PlayerEntity player, Hand hand, int count, BlockPos pos, BlockState state, ServerWorld world, BlockEntity blockEntity) {
+    private static int breakBlock(PlayerEntity player, Hand hand, int count, BlockPos pos, BlockState state, ServerWorld world, BlockEntity blockEntity) {
         Block.getDroppedStacks(state, world, pos, blockEntity, player, ItemStack.EMPTY).forEach(itemStack -> tryInsertIntoShulkerBox(player, hand, itemStack));
         world.breakBlock(pos, false, player);
         player.addDamage(hand, 1, true);
@@ -205,14 +207,14 @@ public class CropMagnetItem extends AbstractFilterableItem {
     }
 
     public static boolean canBreak(ItemStack stack, Item requiredItem) {
-        if (stack != null && stack.getNbt() != null && stack.getNbt().getBoolean(FILTERABLE)) {
-            String item = Registries.ITEM.getId(requiredItem).toString();
-            NbtList list = stack.getNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
-            boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item));
-            boolean isWhitelist = stack.getNbt().getBoolean(WHITELIST);
-            return (isWhitelist && inList) || (!isWhitelist && !inList);
+        if (stack == null || stack.getNbt() == null || !stack.getNbt().getBoolean(FILTERABLE)) {
+            return true;
         }
-        return true;
+        String item = Registries.ITEM.getId(requiredItem).toString();
+        NbtList list = stack.getNbt().getList(FILTER, NbtElement.COMPOUND_TYPE);
+        boolean inList = list.stream().anyMatch(nbtElement -> nbtElement instanceof NbtCompound && Objects.equals(((NbtCompound) nbtElement).getString("id"), item));
+        boolean isWhitelist = stack.getNbt().getBoolean(WHITELIST);
+        return isWhitelist && inList || !isWhitelist && !inList;
     }
 
     @Override

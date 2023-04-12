@@ -30,6 +30,7 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -50,17 +51,23 @@ public class LivingEntityMixin extends EntityMixin {
     public void addDamage(Hand hand, int damage, boolean unbreaking) {
         LivingEntity user = (LivingEntity) (Object) this;
         ItemStack stack = user.getStackInHand(hand);
-        if ((user instanceof PlayerEntity player && player.getAbilities().creativeMode && damage > 0) || !stack.isDamageable()) {
+        boolean creative = user instanceof PlayerEntity player && player.getAbilities().creativeMode && damage > 0;
+        if (creative || !stack.isDamageable()) {
             return;
         }
+        int value = getNextDamage(damage, stack);
+        if (unbreaking) {
+            stack.damage(value, user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
+        } else {
+            stack.setDamage(value);
+        }
+    }
+
+    private static int getNextDamage(int damage, ItemStack stack) {
         int stackDamage = stack.getDamage();
         int stackMaxDamage = stack.getMaxDamage();
         int finalDamage = stackDamage + damage;
-        if (unbreaking) {
-            stack.damage(finalDamage > stackMaxDamage ? 0 : Math.max(damage, 0), user.getRandom(), user instanceof ServerPlayerEntity serverPlayer ? serverPlayer : null);
-        } else {
-            stack.setDamage(finalDamage > stackMaxDamage ? stackMaxDamage : Math.max(finalDamage, 0));
-        }
+        return MathHelper.clamp(finalDamage, 0, stackMaxDamage);
     }
 
     @Override

@@ -36,6 +36,9 @@ public class ElectromagneticRecorderItem extends Item {
 
     public static void registerClient() {
         ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM, new Identifier("recording"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getOrCreateNbt().getBoolean(RECORDING) ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM, new Identifier("tick1"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getDamage() / 20 % 4 == 1 ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM, new Identifier("tick2"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getDamage() / 20 % 4 == 2 ? 1.0F : 0.0F);
+        ModelPredicateProviderRegistry.register(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM, new Identifier("tick3"), (itemStack, clientWorld, livingEntity, provider) -> itemStack.getDamage() / 20 % 4 == 3 ? 1.0F : 0.0F);
     }
 
     @Override
@@ -52,8 +55,12 @@ public class ElectromagneticRecorderItem extends Item {
             return TypedActionResult.pass(stack);
         }
         if (stack.getOrCreateNbt().getBoolean(RECORDING)) {
-            if (!world.isClient) {
-                finishRecording(stack, world, user);
+            if (user.isSneaking()) {
+                initializeNbt(stack);
+            } else {
+                if (!world.isClient) {
+                    finishRecording(stack, world, user);
+                }
             }
             return TypedActionResult.success(stack);
         }
@@ -98,7 +105,7 @@ public class ElectromagneticRecorderItem extends Item {
                 compound.putDouble(Z, entity.getZ());
                 list.add(compound);
                 nbt.put(POS, list);
-                stack.addDamage(null, 1, false);
+                stack.addDamage(1);
             }
             if (entity instanceof PlayerEntity player) {
                 player.getInventory().markDirty();
@@ -135,8 +142,9 @@ public class ElectromagneticRecorderItem extends Item {
     private static void spawnEntrances(World world, BlockPos sourcePos, Vec3d endPos) {
         BlockEntity blockEntity = world.getBlockEntity(sourcePos);
         if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
-            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, sourcePos);
-            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, false, sourcePos);
+            float uniqueOffset = world.random.nextFloat() + 2.0f;
+            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, sourcePos, uniqueOffset);
+            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, false, sourcePos, uniqueOffset);
             sourceEntity.setConnectedEntity(connectedEntity);
             connectedEntity.setConnectedEntity(sourceEntity);
             sourceEntity.setPosition(sourcePos.toCenterPos().add(0, 0.25, 0));
@@ -156,6 +164,7 @@ public class ElectromagneticRecorderItem extends Item {
     private static void initializeNbt(ItemStack stack) {
         stack.getOrCreateNbt().putBoolean(RECORDING, false);
         stack.getOrCreateNbt().put(POS, new NbtList());
+        stack.getOrCreateNbt().remove(SOURCE_POS);
     }
 
 }

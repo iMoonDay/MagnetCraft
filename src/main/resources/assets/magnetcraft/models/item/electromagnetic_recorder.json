@@ -10,7 +10,28 @@
       "predicate": {
         "recording": 1
       },
-      "model": "magnetcraft:item/electromagnetic_recorder_on"
+      "model": "magnetcraft:item/electromagnetic_recorder_on_0"
+    },
+    {
+      "predicate": {
+        "recording": 1,
+        "tick1": 1
+      },
+      "model": "magnetcraft:item/electromagnetic_recorder_on_1"
+    },
+    {
+      "predicate": {
+        "recording": 1,
+        "tick2": 1
+      },
+      "model": "magnetcraft:item/electromagnetic_recorder_on_2"
+    },
+    {
+      "predicate": {
+        "recording": 1,
+        "tick3": 1
+      },
+      "model": "magnetcraft:item/electromagnetic_recorder_on_3"
     }
   ]
 }

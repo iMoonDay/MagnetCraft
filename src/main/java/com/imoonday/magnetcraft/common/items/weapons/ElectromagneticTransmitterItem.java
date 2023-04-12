@@ -151,7 +151,7 @@ public class ElectromagneticTransmitterItem extends Item implements Vanishable {
             }
             int repairRequiredTick = 3 * 20;
             while (this.repairTick >= repairRequiredTick) {
-                stack.addDamage(world.random, -1, false);
+                stack.addDamage(-1);
                 this.repairTick -= repairRequiredTick;
             }
         }

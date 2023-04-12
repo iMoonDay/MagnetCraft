@@ -36,6 +36,7 @@ public class ElectromagneticPulseBombEntity extends ExplosiveProjectileEntity {
 
     public ElectromagneticPulseBombEntity(EntityType<? extends ExplosiveProjectileEntity> entityType, World world) {
         super(entityType, world);
+        this.setNoGravity(true);
     }
 
     public ElectromagneticPulseBombEntity(World world, LivingEntity user, float speed, boolean explosive, ItemStack userStack) {
@@ -43,7 +44,6 @@ public class ElectromagneticPulseBombEntity extends ExplosiveProjectileEntity {
         this.refreshPositionAndAngles(user.getX(), user.getEyeY(), user.getZ(), user.getYaw(), user.getPitch());
         this.refreshPosition();
         this.setOwner(user);
-        this.setNoGravity(true);
         this.noClip = !explosive;
         this.setVelocity(user, user.getPitch(), user.getYaw(), 0f, speed, 1.0f);
         this.setExplosive(explosive);

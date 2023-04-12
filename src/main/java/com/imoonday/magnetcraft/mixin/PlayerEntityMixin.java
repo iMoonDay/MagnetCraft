@@ -5,12 +5,15 @@ import com.imoonday.magnetcraft.common.items.armors.NetheriteMagneticIronArmorIt
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,6 +21,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.stream.DoubleStream;
 
@@ -131,10 +135,34 @@ public abstract class PlayerEntityMixin extends EntityMixin {
                 int maxTick = 60 * 20;
                 while (hasTick && stack.getNbt().getInt(USED_TICK) >= maxTick) {
                     stack.getOrCreateNbt().putInt(USED_TICK, stack.getOrCreateNbt().getInt(USED_TICK) - maxTick);
-                    stack.addDamage(player.getRandom(), 1, true);
+                    stack.addDamage(1, player.getRandom());
                 }
             }
             player.getInventory().markDirty();
+        }
+    }
+
+    @Inject(method = "interact", at = @At(value = "HEAD"), cancellable = true)
+    public void interact(Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (player.isShuttling()) {
+            cir.setReturnValue(ActionResult.PASS);
+        }
+    }
+
+    @Inject(method = "canBeHitByProjectile", at = @At(value = "HEAD"), cancellable = true)
+    public void canBeHitByProjectile(CallbackInfoReturnable<Boolean> cir) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (player.isShuttling()) {
+            cir.setReturnValue(false);
+        }
+    }
+
+    @Inject(method = "attack", at = @At(value = "HEAD"), cancellable = true)
+    public void attack(Entity target, CallbackInfo ci) {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (player.isShuttling()) {
+            ci.cancel();
         }
     }
 

@@ -29,13 +29,12 @@ public class ShuttleEntranceEntityRenderer extends EntityRenderer<ShuttleEntranc
     public void render(ShuttleEntranceEntity entity, float yaw, float tickDelta, MatrixStack matrixStack, VertexConsumerProvider vertexConsumerProvider, int light) {
         matrixStack.push();
         matrixStack.scale(1.5f, 1.5f, 1.5f);
-        float lerp = MathHelper.lerp(tickDelta, entity.prevYaw, yaw);
-        float v = yaw - entity.prevYaw;
-        if (v > 30) {
-            lerp = 180;
-        } else if (v < -30) {
-            lerp = -180;
+        matrixStack.translate(0, -0.2f, 0);
+        float entityYaw = entity.getYaw();
+        if (entityYaw * entity.prevYaw < 0 && Math.abs(entityYaw - entity.prevYaw) > 180) {
+            entityYaw = entityYaw < 0 ? 180 : -180;
         }
+        float lerp = MathHelper.lerp(tickDelta, entity.prevYaw, entityYaw);
         matrixStack.multiply(RotationAxis.NEGATIVE_Y.rotationDegrees(lerp));
         RenderLayer layer = RenderLayer.getEntityCutoutNoCull(TEXTURE);
         VertexConsumer vertexConsumer = vertexConsumerProvider.getBuffer(layer);

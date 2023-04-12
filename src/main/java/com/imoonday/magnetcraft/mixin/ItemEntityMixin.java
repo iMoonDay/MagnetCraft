@@ -53,7 +53,7 @@ public class ItemEntityMixin extends EntityMixin {
                         int damage = stack.getDamage();
                         int maxDamage = stack.getMaxDamage();
                         if (random.nextBetween(1, maxDamage * 400) <= damage) {
-                            stack.addDamage(random, -maxDamage / 10, false);
+                            stack.addDamage(-maxDamage / 10);
                             mainhandRepair = damage - stack.getDamage();
                             success = true;
                         }
@@ -83,6 +83,14 @@ public class ItemEntityMixin extends EntityMixin {
             return insertStack;
         }
         return false;
+    }
+
+    @Inject(method = "onPlayerCollision", at = @At("HEAD"), cancellable = true)
+    public void checkShuttling(PlayerEntity player, CallbackInfo ci) {
+        ItemEntity entity = (ItemEntity) (Object) this;
+        if (entity.isShuttling()) {
+            ci.cancel();
+        }
     }
 
     @Override

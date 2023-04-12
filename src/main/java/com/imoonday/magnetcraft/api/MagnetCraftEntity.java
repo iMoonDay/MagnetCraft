@@ -93,6 +93,20 @@ public interface MagnetCraftEntity {
     default void setWasNoGravity(boolean wasNoGravity) {
     }
 
+    default boolean wasFlying() {
+        return false;
+    }
+
+    default void setWasFlying(boolean wasFlying) {
+    }
+
+    default boolean wasAllowModifyWorld() {
+        return false;
+    }
+
+    default void setWasAllowModifyWorld(boolean wasAllowModifyWorld) {
+    }
+
     default void tryAttract() {
     }
 

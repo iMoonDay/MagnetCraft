@@ -17,26 +17,17 @@ public class ShuttleEntranceEntityModel extends EntityModel<ShuttleEntranceEntit
         ModelData modelData = new ModelData();
         ModelPartData modelPartData = modelData.getRoot();
         ModelPartData main = modelPartData.addChild("main", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 24.0F, 0.0F));
-        main.addChild("body", ModelPartBuilder.create().uv(6, 7).cuboid(0.0F, -10.0F, 0.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F))
-                .uv(8, 0).cuboid(0.0F, -9.0F, 2.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F))
-                .uv(8, 3).cuboid(0.0F, -9.0F, -2.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F))
-                .uv(12, 0).cuboid(0.0F, -8.0F, -3.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(8, 13).cuboid(0.0F, -8.0F, 4.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(13, 9).cuboid(0.0F, -7.0F, 5.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(10, 10).cuboid(0.0F, -6.0F, 6.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
-                .uv(12, 13).cuboid(0.0F, -7.0F, -4.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(0, 12).cuboid(0.0F, -6.0F, -5.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
-                .uv(0, 0).cuboid(0.0F, -4.0F, -6.0F, 1.0F, 8.0F, 1.0F, new Dilation(0.0F))
-                .uv(13, 2).cuboid(0.0F, 4.0F, -5.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
-                .uv(14, 5).cuboid(0.0F, 6.0F, -4.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(4, 0).cuboid(0.0F, -4.0F, 7.0F, 1.0F, 8.0F, 1.0F, new Dilation(0.0F))
-                .uv(4, 13).cuboid(0.0F, 4.0F, 6.0F, 1.0F, 2.0F, 1.0F, new Dilation(0.0F))
-                .uv(14, 11).cuboid(0.0F, 6.0F, 5.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(0, 15).cuboid(0.0F, 7.0F, -3.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(7, 15).cuboid(0.0F, 7.0F, 4.0F, 1.0F, 1.0F, 1.0F, new Dilation(0.0F))
-                .uv(0, 9).cuboid(0.0F, 8.0F, -2.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F))
-                .uv(4, 10).cuboid(0.0F, 8.0F, 2.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F))
-                .uv(10, 6).cuboid(0.0F, 9.0F, 0.0F, 1.0F, 1.0F, 2.0F, new Dilation(0.0F)), ModelTransform.of(-1.0F, -10.0F, 0.0F, 0.0F, 1.5708F, 0.0F));
+        main.addChild("body", ModelPartBuilder.create().uv(6, -2).cuboid(-1.0F, -10.0F, -1.0F, 0.0F, 1.0F, 2.0F, new Dilation(0.0F))
+                .uv(4, -5).cuboid(-1.0F, -9.0F, -3.0F, 0.0F, 1.0F, 6.0F, new Dilation(0.0F))
+                .uv(3, -6).cuboid(-1.0F, -8.0F, -4.0F, 0.0F, 1.0F, 8.0F, new Dilation(0.0F))
+                .uv(2, -7).cuboid(-1.0F, -7.0F, -5.0F, 0.0F, 1.0F, 10.0F, new Dilation(0.0F))
+                .uv(1, -8).cuboid(-1.0F, -6.0F, -6.0F, 0.0F, 2.0F, 12.0F, new Dilation(0.0F))
+                .uv(0, -8).cuboid(-1.0F, -4.0F, -7.0F, 0.0F, 8.0F, 14.0F, new Dilation(0.0F))
+                .uv(1, 2).cuboid(-1.0F, 4.0F, -6.0F, 0.0F, 2.0F, 12.0F, new Dilation(0.0F))
+                .uv(2, 6).cuboid(-1.0F, 6.0F, -5.0F, 0.0F, 1.0F, 10.0F, new Dilation(0.0F))
+                .uv(3, 9).cuboid(-1.0F, 7.0F, -4.0F, 0.0F, 1.0F, 8.0F, new Dilation(0.0F))
+                .uv(4, 12).cuboid(-1.0F, 8.0F, -3.0F, 0.0F, 1.0F, 6.0F, new Dilation(0.0F))
+                .uv(6, 17).cuboid(-1.0F, 9.0F, -1.0F, 0.0F, 1.0F, 2.0F, new Dilation(0.0F)), ModelTransform.of(0.0F, -10.0F, -1.0F, 0.0F, 1.5708F, 0.0F));
         return TexturedModelData.of(modelData, 32, 32);
     }
 

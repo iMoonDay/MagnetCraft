@@ -7,7 +7,11 @@ import org.jetbrains.annotations.Nullable;
 @SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
 public interface MagnetCraftItemStack {
 
-    default void addDamage(@Nullable Random random, int damage, boolean unbreaking) {}
+    default void addDamage(int damage, @Nullable Random random) {
+    }
+
+    default void addDamage(int damage) {
+    }
 
     default boolean isBroken() {
         return false;

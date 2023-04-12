@@ -99,7 +99,7 @@ public abstract class AbstractMagneticSuckerItem extends Item {
         world.playSound(player, pos, blockSoundGroup.getBreakSound(), SoundCategory.BLOCKS, (blockSoundGroup.getVolume() + 1.0f) / 2.0f, blockSoundGroup.getPitch() * 0.8f);
         world.emitGameEvent(GameEvent.BLOCK_DESTROY, pos, GameEvent.Emitter.of(player, state));
         if (!player.getAbilities().creativeMode) {
-            stack.addDamage(player.getRandom(), 1, true);
+            stack.addDamage(1, player.getRandom());
         }
     }
 

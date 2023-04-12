@@ -6,21 +6,23 @@ import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.EntityRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.command.argument.EntityAnchorArgumentType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 public class ShuttleEntranceEntity extends Entity {
 
@@ -29,7 +31,8 @@ public class ShuttleEntranceEntity extends Entity {
     public static final String SOURCE_POS = "SourcePos";
     protected UUID connectedEntity;
     protected boolean isSource;
-    protected BlockPos sourcePos;
+    private float uniqueOffset;
+    protected static final TrackedData<BlockPos> SOURCE_POS_DATA = DataTracker.registerData(ShuttleEntranceEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
 
     public ShuttleEntranceEntity(EntityType<?> type, World world) {
         super(type, world);
@@ -39,51 +42,42 @@ public class ShuttleEntranceEntity extends Entity {
         this.setPitch(0);
     }
 
-    public ShuttleEntranceEntity(World world, boolean isSource, BlockPos sourcePos) {
+    public ShuttleEntranceEntity(World world, boolean isSource, BlockPos sourcePos, float uniqueOffset) {
         this(EntityRegistries.SHUTTLE_ENTRANCE, world);
         this.isSource = isSource;
-        this.sourcePos = sourcePos;
+        this.uniqueOffset = uniqueOffset;
+        this.setSourcePos(sourcePos);
     }
 
     @Override
     public void tick() {
-        if (this.world instanceof ServerWorld serverWorld) {
-            Entity entity = serverWorld.getEntity(this.connectedEntity);
-            if (entity == null) {
-                this.discard();
-                return;
-            }
-        }
-        if (this.sourcePos == null) {
+        if (world.isClient) {
             return;
         }
-        BlockEntity blockEntity = world.getBlockEntity(this.sourcePos);
-        if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity base)) {
-            return;
-        }
-        if (!base.isConnecting()) {
+        ShuttleEntranceEntity connectedEntity = getConnectedEntity();
+        if (connectedEntity == null) {
             this.discard();
             return;
         }
-        BlockState state = this.world.getBlockState(this.sourcePos);
-        if (state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK)) {
-            Boolean powered = state.get(ElectromagneticShuttleBaseBlock.POWERED);
-            this.setInvisible(!powered);
-            if (!powered) {
-                return;
-            }
-        } else {
-            if (this.world instanceof ServerWorld serverWorld) {
-                Entity entity = serverWorld.getEntity(this.connectedEntity);
-                if (entity != null) {
-                    entity.discard();
-                }
-                this.discard();
-            }
+        BlockEntity blockEntity = world.getBlockEntity(this.getSourcePos());
+        if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity base) || !base.isConnecting()) {
+            this.discard();
+            return;
         }
-        PlayerEntity player = this.world.getClosestPlayer(this, 15);
-        if (player != null) {
-            Vec3d pos = EntityAnchorArgumentType.EntityAnchor.EYES.positionAt(this);
+        if (!this.isSourcePowered()) {
+            return;
+        }
+        BlockState state = this.world.getBlockState(this.getSourcePos());
+        if (state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK)) {
+            this.setInvisible(!this.isSourcePowered());
+        } else {
+            connectedEntity.discard();
+            this.discard();
+            return;
+        }
+        PlayerEntity player = Optional.ofNullable(this.world.getClosestPlayer(this.isSource ? this : connectedEntity, 5)).orElse(this.world.getClosestPlayer(isSource ? connectedEntity : this, 5));
+        if (player != null && !player.getBoundingBox().intersects(this.getBoundingBox())) {
+            Vec3d pos = this.getPos();
             double offsetX = player.getX() - pos.x;
             double offsetZ = player.getZ() - pos.z;
             double rotation = MathHelper.atan2(offsetZ, offsetX);
@@ -93,12 +87,23 @@ public class ShuttleEntranceEntity extends Entity {
             while (rotation < (float) (-Math.PI)) {
                 rotation += (float) Math.PI * 2;
             }
-            this.setYaw(MathHelper.lerp(1, this.getYaw(), MathHelper.wrapDegrees((float) (rotation * 57.2957763671875) - 90.0f)));
+            float newYaw = MathHelper.wrapDegrees((float) (rotation * 57.2957763671875) - 90.0f);
+            float yaw = MathHelper.lerp(1, this.getYaw(), newYaw);
+            this.setYaw(yaw);
         } else {
-            float uniqueOffset = -2.8647919f;
-            float nextYaw = this.getYaw() + uniqueOffset;
+            float connectedUniqueOffset = connectedEntity.getUniqueOffset();
+            if (this.uniqueOffset == 0 || this.uniqueOffset != connectedUniqueOffset) {
+                if (connectedUniqueOffset != 0) {
+                    this.uniqueOffset = connectedUniqueOffset;
+                } else {
+                    float newUniqueOffset = world.random.nextFloat() + 2.0f;
+                    this.uniqueOffset = newUniqueOffset;
+                    connectedEntity.setUniqueOffset(newUniqueOffset);
+                }
+            }
+            float nextYaw = this.getYaw() + this.uniqueOffset;
             while (nextYaw > 180) {
-                nextYaw -=360;
+                nextYaw -= 360;
             }
             while (nextYaw < -180) {
                 nextYaw = 360 - nextYaw;
@@ -110,15 +115,51 @@ public class ShuttleEntranceEntity extends Entity {
             if (entity.isShuttling()) {
                 continue;
             }
+            if (entity instanceof PlayerEntity playerEntity) {
+                if (playerEntity.isSneaking()) {
+                    continue;
+                }
+            }
             onCollide(entity);
         }
+    }
+
+    @Nullable
+    public ShuttleEntranceEntity getConnectedEntity() {
+        if (world instanceof ServerWorld serverWorld) {
+            Entity entity = serverWorld.getEntity(this.connectedEntity);
+            return entity instanceof ShuttleEntranceEntity entrance ? entrance : null;
+        }
+        return null;
+    }
+
+    @Override
+    public void remove(RemovalReason reason) {
+        super.remove(reason);
+        this.world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.VOICE);
+    }
+
+    public BlockPos getSourcePos() {
+        return this.dataTracker.get(SOURCE_POS_DATA);
+    }
+
+    public void setSourcePos(BlockPos pos) {
+        this.dataTracker.set(SOURCE_POS_DATA, pos);
+    }
+
+    public float getUniqueOffset() {
+        return this.uniqueOffset;
+    }
+
+    public void setUniqueOffset(float uniqueOffset) {
+        this.uniqueOffset = uniqueOffset;
     }
 
     private void onCollide(Entity entity) {
         if (this.connectedEntity == null) {
             return;
         }
-        BlockEntity blockEntity = this.world.getBlockEntity(sourcePos);
+        BlockEntity blockEntity = this.world.getBlockEntity(getSourcePos());
         if (blockEntity == null) {
             return;
         }
@@ -140,6 +181,7 @@ public class ShuttleEntranceEntity extends Entity {
 
     @Override
     protected void initDataTracker() {
+        this.dataTracker.startTracking(SOURCE_POS_DATA, BlockPos.ORIGIN);
     }
 
     @Override
@@ -152,7 +194,7 @@ public class ShuttleEntranceEntity extends Entity {
         }
         if (nbt.contains(SOURCE_POS) && nbt.getIntArray(SOURCE_POS).length == 3) {
             int[] pos = nbt.getIntArray(SOURCE_POS);
-            this.sourcePos = new BlockPos(pos[0], pos[1], pos[2]);
+            this.setSourcePos(new BlockPos(pos[0], pos[1], pos[2]));
         }
     }
 
@@ -160,12 +202,20 @@ public class ShuttleEntranceEntity extends Entity {
     protected void writeCustomDataToNbt(NbtCompound nbt) {
         nbt.putUuid(CONNECTED_ENTITY, this.connectedEntity);
         nbt.putBoolean(SOURCE, this.isSource);
-        nbt.putIntArray(SOURCE_POS, new int[]{this.sourcePos.getX(), this.sourcePos.getY(), this.sourcePos.getZ()});
+        nbt.putIntArray(SOURCE_POS, new int[]{this.getSourcePos().getX(), this.getSourcePos().getY(), this.getSourcePos().getZ()});
     }
 
     @Override
     public boolean shouldRender(double distance) {
-        return true;
+        return isSourcePowered();
+    }
+
+    private boolean isSourcePowered() {
+        BlockState state = this.world.getBlockState(this.getSourcePos());
+        if (state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK)) {
+            return state.get(ElectromagneticShuttleBaseBlock.POWERED);
+        }
+        return false;
     }
 
     @Override

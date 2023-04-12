@@ -12,7 +12,10 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtList;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
 import net.minecraft.state.property.Properties;
@@ -33,6 +36,9 @@ import org.jetbrains.annotations.Nullable;
 public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
 
     public static final BooleanProperty POWERED = Properties.POWERED;
+    public static final String RECORDING = "Recording";
+    public static final String SOURCE_POS = "SourcePos";
+    public static final String POS = "Pos";
 
     public ElectromagneticShuttleBaseBlock(Settings settings) {
         super(settings);
@@ -101,12 +107,22 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
         ItemStack stack = player.getStackInHand(hand);
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (stack.isOf(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM)) {
-            if (!player.getBlockPos().equals(pos)) {
-                Vec3d center = new Vec3d(pos.toCenterPos().getX(), state.getCollisionShape(world, pos).offset(pos.getX(), pos.getY(), pos.getZ()).getMax(Direction.Axis.Y), pos.toCenterPos().getZ());
-                player.refreshPositionAfterTeleport(center);
+            Vec3d center = new Vec3d(pos.toCenterPos().getX(), state.getCollisionShape(world, pos).offset(pos.getX(), pos.getY(), pos.getZ()).getMax(Direction.Axis.Y), pos.toCenterPos().getZ());
+            if (!player.getPos().isInRange(center, 2)) {
+                player.sendMessage(Text.literal("距离过远"), true);
+                return ActionResult.SUCCESS;
             }
-            stack.getOrCreateNbt().putBoolean("Recording", true);
-            stack.getOrCreateNbt().putIntArray("SourcePos", new int[]{pos.getX(), pos.getY(), pos.getZ()});
+            if (!state.get(POWERED)) {
+                player.sendMessage(Text.literal("未充能"), true);
+                return ActionResult.SUCCESS;
+            }
+            if (!player.getPos().equals(center)) {
+                player.refreshPositionAfterTeleport(center);
+                player.world.playSound(null, player.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.VOICE, 1, 1);
+            }
+            stack.getOrCreateNbt().putBoolean(RECORDING, true);
+            stack.getOrCreateNbt().putIntArray(SOURCE_POS, new int[]{pos.getX(), pos.getY(), pos.getZ()});
+            stack.getOrCreateNbt().put(POS, new NbtList());
             if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
                 if (base.isConnecting()) {
                     base.setConnecting(false);

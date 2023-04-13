@@ -7,17 +7,12 @@ import com.imoonday.magnetcraft.registries.common.EnchantmentRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerAbilities;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -73,8 +68,8 @@ public abstract class PlayerEntityMixin extends EntityMixin {
                 player.setLevitationTick(++tick);
                 player.addExhaustion(player.isSprinting() ? 0.2f / 20 : 0.05f / 20);
                 if (!isClient) {
-                    int usedTick = stack.getNbt() != null && stack.getNbt().contains("UsedTick") ? stack.getOrCreateNbt().getInt("UsedTick") : 0;
-                    stack.getOrCreateNbt().putInt("UsedTick", ++usedTick);
+                    int usedTick = stack.getNbt() != null && stack.getNbt().contains(USED_TICK) ? stack.getOrCreateNbt().getInt(USED_TICK) : 0;
+                    stack.getOrCreateNbt().putInt(USED_TICK, ++usedTick);
                     player.sendMessage(Text.literal(displayTime.toString()), true);
                 }
             }
@@ -101,15 +96,7 @@ public abstract class PlayerEntityMixin extends EntityMixin {
         player.getItemCooldownManager().set(stack.getItem(), cooldown * percent / 100);
     }
 
-    @Shadow
-    public abstract ItemStack getEquippedStack(EquipmentSlot slot);
-
-    @Shadow
-    @Final
-    private PlayerAbilities abilities;
-
-
-    @Inject(method = "tick", at = @At(value = "TAIL"))
+    @Inject(method = "tick", at = @At("TAIL"))
     public void tick(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player != null) {
@@ -142,24 +129,29 @@ public abstract class PlayerEntityMixin extends EntityMixin {
         }
     }
 
-    @Inject(method = "interact", at = @At(value = "HEAD"), cancellable = true)
-    public void interact(Entity entity, Hand hand, CallbackInfoReturnable<ActionResult> cir) {
-        PlayerEntity player = (PlayerEntity) (Object) this;
-        if (player.isShuttling()) {
-            cir.setReturnValue(ActionResult.PASS);
-        }
+    @Inject(method = "canBeHitByProjectile", at = @At("HEAD"), cancellable = true)
+    public void canBeHitByProjectile(CallbackInfoReturnable<Boolean> cir) {
+        shuttingReturn(cir);
     }
 
-    @Inject(method = "canBeHitByProjectile", at = @At(value = "HEAD"), cancellable = true)
-    public void canBeHitByProjectile(CallbackInfoReturnable<Boolean> cir) {
+    @Inject(method = "attack", at = @At("HEAD"), cancellable = true)
+    public void attack(Entity target, CallbackInfo ci) {
+        shuttingCancel(ci);
+    }
+
+    @Inject(method = "canTakeDamage", at = @At("HEAD"), cancellable = true)
+    public void canTakeDamage(CallbackInfoReturnable<Boolean> cir) {
+        shuttingReturn(cir);
+    }
+
+    private void shuttingReturn(CallbackInfoReturnable<Boolean> cir) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player.isShuttling()) {
             cir.setReturnValue(false);
         }
     }
 
-    @Inject(method = "attack", at = @At(value = "HEAD"), cancellable = true)
-    public void attack(Entity target, CallbackInfo ci) {
+    private void shuttingCancel(CallbackInfo ci) {
         PlayerEntity player = (PlayerEntity) (Object) this;
         if (player.isShuttling()) {
             ci.cancel();

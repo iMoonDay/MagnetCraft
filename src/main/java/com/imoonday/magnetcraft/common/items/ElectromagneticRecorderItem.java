@@ -12,10 +12,14 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -142,17 +146,22 @@ public class ElectromagneticRecorderItem extends Item {
     private static void spawnEntrances(World world, BlockPos sourcePos, Vec3d endPos) {
         BlockEntity blockEntity = world.getBlockEntity(sourcePos);
         if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
+            Vec3d startPos = sourcePos.toCenterPos().add(0, 0.25, 0);
             float uniqueOffset = world.random.nextFloat() + 2.0f;
-            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, sourcePos, uniqueOffset);
-            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, false, sourcePos, uniqueOffset);
+            ((ServerWorld) world).getChunkManager().setChunkForced(new ChunkPos(BlockPos.ofFloored(startPos)), true);
+            ((ServerWorld) world).getChunkManager().setChunkForced(new ChunkPos(BlockPos.ofFloored(endPos)), true);
+            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, sourcePos, endPos, uniqueOffset);
+            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, false, sourcePos, startPos, uniqueOffset);
+            sourceEntity.setPosition(startPos);
+            connectedEntity.setPosition(endPos);
             sourceEntity.setConnectedEntity(connectedEntity);
             connectedEntity.setConnectedEntity(sourceEntity);
-            sourceEntity.setPosition(sourcePos.toCenterPos().add(0, 0.25, 0));
-            connectedEntity.setPosition(endPos);
             base.setSourceEntity(sourceEntity);
             base.setConnectedEntity(connectedEntity);
             world.spawnEntity(sourceEntity);
             world.spawnEntity(connectedEntity);
+            world.playSound(null, sourceEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
+            world.playSound(null, connectedEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
         }
     }
 

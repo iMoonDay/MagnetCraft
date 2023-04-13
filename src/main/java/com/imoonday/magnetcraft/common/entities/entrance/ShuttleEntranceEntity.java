@@ -17,6 +17,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -30,6 +31,7 @@ public class ShuttleEntranceEntity extends Entity {
     public static final String SOURCE = "Source";
     public static final String SOURCE_POS = "SourcePos";
     protected UUID connectedEntity;
+    protected Vec3d connectedPos;
     protected boolean isSource;
     private float uniqueOffset;
     protected static final TrackedData<BlockPos> SOURCE_POS_DATA = DataTracker.registerData(ShuttleEntranceEntity.class, TrackedDataHandlerRegistry.BLOCK_POS);
@@ -42,11 +44,12 @@ public class ShuttleEntranceEntity extends Entity {
         this.setPitch(0);
     }
 
-    public ShuttleEntranceEntity(World world, boolean isSource, BlockPos sourcePos, float uniqueOffset) {
+    public ShuttleEntranceEntity(World world, boolean isSource, BlockPos sourcePos, Vec3d connectedPos, float uniqueOffset) {
         this(EntityRegistries.SHUTTLE_ENTRANCE, world);
         this.isSource = isSource;
         this.uniqueOffset = uniqueOffset;
         this.setSourcePos(sourcePos);
+        this.connectedPos = connectedPos;
     }
 
     @Override
@@ -54,20 +57,32 @@ public class ShuttleEntranceEntity extends Entity {
         if (world.isClient) {
             return;
         }
+        if (this.connectedPos == null) {
+            this.discard();
+            return;
+        }
+        if (!world.isChunkLoaded(BlockPos.ofFloored(this.connectedPos))) {
+            return;
+        }
         ShuttleEntranceEntity connectedEntity = getConnectedEntity();
         if (connectedEntity == null) {
             this.discard();
             return;
         }
-        BlockEntity blockEntity = world.getBlockEntity(this.getSourcePos());
-        if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity base) || !base.isConnecting()) {
+        ElectromagneticShuttleBaseEntity blockEntity = getSourceBlockEntity();
+        if (blockEntity == null || !blockEntity.isConnecting()) {
+            this.discard();
+            return;
+        }
+        UUID baseEntity = this.isSource ? blockEntity.getSourceEntity() : blockEntity.getConnectedEntity();
+        if (!baseEntity.equals(this.getUuid())) {
             this.discard();
             return;
         }
         if (!this.isSourcePowered()) {
             return;
         }
-        BlockState state = this.world.getBlockState(this.getSourcePos());
+        BlockState state = getSourceBlockState();
         if (state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK)) {
             this.setInvisible(!this.isSourcePowered());
         } else {
@@ -125,17 +140,36 @@ public class ShuttleEntranceEntity extends Entity {
     }
 
     @Nullable
-    public ShuttleEntranceEntity getConnectedEntity() {
-        if (world instanceof ServerWorld serverWorld) {
-            Entity entity = serverWorld.getEntity(this.connectedEntity);
-            return entity instanceof ShuttleEntranceEntity entrance ? entrance : null;
+    private ElectromagneticShuttleBaseEntity getSourceBlockEntity() {
+        BlockEntity blockEntity = world.getBlockEntity(this.getSourcePos());
+        if (blockEntity instanceof ElectromagneticShuttleBaseEntity entity) {
+            return entity;
         }
         return null;
+    }
+
+    @Nullable
+    public ShuttleEntranceEntity getConnectedEntity() {
+//        if (this.connectedPos == null) {
+//            return null;
+//        }
+//        List<ShuttleEntranceEntity> list = world.getEntitiesByType(TypeFilter.instanceOf(ShuttleEntranceEntity.class), Box.from(this.connectedPos).expand(5), entrance -> entrance.getUuid().equals(this.connectedEntity));
+//        if (list.isEmpty()) {
+//            return null;
+//        }
+//        return list.get(0);
+        //强加载 -> 获取 -> 卸载
+        return ((ServerWorld)world).getEntity(this.connectedEntity) instanceof ShuttleEntranceEntity entity ? entity : null;
     }
 
     @Override
     public void remove(RemovalReason reason) {
         super.remove(reason);
+        ElectromagneticShuttleBaseEntity entity = this.getSourceBlockEntity();
+        if (entity != null) {
+            entity.setConnecting(false);
+        }
+        ((ServerWorld) world).getChunkManager().setChunkForced(new ChunkPos(this.getBlockPos()), false);
         this.world.playSound(null, this.getBlockPos(), SoundEvents.BLOCK_GLASS_BREAK, SoundCategory.VOICE);
     }
 
@@ -159,20 +193,18 @@ public class ShuttleEntranceEntity extends Entity {
         if (this.connectedEntity == null) {
             return;
         }
-        BlockEntity blockEntity = this.world.getBlockEntity(getSourcePos());
+        ElectromagneticShuttleBaseEntity blockEntity = this.getSourceBlockEntity();
         if (blockEntity == null) {
             return;
         }
-        if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
-            if (!base.isConnecting()) {
-                return;
-            }
-            ArrayList<Vec3d> route = new ArrayList<>(base.getRoute());
-            if (!this.isSource) {
-                Collections.reverse(route);
-            }
-            entity.shuttle(route);
+        if (!blockEntity.isConnecting()) {
+            return;
         }
+        ArrayList<Vec3d> route = new ArrayList<>(blockEntity.getRoute());
+        if (!this.isSource) {
+            Collections.reverse(route);
+        }
+        entity.shuttle(route);
     }
 
     public void setConnectedEntity(ShuttleEntranceEntity entity) {
@@ -207,15 +239,19 @@ public class ShuttleEntranceEntity extends Entity {
 
     @Override
     public boolean shouldRender(double distance) {
-        return isSourcePowered();
+        return !this.isInvisible();
     }
 
     private boolean isSourcePowered() {
-        BlockState state = this.world.getBlockState(this.getSourcePos());
+        BlockState state = getSourceBlockState();
         if (state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK)) {
             return state.get(ElectromagneticShuttleBaseBlock.POWERED);
         }
         return false;
+    }
+
+    private BlockState getSourceBlockState() {
+        return this.world.getBlockState(this.getSourcePos());
     }
 
     @Override

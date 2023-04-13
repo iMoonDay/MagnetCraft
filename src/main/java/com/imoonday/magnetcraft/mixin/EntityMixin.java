@@ -3,7 +3,6 @@ package com.imoonday.magnetcraft.mixin;
 import com.imoonday.magnetcraft.api.MagnetCraftEntity;
 import com.imoonday.magnetcraft.common.blocks.entities.AttractSensorEntity;
 import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntity;
-import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.common.tags.BlockTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.EffectRegistries;
@@ -45,8 +44,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import static com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem.EMPTY_UUID;
+import static com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem.followingCheck;
+
 @Mixin(Entity.class)
-public class EntityMixin implements MagnetCraftEntity {
+public abstract class EntityMixin implements MagnetCraftEntity {
 
     private static final String WHITELIST = "Whitelist";
     private static final String TAG = "tag";
@@ -85,15 +87,13 @@ public class EntityMixin implements MagnetCraftEntity {
     private static final String INVULNERABLE = "Invulnerable";
     private static final String NO_CLIP = "NoClip";
     private static final String NO_GRAVITY = "NoGravity";
-    private static final String FLYING = "Flying";
-    private static final String ALLOW_MODIFY_WORLD = "AllowModifyWorld";
     private static final int SHUTTLE_COOLDOWN = 20;
 
     protected NbtCompound attractData = new NbtCompound();
     protected double attractDis = 0;
     protected boolean isAttracting = false;
     protected boolean enable = true;
-    protected UUID attractOwner = CreatureMagnetItem.EMPTY_UUID;
+    protected UUID attractOwner = EMPTY_UUID;
     protected boolean isFollowing = false;
     protected boolean ignoreFallDamage = false;
     protected boolean magneticLevitationMode = true;
@@ -101,8 +101,8 @@ public class EntityMixin implements MagnetCraftEntity {
     protected boolean automaticLevitation = false;
     protected boolean isAdsorbedByEntity = false;
     protected boolean isAdsorbedByBlock = false;
-    protected UUID adsorptionEntityId = CreatureMagnetItem.EMPTY_UUID;
-    protected BlockPos adsorptionBlockPos = new BlockPos(0, 0, 0);
+    protected UUID adsorptionEntityId = EMPTY_UUID;
+    protected BlockPos adsorptionBlockPos = BlockPos.ORIGIN;
 
     protected NbtCompound shuttleData = new NbtCompound();
     protected boolean shuttling = false;
@@ -113,8 +113,6 @@ public class EntityMixin implements MagnetCraftEntity {
     protected boolean wasInvulnerable = false;
     protected boolean wasNoClip = false;
     protected boolean wasNoGravity = false;
-    protected boolean wasFlying = false;
-    protected boolean wasAllowModifyWorld = false;
 
     @Override
     public void shuttle(ArrayList<Vec3d> route) {
@@ -129,8 +127,6 @@ public class EntityMixin implements MagnetCraftEntity {
         entity.setWasInvulnerable(entity.isInvulnerable());
         entity.setWasNoClip(entity.noClip);
         entity.setWasNoGravity(entity.hasNoGravity());
-        entity.setWasFlying(entity instanceof PlayerEntity player && player.getAbilities().flying);
-        entity.setWasAllowModifyWorld(entity instanceof PlayerEntity player && player.getAbilities().allowModifyWorld);
         entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.VOICE, 1, 1);
     }
 
@@ -160,15 +156,10 @@ public class EntityMixin implements MagnetCraftEntity {
                         StatusEffectInstance statusEffectInstance = statusEffects.get(statusEffect);
                         if (statusEffectInstance != null) {
                             StatusEffect type = statusEffectInstance.getEffectType();
-                            System.out.println(statusEffectInstance.getDuration());
                             if (statusEffectInstance.getDuration() <= 21) {
                                 livingEntity.removeStatusEffect(type);
                             }
                         }
-                    }
-                    if (livingEntity instanceof PlayerEntity player) {
-                        player.getAbilities().flying = player.wasFlying();
-                        player.getAbilities().allowModifyWorld = player.wasAllowModifyWorld();
                     }
                 }
                 entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.VOICE, 1, 1);
@@ -182,10 +173,6 @@ public class EntityMixin implements MagnetCraftEntity {
             if (entity instanceof LivingEntity livingEntity) {
                 livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 21, 0, false, false, false));
                 livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 21, 0, false, false, false));
-                if (livingEntity instanceof PlayerEntity player) {
-                    player.getAbilities().flying = true;
-                    player.getAbilities().allowModifyWorld = false;
-                }
             }
             entity.refreshPositionAfterTeleport(entity.getRoute().get(tick));
             entity.addCurrentRouteTick();
@@ -207,12 +194,12 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public boolean isShuttling() {
-        return getShuttleDataBooleanKey(SHUTTLING);
+        return getBoolean(this.shuttleData, SHUTTLING, false);
     }
 
     @Override
     public void setShuttling(boolean shuttling) {
-        setShuttleDataBooleanValue(SHUTTLING, shuttling);
+        this.shuttleData.putBoolean(SHUTTLING, shuttling);
     }
 
     @Override
@@ -248,32 +235,34 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public int getCurrentRouteTick() {
-        return getShuttleDataIntKey(TICK);
+        return getInt(this.shuttleData, TICK);
     }
 
     @Override
     public void setCurrentRouteTick(int currentRouteTick) {
-        setShuttleDataIntValue(TICK, currentRouteTick);
+        this.shuttleData.putInt(TICK, currentRouteTick);
     }
 
     @Override
     public void addCurrentRouteTick() {
-        setShuttleDataIntValue(TICK, ++this.currentRouteTick);
+        int value = ++this.currentRouteTick;
+        this.shuttleData.putInt(TICK, value);
     }
 
     @Override
     public int getShuttleCooldown() {
-        return getShuttleDataIntKey(COOLDOWN);
+        return getInt(this.shuttleData, COOLDOWN);
     }
 
     @Override
     public void setShuttleCooldown(int shuttleCooldown) {
-        setShuttleDataIntValue(COOLDOWN, shuttleCooldown);
+        this.shuttleData.putInt(COOLDOWN, shuttleCooldown);
     }
 
     @Override
     public void minusShuttleCooldown() {
-        setShuttleDataIntValue(COOLDOWN, --this.shuttleCooldown);
+        int value = --this.shuttleCooldown;
+        this.shuttleData.putInt(COOLDOWN, value);
     }
 
     @Override
@@ -291,62 +280,42 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public boolean wasInvisible() {
-        return getShuttleDataBooleanKey(INVISIBLE);
+        return getBoolean(this.shuttleData, INVISIBLE, false);
     }
 
     @Override
     public void setWasInvisible(boolean wasInvisible) {
-        setShuttleDataBooleanValue(INVISIBLE, wasInvisible);
+        this.shuttleData.putBoolean(INVISIBLE, wasInvisible);
     }
 
     @Override
     public boolean wasInvulnerable() {
-        return getShuttleDataBooleanKey(INVULNERABLE);
+        return getBoolean(this.shuttleData, INVULNERABLE, false);
     }
 
     @Override
     public void setWasInvulnerable(boolean wasInvulnerable) {
-        setShuttleDataBooleanValue(INVULNERABLE, wasInvulnerable);
+        this.shuttleData.putBoolean(INVULNERABLE, wasInvulnerable);
     }
 
     @Override
     public boolean wasNoClip() {
-        return getShuttleDataBooleanKey(NO_CLIP);
+        return getBoolean(this.shuttleData, NO_CLIP, false);
     }
 
     @Override
     public void setWasNoClip(boolean wasNoClip) {
-        setShuttleDataBooleanValue(NO_CLIP, wasNoClip);
+        this.shuttleData.putBoolean(NO_CLIP, wasNoClip);
     }
 
     @Override
     public boolean wasNoGravity() {
-        return getShuttleDataBooleanKey(NO_GRAVITY);
+        return getBoolean(this.shuttleData, NO_GRAVITY, false);
     }
 
     @Override
     public void setWasNoGravity(boolean wasNoGravity) {
-        setShuttleDataBooleanValue(NO_GRAVITY, wasNoGravity);
-    }
-
-    @Override
-    public boolean wasFlying() {
-        return getShuttleDataBooleanKey(FLYING);
-    }
-
-    @Override
-    public void setWasFlying(boolean wasFlying) {
-        setShuttleDataBooleanValue(FLYING, wasFlying);
-    }
-
-    @Override
-    public boolean wasAllowModifyWorld() {
-        return getShuttleDataBooleanKey(ALLOW_MODIFY_WORLD);
-    }
-
-    @Override
-    public void setWasAllowModifyWorld(boolean wasAllowModifyWorld) {
-        setShuttleDataBooleanValue(ALLOW_MODIFY_WORLD, wasAllowModifyWorld);
+        this.shuttleData.putBoolean(NO_GRAVITY, wasNoGravity);
     }
 
     @Override
@@ -495,7 +464,7 @@ public class EntityMixin implements MagnetCraftEntity {
         this.wasNoClip = this.wasNoClip();
         this.wasNoGravity = this.wasNoGravity();
         entity.tryAttract();
-        CreatureMagnetItem.followingCheck(entity);
+        followingCheck(entity);
         shuttleTick();
     }
 
@@ -528,41 +497,37 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public boolean isAttracting() {
-        return getAttractDataBooleanKey(ATTRACTING);
+        return getBoolean(this.attractData, ATTRACTING, false);
     }
 
     @Override
     public void setAttracting(boolean attracting) {
-        setValue(DataType.ATTRACT_DATA, ATTRACTING, attracting);
-//        setAttractDataBooleanValue(ATTRACTING, attracting);
+        this.attractData.putBoolean(ATTRACTING, attracting);
         if (!attracting) {
-            setValue(DataType.ATTRACT_DATA, ATTRACT_DIS, (double) 0);
-//            this.attractData.putDouble(ATTRACT_DIS, 0);
+            this.attractData.putDouble(ATTRACT_DIS, 0);
         }
     }
 
     @Override
     public void setAttracting(boolean attracting, double dis) {
         setAttracting(attracting);
-        this.attractData.putDouble(ATTRACT_DIS, attracting ? dis : 0);
+        double value = attracting ? dis : 0;
+        this.attractData.putDouble(ATTRACT_DIS, value);
     }
 
     @Override
     public boolean getEnable() {
-        return getAttractDataBooleanKeyWithTrue(ENABLE);
+        return getBoolean(this.attractData, ENABLE, true);
     }
 
     @Override
     public void setEnable(boolean enable) {
-        setAttractDataBooleanValue(ENABLE, enable);
+        this.attractData.putBoolean(ENABLE, enable);
     }
 
     @Override
     public UUID getAttractOwner() {
-        if (!this.attractData.contains(ATTRACT_OWNER)) {
-            this.attractData.putUuid(ATTRACT_OWNER, CreatureMagnetItem.EMPTY_UUID);
-        }
-        return this.attractData.getUuid(ATTRACT_OWNER);
+        return getUuid(this.attractData, ATTRACT_OWNER);
     }
 
     @Override
@@ -594,32 +559,32 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public boolean isFollowing() {
-        return getAttractDataBooleanKey(FOLLOWING);
+        return getBoolean(this.attractData, FOLLOWING, false);
     }
 
     @Override
     public void setFollowing(boolean following) {
-        setAttractDataBooleanValue(FOLLOWING, following);
+        this.attractData.putBoolean(FOLLOWING, following);
     }
 
     @Override
     public boolean ignoreFallDamage() {
-        return getAttractDataBooleanKey(IGNORE_FALL_DAMAGE);
+        return getBoolean(this.attractData, IGNORE_FALL_DAMAGE, false);
     }
 
     @Override
     public void setIgnoreFallDamage(boolean ignoreFallDamage) {
-        setAttractDataBooleanValue(IGNORE_FALL_DAMAGE, ignoreFallDamage);
+        this.attractData.putBoolean(IGNORE_FALL_DAMAGE, ignoreFallDamage);
     }
 
     @Override
     public boolean getMagneticLevitationMode() {
-        return getAttractDataBooleanKeyWithTrue(MAGNETIC_LEVITATION_MODE);
+        return getBoolean(this.attractData, MAGNETIC_LEVITATION_MODE, true);
     }
 
     @Override
     public void setMagneticLevitationMode(boolean mode) {
-        setAttractDataBooleanValue(MAGNETIC_LEVITATION_MODE, mode);
+        this.attractData.putBoolean(MAGNETIC_LEVITATION_MODE, mode);
     }
 
     @Override
@@ -637,50 +602,47 @@ public class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public boolean getAutomaticLevitation() {
-        return getAttractDataBooleanKeyWithTrue(AUTOMATIC_LEVITATION);
+        return getBoolean(this.attractData, AUTOMATIC_LEVITATION, true);
     }
 
     @Override
     public void setAutomaticLevitation(boolean enable) {
-        setAttractDataBooleanValue(AUTOMATIC_LEVITATION, enable);
+        this.attractData.putBoolean(AUTOMATIC_LEVITATION, enable);
     }
 
     @Override
     public boolean isAdsorbedByEntity() {
-        return getAttractDataBooleanKey(ADSORBED_BY_ENTITY) && !this.isAdsorbedByBlock();
+        return getBoolean(this.shuttleData, ADSORBED_BY_ENTITY, false) && !this.isAdsorbedByBlock();
     }
 
     @Override
     public void setAdsorbedByEntity(boolean adsorbed) {
-        setAttractDataBooleanValue(ADSORBED_BY_ENTITY, adsorbed);
+        this.attractData.putBoolean(ADSORBED_BY_ENTITY, adsorbed);
         if (adsorbed) {
             this.setAdsorbedByBlock(false);
         } else {
-            this.setAdsorptionEntityId(CreatureMagnetItem.EMPTY_UUID, true);
+            this.setAdsorptionEntityId(EMPTY_UUID, true);
         }
     }
 
     @Override
     public boolean isAdsorbedByBlock() {
-        return getAttractDataBooleanKey(ADSORBED_BY_BLOCK) && !this.isAdsorbedByEntity();
+        return getBoolean(this.shuttleData, ADSORBED_BY_BLOCK, false) && !this.isAdsorbedByEntity();
     }
 
     @Override
     public void setAdsorbedByBlock(boolean adsorbed) {
-        setAttractDataBooleanValue(ADSORBED_BY_BLOCK, adsorbed);
+        this.attractData.putBoolean(ADSORBED_BY_BLOCK, adsorbed);
         if (adsorbed) {
             this.setAdsorbedByEntity(false);
         } else {
-            this.setAdsorptionBlockPos(new BlockPos(0, 0, 0), true);
+            this.setAdsorptionBlockPos(BlockPos.ORIGIN, true);
         }
     }
 
     @Override
     public UUID getAdsorptionEntityId() {
-        if (!this.attractData.contains(ADSORPTION_ENTITY_ID)) {
-            this.attractData.putUuid(ADSORPTION_ENTITY_ID, CreatureMagnetItem.EMPTY_UUID);
-        }
-        return this.attractData.getUuid(ADSORPTION_ENTITY_ID);
+        return getUuid(this.attractData, ADSORPTION_ENTITY_ID);
     }
 
     @Override
@@ -710,108 +672,103 @@ public class EntityMixin implements MagnetCraftEntity {
         this.attractData.putIntArray(ADSORPTION_BLOCK_POS, new int[]{pos.getX(), pos.getY(), pos.getZ()});
     }
 
-    private boolean getShuttleDataBooleanKey(String key) {
-        if (!this.shuttleData.contains(key)) {
-            setShuttleDataBooleanValue(key, false);
+    private static boolean getBoolean(NbtCompound data, String key, boolean defaultValue) {
+        if (!data.contains(key)) {
+            data.putBoolean(key, defaultValue);
         }
-        return this.shuttleData.getBoolean(key);
+        return data.getBoolean(key);
     }
 
-    private void setShuttleDataBooleanValue(String key, boolean value) {
-        this.shuttleData.putBoolean(key, value);
-    }
-
-    private int getShuttleDataIntKey(String key) {
-        if (!this.shuttleData.contains(key)) {
-            setShuttleDataIntValue(key, 0);
+    private static int getInt(NbtCompound data, String key) {
+        if (!data.contains(key)) {
+            data.putInt(key, 0);
         }
-        return this.shuttleData.getInt(key);
+        return data.getInt(key);
     }
 
-    private void setShuttleDataIntValue(String key, int value) {
-        this.shuttleData.putInt(key, value);
-    }
-
-    private boolean getAttractDataBooleanKey(String key) {
-        if (!this.attractData.contains(key)) {
-            setShuttleDataBooleanValue(key, false);
+    private static UUID getUuid(NbtCompound data, String key) {
+        if (!data.contains(key)) {
+            data.putUuid(key, EMPTY_UUID);
         }
-        return this.attractData.getBoolean(key);
-    }
-
-    private boolean getAttractDataBooleanKeyWithTrue(String key) {
-        if (!this.attractData.contains(key)) {
-            setShuttleDataBooleanValue(key, true);
-        }
-        return this.attractData.getBoolean(key);
-    }
-
-    private void setAttractDataBooleanValue(String key, boolean value) {
-        this.attractData.putBoolean(key, value);
-    }
-
-    private int getAttractDataIntKey(String key) {
-        if (!this.attractData.contains(key)) {
-            setShuttleDataIntValue(key, 0);
-        }
-        return this.attractData.getInt(key);
-    }
-
-    private void setAttractDataIntValue(String key, int value) {
-        this.attractData.putInt(key, value);
-    }
-
-    private <T> void setValue(DataType dataType, String key, T value) {
-        NbtCompound data = switch (dataType) {
-            case ATTRACT_DATA -> this.attractData;
-            case SHUTTLE_DATA -> this.shuttleData;
-        };
-        if (value instanceof Boolean booleanValue) {
-            data.putBoolean(key, booleanValue);
-        } else if (value instanceof Integer intValue) {
-            data.putInt(key, intValue);
-        } else if (value instanceof Double doubleValue) {
-            data.putDouble(key, doubleValue);
-        } else if (value instanceof UUID uuidValue) {
-            data.putUuid(key, uuidValue);
-        } else if (value instanceof int[] ints) {
-            data.putIntArray(key, ints);
-        } else if (value instanceof NbtElement element) {
-            data.put(key, element);
-        }
+        return data.getUuid(key);
     }
 
     @Inject(method = "writeNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;writeCustomDataToNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     public void writePocketsDataToNbt(NbtCompound nbt, CallbackInfoReturnable<NbtCompound> cir) {
-        this.attractData.putDouble(ATTRACT_DIS, this.getAttractDis());
-        this.attractData.putBoolean(ATTRACTING, this.isAttracting() && this.canAttract());
-        this.attractData.putBoolean(ENABLE, this.getEnable());
-        this.attractData.putUuid(ATTRACT_OWNER, this.getAttractOwner());
-        this.attractData.putBoolean(FOLLOWING, this.isFollowing());
-        this.attractData.putBoolean(IGNORE_FALL_DAMAGE, this.ignoreFallDamage());
-        this.attractData.putBoolean(MAGNETIC_LEVITATION_MODE, this.getMagneticLevitationMode());
-        this.attractData.putInt(LEVITATION_TICK, this.getLevitationTick());
-        this.attractData.putBoolean(AUTOMATIC_LEVITATION, this.getAutomaticLevitation());
-        this.attractData.putBoolean(ADSORBED_BY_ENTITY, this.isAdsorbedByEntity());
-        this.attractData.putBoolean(ADSORBED_BY_BLOCK, this.isAdsorbedByBlock());
-        this.attractData.putUuid(ADSORPTION_ENTITY_ID, this.getAdsorptionEntityId());
-        this.attractData.putIntArray(ADSORPTION_BLOCK_POS, new int[]{this.getAdsorptionBlockPos().getX(), this.getAdsorptionBlockPos().getY(), this.getAdsorptionBlockPos().getZ()});
-        nbt.put(ATTRACT_DATA, this.attractData);
-        setShuttleDataBooleanValue(SHUTTLING, this.isShuttling());
-        this.shuttleData.put(ROUTE, asNbtList(this.getRoute()));
-        setShuttleDataIntValue(TICK, this.getCurrentRouteTick());
-        setShuttleDataIntValue(COOLDOWN, this.getShuttleCooldown());
-        setShuttleDataBooleanValue(INVISIBLE, this.wasInvisible());
-        setShuttleDataBooleanValue(INVULNERABLE, this.wasInvulnerable());
-        setShuttleDataBooleanValue(NO_CLIP, this.wasNoClip());
-        setShuttleDataBooleanValue(NO_GRAVITY, this.wasNoGravity());
-        setShuttleDataBooleanValue(FLYING, this.wasFlying());
-        setShuttleDataBooleanValue(ALLOW_MODIFY_WORLD, this.wasAllowModifyWorld());
-        nbt.put(SHUTTLE_DATA, this.shuttleData);
+        writeAttractDataToNbt(nbt);
+        writeShuttleDataToNbt(nbt);
+    }
+
+    private void writeShuttleDataToNbt(NbtCompound nbt) {
+        NbtCompound data = this.shuttleData;
+        data.putBoolean(SHUTTLING, this.isShuttling());
+        data.put(ROUTE, asNbtList(this.getRoute()));
+        data.putInt(TICK, this.getCurrentRouteTick());
+        data.putInt(COOLDOWN, this.getShuttleCooldown());
+        data.putBoolean(INVISIBLE, this.wasInvisible());
+        data.putBoolean(INVULNERABLE, this.wasInvulnerable());
+        data.putBoolean(NO_CLIP, this.wasNoClip());
+        data.putBoolean(NO_GRAVITY, this.wasNoGravity());
+        nbt.put(SHUTTLE_DATA, data);
+    }
+
+    private void writeAttractDataToNbt(NbtCompound nbt) {
+        NbtCompound data = this.attractData;
+        data.putDouble(ATTRACT_DIS, this.getAttractDis());
+        data.putBoolean(ATTRACTING, this.isAttracting() && this.canAttract());
+        data.putBoolean(ENABLE, this.getEnable());
+        data.putUuid(ATTRACT_OWNER, this.getAttractOwner());
+        data.putBoolean(FOLLOWING, this.isFollowing());
+        data.putBoolean(IGNORE_FALL_DAMAGE, this.ignoreFallDamage());
+        data.putBoolean(MAGNETIC_LEVITATION_MODE, this.getMagneticLevitationMode());
+        data.putInt(LEVITATION_TICK, this.getLevitationTick());
+        data.putBoolean(AUTOMATIC_LEVITATION, this.getAutomaticLevitation());
+        data.putBoolean(ADSORBED_BY_ENTITY, this.isAdsorbedByEntity());
+        data.putBoolean(ADSORBED_BY_BLOCK, this.isAdsorbedByBlock());
+        data.putUuid(ADSORPTION_ENTITY_ID, this.getAdsorptionEntityId());
+        BlockPos pos = this.getAdsorptionBlockPos();
+        data.putIntArray(ADSORPTION_BLOCK_POS, new int[]{pos.getX(), pos.getY(), pos.getZ()});
+        nbt.put(ATTRACT_DATA, data);
     }
 
     @Inject(method = "readNbt", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;readCustomDataFromNbt(Lnet/minecraft/nbt/NbtCompound;)V", shift = At.Shift.AFTER))
     public void readPocketsDataFromNbt(NbtCompound nbt, CallbackInfo ci) {
+        readAttractDataFromNbt(nbt);
+        readShuttleDataFromNbt(nbt);
+    }
+
+    private void readShuttleDataFromNbt(NbtCompound nbt) {
+        if (nbt.contains(SHUTTLE_DATA)) {
+            NbtCompound data = nbt.getCompound(SHUTTLE_DATA);
+            this.shuttleData = data;
+            if (data.contains(SHUTTLING)) {
+                this.shuttling = data.getBoolean(SHUTTLING);
+            }
+            if (data.contains(ROUTE)) {
+                this.route = asArrayList(data);
+            }
+            if (data.contains(TICK)) {
+                this.currentRouteTick = data.getInt(TICK);
+            }
+            if (data.contains(COOLDOWN)) {
+                this.shuttleCooldown = data.getInt(COOLDOWN);
+            }
+            if (data.contains(INVISIBLE)) {
+                this.wasInvisible = data.getBoolean(INVISIBLE);
+            }
+            if (data.contains(INVULNERABLE)) {
+                this.wasInvulnerable = data.getBoolean(INVULNERABLE);
+            }
+            if (data.contains(NO_CLIP)) {
+                this.wasNoClip = data.getBoolean(NO_CLIP);
+            }
+            if (data.contains(NO_GRAVITY)) {
+                this.wasNoGravity = data.getBoolean(NO_GRAVITY);
+            }
+        }
+    }
+
+    private void readAttractDataFromNbt(NbtCompound nbt) {
         if (nbt.contains(ATTRACT_DATA)) {
             NbtCompound data = nbt.getCompound(ATTRACT_DATA);
             this.attractData = data;
@@ -852,41 +809,8 @@ public class EntityMixin implements MagnetCraftEntity {
                 this.adsorptionEntityId = data.getUuid(ADSORPTION_ENTITY_ID);
             }
             if (data.contains(ADSORPTION_BLOCK_POS) && data.getIntArray(ADSORPTION_BLOCK_POS).length == 3) {
-                this.adsorptionBlockPos = new BlockPos(data.getIntArray(ADSORPTION_BLOCK_POS)[0], data.getIntArray(ADSORPTION_BLOCK_POS)[1], data.getIntArray(ADSORPTION_BLOCK_POS)[2]);
-            }
-        }
-        if (nbt.contains(SHUTTLE_DATA)) {
-            NbtCompound data = nbt.getCompound(SHUTTLE_DATA);
-            this.shuttleData = data;
-            if (data.contains(SHUTTLING)) {
-                this.shuttling = data.getBoolean(SHUTTLING);
-            }
-            if (data.contains(ROUTE)) {
-                this.route = asArrayList(data);
-            }
-            if (data.contains(TICK)) {
-                this.currentRouteTick = data.getInt(TICK);
-            }
-            if (data.contains(COOLDOWN)) {
-                this.shuttleCooldown = data.getInt(COOLDOWN);
-            }
-            if (data.contains(INVISIBLE)) {
-                this.wasInvisible = data.getBoolean(INVISIBLE);
-            }
-            if (data.contains(INVULNERABLE)) {
-                this.wasInvulnerable = data.getBoolean(INVULNERABLE);
-            }
-            if (data.contains(NO_CLIP)) {
-                this.wasNoClip = data.getBoolean(NO_CLIP);
-            }
-            if (data.contains(NO_GRAVITY)) {
-                this.wasNoGravity = data.getBoolean(NO_GRAVITY);
-            }
-            if (data.contains(FLYING)) {
-                this.wasFlying = data.getBoolean(FLYING);
-            }
-            if (data.contains(ALLOW_MODIFY_WORLD)) {
-                this.wasAllowModifyWorld = data.getBoolean(ALLOW_MODIFY_WORLD);
+                int[] ints = data.getIntArray(ADSORPTION_BLOCK_POS);
+                this.adsorptionBlockPos = new BlockPos(ints[0], ints[1], ints[2]);
             }
         }
     }

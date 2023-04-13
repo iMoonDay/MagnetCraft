@@ -1,7 +1,6 @@
 package com.imoonday.magnetcraft.common.blocks.entities;
 
 import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntity;
-import com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import me.shedaniel.cloth.clothconfig.shadowed.blue.endless.jankson.annotation.Nullable;
 import net.minecraft.block.BlockState;
@@ -21,6 +20,8 @@ import net.minecraft.world.World;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import static com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem.EMPTY_UUID;
+
 public class ElectromagneticShuttleBaseEntity extends BlockEntity {
 
     public static final String CONNECTING = "Connecting";
@@ -32,33 +33,23 @@ public class ElectromagneticShuttleBaseEntity extends BlockEntity {
     public static final String CONNECTED_ENTITY = "ConnectedEntity";
     private boolean connecting = false;
     private ArrayList<Vec3d> route = new ArrayList<>();
-    private UUID sourceEntity = CreatureMagnetItem.EMPTY_UUID;
-    private UUID connectedEntity = CreatureMagnetItem.EMPTY_UUID;
+    private UUID sourceEntity = EMPTY_UUID;
+    private UUID connectedEntity = EMPTY_UUID;
 
     public ElectromagneticShuttleBaseEntity(BlockPos pos, BlockState state) {
         super(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY, pos, state);
     }
 
-    public static void tick(World world, ElectromagneticShuttleBaseEntity entity) {
-        if (entity.connecting) {
-            if (world instanceof ServerWorld serverWorld) {
-                Entity sourceEntity = serverWorld.getEntity(entity.getSourceEntity());
-                Entity connectedEntity = serverWorld.getEntity(entity.getConnectedEntity());
-                if (sourceEntity == null || connectedEntity == null) {
-                    entity.setConnecting(false);
-                    if (sourceEntity != null) {
-                        sourceEntity.discard();
-                    } else if (connectedEntity != null) {
-                        connectedEntity.discard();
-                    }
-                }
-            }
-        }
+    public static void tick(ElectromagneticShuttleBaseEntity entity) {
         if (!entity.connecting) {
-            entity.setRoute(new ArrayList<>());
-            entity.setSourceEntity(CreatureMagnetItem.EMPTY_UUID);
-            entity.setConnectedEntity(CreatureMagnetItem.EMPTY_UUID);
+            initialize(entity);
         }
+    }
+
+    private static void initialize(ElectromagneticShuttleBaseEntity entity) {
+        entity.setRoute(new ArrayList<>());
+        entity.setSourceEntity(EMPTY_UUID);
+        entity.setConnectedEntity(EMPTY_UUID);
     }
 
     @Override

@@ -59,7 +59,7 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
-        return checkType(type, BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY, (world1, pos, state1, entity) -> ElectromagneticShuttleBaseEntity.tick(entity));
+        return checkType(type, BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY, (world1, pos, state1, entity) -> ElectromagneticShuttleBaseEntity.tick(world1, entity));
     }
 
     @Override
@@ -126,7 +126,7 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
             if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
                 if (base.isConnecting()) {
                     base.setConnecting(false);
-                    base.clearEntity(world);
+                    base.clearEntity((ServerWorld) world);
                 }
             }
             return ActionResult.SUCCESS;

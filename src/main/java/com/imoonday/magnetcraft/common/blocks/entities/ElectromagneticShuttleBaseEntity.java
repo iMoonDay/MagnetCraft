@@ -14,6 +14,7 @@ import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -35,12 +36,32 @@ public class ElectromagneticShuttleBaseEntity extends BlockEntity {
     private ArrayList<Vec3d> route = new ArrayList<>();
     private UUID sourceEntity = EMPTY_UUID;
     private UUID connectedEntity = EMPTY_UUID;
+    private Vec3d sourcePos;
+    private Vec3d connectedPos;
 
     public ElectromagneticShuttleBaseEntity(BlockPos pos, BlockState state) {
         super(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_ENTITY, pos, state);
     }
 
-    public static void tick(ElectromagneticShuttleBaseEntity entity) {
+    public static void tick(World world, ElectromagneticShuttleBaseEntity entity) {
+        if (entity.connecting && world instanceof ServerWorld serverWorld) {
+            Entity connectedEntity = serverWorld.getEntity(entity.getConnectedEntity());
+            Entity sourceEntity = serverWorld.getEntity(entity.getSourceEntity());
+            if (sourceEntity == null || connectedEntity == null) {
+                if (entity.sourcePos == null || entity.connectedPos == null) {
+                    entity.clearEntity(serverWorld);
+                    entity.setConnecting(false);
+                }
+                serverWorld.getChunkManager().setChunkForced(new ChunkPos(BlockPos.ofFloored(entity.sourcePos)), true);
+                serverWorld.getChunkManager().setChunkForced(new ChunkPos(BlockPos.ofFloored(entity.connectedPos)), true);
+                connectedEntity = serverWorld.getEntity(entity.getConnectedEntity());
+                sourceEntity = serverWorld.getEntity(entity.getSourceEntity());
+                if (sourceEntity == null || connectedEntity == null) {
+                    entity.clearEntity(serverWorld);
+                    entity.setConnecting(false);
+                }
+            }
+        }
         if (!entity.connecting) {
             initialize(entity);
         }
@@ -120,6 +141,7 @@ public class ElectromagneticShuttleBaseEntity extends BlockEntity {
 
     public void setSourceEntity(ShuttleEntranceEntity sourceEntity) {
         this.sourceEntity = sourceEntity.getUuid();
+        this.sourcePos = sourceEntity.getPos();
     }
 
     public UUID getConnectedEntity() {
@@ -132,18 +154,17 @@ public class ElectromagneticShuttleBaseEntity extends BlockEntity {
 
     public void setConnectedEntity(ShuttleEntranceEntity connectedEntity) {
         this.connectedEntity = connectedEntity.getUuid();
+        this.connectedPos = connectedEntity.getPos();
     }
 
-    public void clearEntity(World world) {
-        if (world instanceof ServerWorld serverWorld) {
-            Entity sourceEntity = serverWorld.getEntity(this.sourceEntity);
-            Entity connectedEntity = serverWorld.getEntity(this.connectedEntity);
-            if (sourceEntity != null) {
-                sourceEntity.discard();
-            }
-            if (connectedEntity != null) {
-                connectedEntity.discard();
-            }
+    public void clearEntity(ServerWorld world) {
+        Entity sourceEntity = world.getEntity(this.sourceEntity);
+        Entity connectedEntity = world.getEntity(this.connectedEntity);
+        if (sourceEntity != null) {
+            sourceEntity.discard();
+        }
+        if (connectedEntity != null) {
+            connectedEntity.discard();
         }
     }
 

@@ -12,14 +12,12 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -71,49 +69,21 @@ public class ElectromagneticRecorderItem extends Item {
         return TypedActionResult.pass(stack);
     }
 
-    @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (world.isClient) {
-            return;
-        }
-        NbtCompound nbt = stack.getOrCreateNbt();
-        if (!nbt.contains(RECORDING)) {
-            nbt.putBoolean(RECORDING, false);
-        }
-        if (!nbt.contains(POS)) {
-            nbt.put(POS, new NbtList());
-        }
-        NbtList list = nbt.getList(POS, NbtElement.COMPOUND_TYPE);
-        stack.setDamage(list.size());
-        if (nbt.getBoolean(RECORDING)) {
-            if (stack.isBroken() || !selected) {
-                finishRecording(stack, world, entity);
-                return;
-            }
-            boolean recorded = false;
-            for (NbtElement element : list) {
-                NbtCompound compound = (NbtCompound) element;
-                double x = compound.getDouble(X);
-                double y = compound.getDouble(Y);
-                double z = compound.getDouble(Z);
-                Vec3d pos = new Vec3d(x, y, z);
-                if (pos.equals(entity.getPos())) {
-                    recorded = true;
-                    break;
-                }
-            }
-            if (!recorded) {
-                NbtCompound compound = new NbtCompound();
-                compound.putDouble(X, entity.getX());
-                compound.putDouble(Y, entity.getY());
-                compound.putDouble(Z, entity.getZ());
-                list.add(compound);
-                nbt.put(POS, list);
-                stack.addDamage(1);
-            }
-            if (entity instanceof PlayerEntity player) {
-                player.getInventory().markDirty();
-            }
+    private static void spawnEntrances(World world, BlockPos sourcePos, Vec3d endPos) {
+        BlockEntity blockEntity = world.getBlockEntity(sourcePos);
+        if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
+            Vec3d startPos = sourcePos.toCenterPos().add(0, 0.25, 0);
+            float uniqueOffset = world.random.nextFloat() + 2.0f;
+            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, startPos, true, sourcePos, endPos, uniqueOffset);
+            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, endPos, false, sourcePos, startPos, uniqueOffset);
+            sourceEntity.setConnectedEntity(connectedEntity);
+            connectedEntity.setConnectedEntity(sourceEntity);
+            base.setSourceEntity(sourceEntity);
+            base.setConnectedEntity(connectedEntity);
+            world.spawnEntity(sourceEntity);
+            world.spawnEntity(connectedEntity);
+            world.playSound(null, sourceEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
+            world.playSound(null, connectedEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
         }
     }
 
@@ -143,25 +113,54 @@ public class ElectromagneticRecorderItem extends Item {
         }
     }
 
-    private static void spawnEntrances(World world, BlockPos sourcePos, Vec3d endPos) {
-        BlockEntity blockEntity = world.getBlockEntity(sourcePos);
-        if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
-            Vec3d startPos = sourcePos.toCenterPos().add(0, 0.25, 0);
-            float uniqueOffset = world.random.nextFloat() + 2.0f;
-            ((ServerWorld) world).getChunkManager().setChunkForced(new ChunkPos(BlockPos.ofFloored(startPos)), true);
-            ((ServerWorld) world).getChunkManager().setChunkForced(new ChunkPos(BlockPos.ofFloored(endPos)), true);
-            ShuttleEntranceEntity sourceEntity = new ShuttleEntranceEntity(world, true, sourcePos, endPos, uniqueOffset);
-            ShuttleEntranceEntity connectedEntity = new ShuttleEntranceEntity(world, false, sourcePos, startPos, uniqueOffset);
-            sourceEntity.setPosition(startPos);
-            connectedEntity.setPosition(endPos);
-            sourceEntity.setConnectedEntity(connectedEntity);
-            connectedEntity.setConnectedEntity(sourceEntity);
-            base.setSourceEntity(sourceEntity);
-            base.setConnectedEntity(connectedEntity);
-            world.spawnEntity(sourceEntity);
-            world.spawnEntity(connectedEntity);
-            world.playSound(null, sourceEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
-            world.playSound(null, connectedEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        if (world.isClient) {
+            return;
+        }
+        NbtCompound nbt = stack.getOrCreateNbt();
+        if (!nbt.contains(RECORDING)) {
+            nbt.putBoolean(RECORDING, false);
+        }
+        if (!nbt.contains(POS)) {
+            nbt.put(POS, new NbtList());
+        }
+        NbtList list = nbt.getList(POS, NbtElement.COMPOUND_TYPE);
+        stack.setDamage(list.size());
+        if (nbt.getBoolean(RECORDING)) {
+            int[] sourcePos = stack.getOrCreateNbt().getIntArray(SOURCE_POS);
+            BlockPos blockPos = new BlockPos(sourcePos[0], sourcePos[1], sourcePos[2]);
+            BlockEntity blockEntity = world.getBlockEntity(blockPos);
+            if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity) || stack.isBroken() || !selected) {
+                finishRecording(stack, world, entity);
+                return;
+            }
+            boolean recorded = false;
+            for (NbtElement element : list) {
+                NbtCompound compound = (NbtCompound) element;
+                double x = compound.getDouble(X);
+                double y = compound.getDouble(Y);
+                double z = compound.getDouble(Z);
+                Vec3d pos = new Vec3d(x, y, z);
+                if (pos.equals(entity.getPos())) {
+                    recorded = true;
+                    break;
+                }
+            }
+            if (!recorded) {
+                NbtCompound compound = new NbtCompound();
+                compound.putDouble(X, entity.getX());
+                compound.putDouble(Y, entity.getY());
+                compound.putDouble(Z, entity.getZ());
+                list.add(compound);
+                nbt.put(POS, list);
+                stack.addDamage(1);
+            }
+            if (entity instanceof PlayerEntity player) {
+                player.getInventory().markDirty();
+            }
+        } else {
+            initializeNbt(stack);
         }
     }
 

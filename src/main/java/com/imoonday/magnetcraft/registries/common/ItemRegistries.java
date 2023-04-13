@@ -81,7 +81,7 @@ public class ItemRegistries {
     public static final MagneticWrenchItem MAGNETIC_WRENCH_ITEM = register("magnetic_wrench", new MagneticWrenchItem(settings()));
 
     //电磁记录仪
-    public static final ElectromagneticRecorderItem ELECTROMAGNETIC_RECORDER_ITEM = register("electromagnetic_recorder", new ElectromagneticRecorderItem(nonStackable(30 * 20)));
+    public static final ElectromagneticRecorderItem ELECTROMAGNETIC_RECORDER_ITEM = register("electromagnetic_recorder", new ElectromagneticRecorderItem(nonStackable(15 * 20)));
 
     //磁铁工具
     public static final SwordItem MAGNETIC_IRON_SWORD = register("magnetic_iron_sword", new SwordItem(MagneticIronToolMaterial.INSTANCE, 3, -2.4f, settings()));

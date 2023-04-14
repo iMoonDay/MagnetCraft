@@ -108,12 +108,12 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (stack.isOf(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM)) {
             Vec3d center = new Vec3d(pos.toCenterPos().getX(), state.getCollisionShape(world, pos).offset(pos.getX(), pos.getY(), pos.getZ()).getMax(Direction.Axis.Y), pos.toCenterPos().getZ());
-            if (!player.getPos().isInRange(center, 2)) {
-                player.sendMessage(Text.literal("距离过远"), true);
+            if (!player.getPos().isInRange(center, 2.5)) {
+                player.sendMessage(Text.translatable("block.magnetcraft.electromagnetic_shuttle_base.message_1"), true);
                 return ActionResult.SUCCESS;
             }
             if (!state.get(POWERED)) {
-                player.sendMessage(Text.literal("未充能"), true);
+                player.sendMessage(Text.translatable("block.magnetcraft.electromagnetic_shuttle_base.message_2"), true);
                 return ActionResult.SUCCESS;
             }
             if (!player.getPos().equals(center)) {
@@ -132,11 +132,11 @@ public class ElectromagneticShuttleBaseBlock extends BlockWithEntity {
             return ActionResult.SUCCESS;
         }
         if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
-            if (base.isConnecting()) {
-                String string = base.getRoute().get(base.getRoute().size() - 1).toString();
-                player.sendMessage(Text.literal("当前绑定坐标: " + string), true);
+            if (base.isConnecting() && base.getRoute().size() > 0) {
+                BlockPos blockPos = BlockPos.ofFloored(base.getRoute().get(base.getRoute().size() - 1));
+                player.sendMessage(Text.translatable("block.magnetcraft.electromagnetic_shuttle_base.message_3", blockPos.getX(), blockPos.getY(), blockPos.getZ()), true);
             } else {
-                player.sendMessage(Text.literal("当前未绑定坐标"), true);
+                player.sendMessage(Text.translatable("block.magnetcraft.electromagnetic_shuttle_base.message_4"), true);
             }
         }
         return ActionResult.SUCCESS;

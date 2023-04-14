@@ -82,6 +82,7 @@ public class ElectromagneticRecorderItem extends Item {
             base.setConnectedEntity(connectedEntity);
             world.spawnEntity(sourceEntity);
             world.spawnEntity(connectedEntity);
+            base.markDirty();
             world.playSound(null, sourceEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
             world.playSound(null, connectedEntity.getBlockPos(), SoundEvents.BLOCK_BEACON_ACTIVATE, SoundCategory.VOICE);
         }
@@ -128,10 +129,14 @@ public class ElectromagneticRecorderItem extends Item {
         NbtList list = nbt.getList(POS, NbtElement.COMPOUND_TYPE);
         stack.setDamage(list.size());
         if (nbt.getBoolean(RECORDING)) {
+            if (!selected) {
+                initializeNbt(stack);
+                return;
+            }
             int[] sourcePos = stack.getOrCreateNbt().getIntArray(SOURCE_POS);
             BlockPos blockPos = new BlockPos(sourcePos[0], sourcePos[1], sourcePos[2]);
             BlockEntity blockEntity = world.getBlockEntity(blockPos);
-            if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity) || stack.isBroken() || !selected) {
+            if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity) || stack.isBroken()) {
                 finishRecording(stack, world, entity);
                 return;
             }
@@ -169,10 +174,11 @@ public class ElectromagneticRecorderItem extends Item {
         return false;
     }
 
-    private static void initializeNbt(ItemStack stack) {
+    public static void initializeNbt(ItemStack stack) {
         stack.getOrCreateNbt().putBoolean(RECORDING, false);
         stack.getOrCreateNbt().put(POS, new NbtList());
         stack.getOrCreateNbt().remove(SOURCE_POS);
+        stack.setDamage(0);
     }
 
 }

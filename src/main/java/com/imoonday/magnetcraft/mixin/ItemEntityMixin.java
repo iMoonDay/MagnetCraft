@@ -1,11 +1,13 @@
 package com.imoonday.magnetcraft.mixin;
 
+import com.imoonday.magnetcraft.common.items.ElectromagneticRecorderItem;
 import com.imoonday.magnetcraft.common.items.armors.MagneticShulkerBackpackItem;
 import com.imoonday.magnetcraft.common.tags.FluidTags;
 import com.imoonday.magnetcraft.common.tags.ItemTags;
 import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.FluidRegistries;
+import com.imoonday.magnetcraft.registries.common.ItemRegistries;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.EquipmentSlot;
@@ -36,36 +38,62 @@ public class ItemEntityMixin extends EntityMixin {
             if (world == null) {
                 return;
             }
-            ItemStack stack = entity.getStack();
-            boolean isAttracting = stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
-            int dis = ModConfig.getValue().droppedMagnetAttractDis;
-            if (isAttracting && this.canAttract()) {
-                this.setAttracting(true, dis);
-            }
-            if (entity.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
-                boolean success = false;
-                int mainhandRepair = 0;
-                int offhandRepair = 0;
-                BlockState state = entity.getBlockStateAtPos();
-                if (!entity.world.isClient && state.isOf(FluidRegistries.MAGNETIC_FLUID)) {
-                    Random random = entity.world.random;
-                    if (stack.isIn(ItemTags.MAGNETS) && stack.isDamageable() && stack.isDamaged()) {
-                        int damage = stack.getDamage();
-                        int maxDamage = stack.getMaxDamage();
-                        if (random.nextBetween(1, maxDamage * 400) <= damage) {
-                            stack.addDamage(-maxDamage / 10);
-                            mainhandRepair = damage - stack.getDamage();
-                            success = true;
-                        }
-                    }
-                    if (success && random.nextBetween(1, 200) <= mainhandRepair + offhandRepair) {
-                        entity.world.setBlockState(entity.getBlockPos(), Blocks.WATER.getDefaultState());
+            checkAttract();
+            checkIsInFluid();
+            checkAttractSource();
+            checkIsRecorder();
+        }
+    }
+
+    private void checkIsRecorder() {
+        ItemEntity entity = (ItemEntity) (Object) this;
+        ItemStack stack = entity.getStack();
+        if (stack.isOf(ItemRegistries.ELECTROMAGNETIC_RECORDER_ITEM)) {
+            ElectromagneticRecorderItem.initializeNbt(stack);
+        }
+    }
+
+    private void checkAttractSource() {
+        ItemEntity entity = (ItemEntity) (Object) this;
+        if (entity.getAttractSource() != null && entity.isOnGround()) {
+            entity.setAttractSource(null);
+        }
+    }
+
+    private void checkIsInFluid() {
+        ItemEntity entity = (ItemEntity) (Object) this;
+        World world = entity.world;
+        ItemStack stack = entity.getStack();
+        if (entity.isSubmergedIn(FluidTags.MAGNETIC_FLUID)) {
+            boolean success = false;
+            int mainhandRepair = 0;
+            int offhandRepair = 0;
+            BlockState state = entity.getBlockStateAtPos();
+            if (!world.isClient && state.isOf(FluidRegistries.MAGNETIC_FLUID)) {
+                Random random = world.random;
+                if (stack.isIn(ItemTags.MAGNETS) && stack.isDamageable() && stack.isDamaged()) {
+                    int damage = stack.getDamage();
+                    int maxDamage = stack.getMaxDamage();
+                    if (random.nextBetween(1, maxDamage * 400) <= damage) {
+                        stack.addDamage(-maxDamage / 10);
+                        mainhandRepair = damage - stack.getDamage();
+                        success = true;
                     }
                 }
+                if (success && random.nextBetween(1, 200) <= mainhandRepair + offhandRepair) {
+                    world.setBlockState(entity.getBlockPos(), Blocks.WATER.getDefaultState());
+                }
             }
-            if (this.getAttractSource() != null && entity.isOnGround()) {
-                this.setAttractSource(null);
-            }
+        }
+    }
+
+    private void checkAttract() {
+        ItemEntity entity = (ItemEntity) (Object) this;
+        ItemStack stack = entity.getStack();
+        boolean isAttracting = stack.isIn(ItemTags.ATTRACTIVE_MAGNETS) && stack.getOrCreateNbt().getBoolean("Enable");
+        int dis = ModConfig.getValue().droppedMagnetAttractDis;
+        if (isAttracting && entity.canAttract()) {
+            entity.setAttracting(true, dis);
         }
     }
 

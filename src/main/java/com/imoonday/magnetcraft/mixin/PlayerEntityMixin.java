@@ -105,12 +105,17 @@ public abstract class PlayerEntityMixin extends EntityMixin {
                 return;
             }
             player.tryLevitation();
-            boolean shouldDecreaseTick = player.getLevitationTick() > 0 && (player.isOnGround() || player.getAbilities().flying);
-            if (shouldDecreaseTick) {
-                player.setLevitationTick(player.getLevitationTick() - 3);
-            }
-            if (!player.isSpectator() && !player.getAbilities().creativeMode && player.hasNoGravity()) {
-                player.setNoGravity(false);
+            levitationTick();
+            handleUsedTick();
+        }
+    }
+
+    private void handleUsedTick() {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        if (player != null) {
+            World world = player.world;
+            if (world == null) {
+                return;
             }
             if (!world.isClient && !player.isSpectator()) {
                 ItemStack stack = player.getEquippedStack(EquipmentSlot.FEET);
@@ -126,6 +131,17 @@ public abstract class PlayerEntityMixin extends EntityMixin {
                 }
             }
             player.getInventory().markDirty();
+        }
+    }
+
+    private void levitationTick() {
+        PlayerEntity player = (PlayerEntity) (Object) this;
+        boolean shouldDecreaseTick = player.getLevitationTick() > 0 && (player.isOnGround() || player.getAbilities().flying);
+        if (shouldDecreaseTick) {
+            player.setLevitationTick(player.getLevitationTick() - 3);
+        }
+        if (!player.isSpectator() && !player.getAbilities().creativeMode && player.hasNoGravity()) {
+            player.setNoGravity(false);
         }
     }
 

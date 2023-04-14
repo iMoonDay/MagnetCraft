@@ -1,5 +1,6 @@
 package com.imoonday.magnetcraft.registries.common;
 
+import com.imoonday.magnetcraft.common.entities.BackpackEntityModel;
 import com.imoonday.magnetcraft.common.entities.bomb.ElectromagneticPulseBombEntityRenderer;
 import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntityModel;
 import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntityRenderer;
@@ -18,9 +19,15 @@ import static com.imoonday.magnetcraft.registries.special.IdentifierRegistries.i
 @Environment(EnvType.CLIENT)
 public class EntityRendererRegistries {
 
-    public static final EntityModelLayer MODEL_MAGNETIC_IRON_GOLEM_LAYER = new EntityModelLayer(id("magnetic_iron_golem"), "main");
-    public static final EntityModelLayer MODEL_MAGNETIC_WRENCH_LAYER = new EntityModelLayer(id("magnetic_wrench"), "main");
-    public static final EntityModelLayer MODEL_SHUTTLE_ENTRANCE_LAYER = new EntityModelLayer(id("shuttle_entrance"), "main");
+    public static final String MAIN = "main";
+    public static final EntityModelLayer MODEL_MAGNETIC_IRON_GOLEM_LAYER = registerMain("magnetic_iron_golem");
+    public static final EntityModelLayer MODEL_MAGNETIC_WRENCH_LAYER = registerMain("magnetic_wrench");
+    public static final EntityModelLayer MODEL_SHUTTLE_ENTRANCE_LAYER = registerMain("shuttle_entrance");
+    public static final EntityModelLayer MODEL_BACKPACK_LAYER = registerMain("backpack");
+
+    static EntityModelLayer registerMain(String id) {
+        return new EntityModelLayer(id(id), MAIN);
+    }
 
     public static void registerClient() {
         EntityRendererRegistry.register(EntityRegistries.MAGNETIC_IRON_GOLEM, MagneticIronGolemEntityRenderer::new);
@@ -30,6 +37,7 @@ public class EntityRendererRegistries {
         EntityRendererRegistry.register(EntityRegistries.ELECTROMAGNETIC_PULSE_BOMB, ElectromagneticPulseBombEntityRenderer::new);
         EntityRendererRegistry.register(EntityRegistries.SHUTTLE_ENTRANCE, ShuttleEntranceEntityRenderer::new);
         EntityModelLayerRegistry.registerModelLayer(MODEL_SHUTTLE_ENTRANCE_LAYER, ShuttleEntranceEntityModel::getTexturedModelData);
+        EntityModelLayerRegistry.registerModelLayer(MODEL_BACKPACK_LAYER, BackpackEntityModel::getTexturedModelData);
     }
 
 }

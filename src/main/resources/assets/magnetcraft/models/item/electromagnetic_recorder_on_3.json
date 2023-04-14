@@ -1,5 +1,5 @@
 {
-  "parent": "item/handheld",
+  "parent": "item/generated",
   "textures": {
     "layer0": "magnetcraft:item/electromagnetic_recorder_on_3"
   }

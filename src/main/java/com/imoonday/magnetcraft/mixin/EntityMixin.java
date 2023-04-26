@@ -15,9 +15,6 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.ExperienceOrbEntity;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffect;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
@@ -25,6 +22,7 @@ import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtList;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.registry.Registries;
+import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.function.BooleanBiFunction;
@@ -34,6 +32,7 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,7 +40,9 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.imoonday.magnetcraft.common.items.magnets.CreatureMagnetItem.EMPTY_UUID;
@@ -88,6 +89,8 @@ public abstract class EntityMixin implements MagnetCraftEntity {
     private static final String NO_CLIP = "NoClip";
     private static final String NO_GRAVITY = "NoGravity";
     private static final int SHUTTLE_COOLDOWN = 20;
+    private static final String LAST_GAME_MODE = "LastGameMode";
+    private static final String FLYING = "WasFlying";
 
     protected NbtCompound attractData = new NbtCompound();
     protected double attractDis = 0;
@@ -113,6 +116,8 @@ public abstract class EntityMixin implements MagnetCraftEntity {
     protected boolean wasInvulnerable = false;
     protected boolean wasNoClip = false;
     protected boolean wasNoGravity = false;
+    protected int lastGameMode = 0;
+    protected boolean wasFlying = false;
 
     @Override
     public void shuttle(ArrayList<Vec3d> route) {
@@ -127,6 +132,8 @@ public abstract class EntityMixin implements MagnetCraftEntity {
         entity.setWasInvulnerable(entity.isInvulnerable());
         entity.setWasNoClip(entity.noClip);
         entity.setWasNoGravity(entity.hasNoGravity());
+        entity.setLastGameMode(entity instanceof ServerPlayerEntity player ? player.interactionManager.getGameMode().getId() : 0);
+        entity.setWasFlying(entity instanceof ServerPlayerEntity player && player.getAbilities().flying);
         entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.VOICE, 1, 1);
     }
 
@@ -142,41 +149,58 @@ public abstract class EntityMixin implements MagnetCraftEntity {
         while (times <= 3) {
             int tick = entity.getCurrentRouteTick();
             int maxTick = entity.getRoute().size();
-            if (tick >= maxTick) {
+            if (tick < maxTick) {
+                if (entity instanceof ServerPlayerEntity player) {
+                    if (!player.isSpectator()) {
+                        player.changeGameMode(GameMode.SPECTATOR);
+                    }
+                } else {
+                    if (!entity.isInvisible()) {
+                        entity.setInvisible(true);
+                    }
+                    if (!entity.isInvulnerable()) {
+                        entity.setInvulnerable(true);
+                    }
+                    if (!entity.noClip) {
+                        entity.noClip = true;
+                    }
+                    if (!entity.hasNoGravity()) {
+                        entity.setNoGravity(true);
+                    }
+                }
+                entity.refreshPositionAfterTeleport(entity.getRoute().get(tick));
+                entity.addCurrentRouteTick();
+                times++;
+            } else {
                 entity.setShuttling(false);
                 entity.setRoute(new ArrayList<>());
                 entity.setCurrentRouteTick(0);
-                entity.setInvisible(entity.wasInvisible());
-                entity.setInvulnerable(entity.wasInvulnerable());
-                entity.noClip = entity.wasNoClip();
-                entity.setNoGravity(entity.wasNoGravity());
-                if (entity instanceof LivingEntity livingEntity) {
-                    Map<StatusEffect, StatusEffectInstance> statusEffects = livingEntity.getActiveStatusEffects();
-                    for (StatusEffect statusEffect : Arrays.asList(StatusEffects.BLINDNESS, StatusEffects.DARKNESS)) {
-                        StatusEffectInstance statusEffectInstance = statusEffects.get(statusEffect);
-                        if (statusEffectInstance != null) {
-                            StatusEffect type = statusEffectInstance.getEffectType();
-                            if (statusEffectInstance.getDuration() <= 21) {
-                                livingEntity.removeStatusEffect(type);
-                            }
-                        }
+                entity.setIgnoreFallDamage(true);
+                if (entity instanceof ServerPlayerEntity player) {
+                    if (player.wasFlying() != player.getAbilities().flying) {
+                        player.getAbilities().flying = player.wasFlying();
+                    }
+                    if (player.getLastGameMode() != player.interactionManager.getGameMode().getId()) {
+                        player.changeGameMode(GameMode.byId(player.getLastGameMode()));
+                    }
+                } else {
+                    if (entity.wasInvisible() != entity.isInvisible()) {
+                        entity.setInvisible(entity.wasInvisible());
+                    }
+                    if (entity.wasInvulnerable() != entity.isInvulnerable()) {
+                        entity.setInvulnerable(entity.wasInvulnerable());
+                    }
+                    if (entity.wasNoClip() != entity.noClip) {
+                        entity.noClip = entity.wasNoClip();
+                    }
+                    if (entity.wasNoGravity() != entity.hasNoGravity()) {
+                        entity.setNoGravity(entity.wasNoGravity());
                     }
                 }
                 entity.world.playSound(null, entity.getBlockPos(), SoundEvents.ENTITY_ENDERMAN_TELEPORT, SoundCategory.VOICE, 1, 1);
                 entity.shuttleCooldown();
                 return;
             }
-            entity.setInvisible(true);
-            entity.setInvulnerable(true);
-            entity.noClip = true;
-            entity.setNoGravity(true);
-            if (entity instanceof LivingEntity livingEntity) {
-                livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 21, 0, false, false, false));
-                livingEntity.addStatusEffect(new StatusEffectInstance(StatusEffects.DARKNESS, 21, 0, false, false, false));
-            }
-            entity.refreshPositionAfterTeleport(entity.getRoute().get(tick));
-            entity.addCurrentRouteTick();
-            times++;
         }
     }
 
@@ -261,8 +285,7 @@ public abstract class EntityMixin implements MagnetCraftEntity {
 
     @Override
     public void minusShuttleCooldown() {
-        int value = --this.shuttleCooldown;
-        this.shuttleData.putInt(COOLDOWN, value);
+        this.shuttleData.putInt(COOLDOWN, --this.shuttleCooldown);
     }
 
     @Override
@@ -276,6 +299,26 @@ public abstract class EntityMixin implements MagnetCraftEntity {
     @Override
     public void setShuttleData(NbtCompound shuttleData) {
         this.shuttleData = shuttleData;
+    }
+
+    @Override
+    public int getLastGameMode() {
+        return getInt(this.shuttleData, LAST_GAME_MODE);
+    }
+
+    @Override
+    public void setLastGameMode(int lastGameMode) {
+        this.shuttleData.putInt(LAST_GAME_MODE, lastGameMode);
+    }
+
+    @Override
+    public boolean wasFlying() {
+        return getBoolean(this.shuttleData, FLYING, false);
+    }
+
+    @Override
+    public void setWasFlying(boolean wasFlying) {
+        this.shuttleData.putBoolean(FLYING, wasFlying);
     }
 
     @Override
@@ -463,7 +506,7 @@ public abstract class EntityMixin implements MagnetCraftEntity {
         this.wasInvulnerable = this.wasInvulnerable();
         this.wasNoClip = this.wasNoClip();
         this.wasNoGravity = this.wasNoGravity();
-        entity.tryAttract();
+        tryAttract();
         followingCheck(entity);
         shuttleTick();
     }
@@ -709,6 +752,8 @@ public abstract class EntityMixin implements MagnetCraftEntity {
         data.putBoolean(INVULNERABLE, this.wasInvulnerable());
         data.putBoolean(NO_CLIP, this.wasNoClip());
         data.putBoolean(NO_GRAVITY, this.wasNoGravity());
+        data.putInt(LAST_GAME_MODE, this.getLastGameMode());
+        data.putBoolean(FLYING, this.wasFlying());
         nbt.put(SHUTTLE_DATA, data);
     }
 
@@ -764,6 +809,12 @@ public abstract class EntityMixin implements MagnetCraftEntity {
             }
             if (data.contains(NO_GRAVITY)) {
                 this.wasNoGravity = data.getBoolean(NO_GRAVITY);
+            }
+            if (data.contains(LAST_GAME_MODE)) {
+                this.lastGameMode = data.getInt(LAST_GAME_MODE);
+            }
+            if (data.contains(FLYING)) {
+                this.wasFlying = data.getBoolean(FLYING);
             }
         }
     }

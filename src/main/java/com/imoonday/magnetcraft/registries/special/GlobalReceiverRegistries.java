@@ -31,7 +31,7 @@ public class GlobalReceiverRegistries {
     public static final String ON = "on";
     public static final String OFF = "off";
 
-    public static void serverPlayNetworkingRegister() {
+    public static void register() {
         registerServer(KEYBINDINGS_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             if (!player.getItemCooldownManager().isCoolingDown(ItemRegistries.MAGNET_CONTROLLER_ITEM)) {
                 boolean contains = player.getInventory().containsAny(stack -> stack.isOf(ItemRegistries.MAGNET_CONTROLLER_ITEM) || ((Block.getBlockFromItem(stack.getItem()) instanceof ShulkerBoxBlock || stack.getItem() instanceof MagneticShulkerBackpackItem) && stack.getNbt() != null && stack.getNbt().getCompound(BLOCK_ENTITY_TAG).getList(ITEMS, NbtElement.COMPOUND_TYPE).stream().map(nbtElement -> (NbtCompound) nbtElement).anyMatch(nbtCompound -> nbtCompound.getString(ID).equals(Registries.ITEM.getId(ItemRegistries.MAGNET_CONTROLLER_ITEM).toString()))));
@@ -89,7 +89,7 @@ public class GlobalReceiverRegistries {
             }
         }));
 
-        registerServer(OPEN_BACKPACK, (server, player, handler, buf, packetSender) -> server.execute(() -> {
+        registerServer(OPEN_BACKPACK_PACKET_ID, (server, player, handler, buf, packetSender) -> server.execute(() -> {
             ItemStack stack = player.getEquippedStack(EquipmentSlot.CHEST);
             if (stack.getItem() instanceof MagneticShulkerBackpackItem backpack) {
                 backpack.openScreen(player, stack, 38);
@@ -98,7 +98,7 @@ public class GlobalReceiverRegistries {
 
     }
 
-    public static void clientPlayNetworkingRegister() {
+    public static void registerClient() {
         registerClient(USE_CONTROLLER_PACKET_ID, (client, handler, buf, responseSender) -> {
             boolean enable = buf.readBoolean();
             client.execute(() -> {

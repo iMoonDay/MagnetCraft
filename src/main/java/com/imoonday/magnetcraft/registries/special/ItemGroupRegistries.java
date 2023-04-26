@@ -1,13 +1,11 @@
 package com.imoonday.magnetcraft.registries.special;
 
 import com.imoonday.magnetcraft.common.items.magnets.MineralMagnetItem;
+import com.imoonday.magnetcraft.config.ModConfig;
 import com.imoonday.magnetcraft.registries.common.PotionRegistries;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.fabricmc.fabric.api.itemgroup.v1.ItemGroupEvents;
-import net.minecraft.item.ItemGroup;
-import net.minecraft.item.ItemGroups;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
+import net.minecraft.item.*;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.text.Text;
 
@@ -34,6 +32,9 @@ public class ItemGroupRegistries {
 
     @SuppressWarnings("AlibabaMethodTooLong")
     public static void register() {
+        if (!ModConfig.getConfig().addItemsToGroups) {
+            return;
+        }
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.NATURAL).register(content -> {
             content.addAfter(Items.DEEPSLATE_IRON_ORE, MAGNETITE_BLOCK);
@@ -68,6 +69,7 @@ public class ItemGroupRegistries {
             content.addAfter(MAGNETIC_IRON_AXE, MAGNETIC_IRON_SHOVEL);
             content.addAfter(MAGNETIC_IRON_SHOVEL, MAGNETIC_IRON_HOE);
             content.addAfter(MAGNETIC_IRON_HOE, MAGNETIC_WRENCH_ITEM);
+            content.addAfter(MAGNETIC_WRENCH_ITEM, ELECTROMAGNETIC_RECORDER_ITEM);
             content.addAfter(Items.NETHERITE_HOE, NETHERITE_MAGNETIC_IRON_SHOVEL);
             content.addAfter(NETHERITE_MAGNETIC_IRON_SHOVEL, NETHERITE_MAGNETIC_IRON_PICKAXE);
             content.addAfter(NETHERITE_MAGNETIC_IRON_PICKAXE, NETHERITE_MAGNETIC_IRON_AXE);
@@ -121,6 +123,7 @@ public class ItemGroupRegistries {
             content.addAfter(Items.IRON_HORSE_ARMOR, MAGNETIC_IRON_HORSE_ARMOR);
             content.add(ELECTROMAGNETIC_TRANSMITTER_ITEM);
             content.add(ELECTROMAGNETIC_GUN_ITEM);
+            content.add(MAGNETIC_BATTERY);
         });
 
         ItemGroupEvents.modifyEntriesEvent(ItemGroups.FUNCTIONAL).register(content -> {

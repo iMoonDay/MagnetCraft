@@ -24,7 +24,7 @@ public class MagnetCraft implements ModInitializer {
         EffectRegistries.register();
         PotionRegistries.register();
         EnchantmentRegistries.register();
-        GlobalReceiverRegistries.serverPlayNetworkingRegister();
+        GlobalReceiverRegistries.register();
         CustomStatRegistries.register();
         CommandRegistries.register();
         ScreenRegistries.register();
@@ -32,5 +32,4 @@ public class MagnetCraft implements ModInitializer {
         CallbackRegistries.register();
         TradeRegistries.register();
     }
-
 }

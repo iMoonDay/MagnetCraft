@@ -75,7 +75,7 @@ public class KeyBindingRegistries {
                 ClientPlayNetworking.send(AUTOMATIC_LEVITATION_PACKET_ID, PacketByteBufs.empty());
             }
             while (openBackpack.wasPressed()) {
-                ClientPlayNetworking.send(OPEN_BACKPACK, PacketByteBufs.empty());
+                ClientPlayNetworking.send(OPEN_BACKPACK_PACKET_ID, PacketByteBufs.empty());
             }
         });
     }

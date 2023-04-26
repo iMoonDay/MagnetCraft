@@ -251,6 +251,7 @@
   "text.autoconfig.magnetcraft.option.displayMessageFeedback": "Display Message Feedback",
   "text.autoconfig.magnetcraft.option.enableSneakToSwitch": "Enable Sneak To Switch",
   "text.autoconfig.magnetcraft.option.rightClickReversal": "Swap Right-Click and Sneaking Right-Click function",
+  "text.autoconfig.magnetcraft.option.addItemsToGroups": "Add items to the vanilla group",
   "text.autoconfig.magnetcraft.option.whitelist": "White List",
   "text.autoconfig.magnetcraft.option.whitelist.enable": "Enable White List",
   "text.autoconfig.magnetcraft.option.whitelist.list": "Item id",

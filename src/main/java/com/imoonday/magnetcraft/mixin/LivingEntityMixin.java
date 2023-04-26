@@ -169,7 +169,7 @@ public class LivingEntityMixin extends EntityMixin {
                         } else {
                             player.getInventory().offerOrDrop(((ItemEntity) targetEntity).getStack());
                         }
-                        targetEntity.kill();
+                        targetEntity.discard();
                     });
                 }
             }
@@ -188,6 +188,9 @@ public class LivingEntityMixin extends EntityMixin {
     @Inject(method = "damage", at = @At(value = "HEAD"), cancellable = true)
     protected void damage(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
+        if (entity.world.isClient) {
+            cir.setReturnValue(false);
+        }
         if (entity.ignoreFallDamage() && source.isOf(DamageTypes.FALL) && !entity.world.isClient) {
             entity.setIgnoreFallDamage(false);
             cir.setReturnValue(false);
@@ -237,7 +240,7 @@ public class LivingEntityMixin extends EntityMixin {
         boolean hasEffect = entity.hasStatusEffect(EffectRegistries.ATTRACT_EFFECT);
         boolean horseArmorAttracting = entity instanceof HorseEntity horseEntity && horseEntity.getArmorType().isOf(ItemRegistries.MAGNETIC_IRON_HORSE_ARMOR);
         boolean equippingBackpack = entity.getEquippedStack(EquipmentSlot.CHEST).isOf(BlockRegistries.MAGNETIC_SHULKER_BACKPACK_ITEM);
-        double[] minDis = new double[]{value.electromagnetAttractMinDis, value.permanentMagnetAttractMinDis, value.polarMagnetAttractMinDis};
+        double[] minDis = {value.electromagnetAttractMinDis, value.permanentMagnetAttractMinDis, value.polarMagnetAttractMinDis};
         double horseArmorAttractDis = value.horseArmorAttractDis;
         double backpackAttractDis = value.backpackAttractDis;
         double magnetHandSpacing = value.magnetHandSpacing;
@@ -253,9 +256,9 @@ public class LivingEntityMixin extends EntityMixin {
         boolean mainhandMagnetHasEnch = mainhandMagnet && mainhandHasEnch;
         boolean offhandMagnetHasEnch = offhandMagnet && offhandHasEnch;
         boolean handMagnetHasEnch = mainhandMagnetHasEnch || offhandMagnetHasEnch;
-        boolean[] handItems = new boolean[]{handElectromagnet, handPermanent, handPolar};
-        boolean[] mainhandItems = new boolean[]{mainhandElectromagnet, mainhandPermanent, mainhandPolar};
-        boolean[] offhandItems = new boolean[]{offhandElectromagnet, offhandPermanent, offhandPolar};
+        boolean[] handItems = {handElectromagnet, handPermanent, handPolar};
+        boolean[] mainhandItems = {mainhandElectromagnet, mainhandPermanent, mainhandPolar};
+        boolean[] offhandItems = {offhandElectromagnet, offhandPermanent, offhandPolar};
         int enchLvl = entity.getEnchantmentLvl(EnchantmentRegistries.ATTRACT_ENCHANTMENT);
         double enchMinDis = enchDefaultDis + disPerLvl;
         double finalDis = hasEnch ? enchMinDis + (enchLvl - 1) * disPerLvl : 0;

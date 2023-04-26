@@ -251,6 +251,7 @@
   "text.autoconfig.magnetcraft.option.displayMessageFeedback": "显示消息反馈",
   "text.autoconfig.magnetcraft.option.enableSneakToSwitch": "启用潜行切换",
   "text.autoconfig.magnetcraft.option.rightClickReversal": "交换右键与潜行右键的功能",
+  "text.autoconfig.magnetcraft.option.addItemsToGroups": "将物品添加到原版分组中",
   "text.autoconfig.magnetcraft.option.whitelist": "白名单",
   "text.autoconfig.magnetcraft.option.whitelist.enable": "启用白名单",
   "text.autoconfig.magnetcraft.option.whitelist.list": "物品id",

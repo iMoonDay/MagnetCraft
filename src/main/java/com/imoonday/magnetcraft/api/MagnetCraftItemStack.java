@@ -4,7 +4,6 @@ import net.minecraft.enchantment.Enchantment;
 import net.minecraft.util.math.random.Random;
 import org.jetbrains.annotations.Nullable;
 
-@SuppressWarnings("AlibabaAbstractMethodOrInterfaceMethodMustUseJavadoc")
 public interface MagnetCraftItemStack {
 
     default void addDamage(int damage, @Nullable Random random) {

@@ -7,7 +7,6 @@
     "AbstractMinecartEntityMixin",
     "ArrowEntityMixin",
     "BlockMixin",
-    "BrewingMixin",
     "CarvedPumpkinBlockMixin",
     "EnchantmentHelperMixin",
     "EntityMixin",
@@ -24,6 +23,8 @@
     "defaultRequire": 1
   },
   "client": [
+    "ArmorStandEntityRendererMixin",
+    "BipedEntityRendererMixin",
     "ClientPlayerEntityMixin",
     "PlayerEntityRendererMixin"
   ]

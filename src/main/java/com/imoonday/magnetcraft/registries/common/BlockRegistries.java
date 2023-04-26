@@ -68,8 +68,8 @@ public class BlockRegistries {
     public static final BlockEntityType<AttractSensorEntity> ATTRACT_SENSOR_ENTITY = registerBlockEntity("attract_sensor", AttractSensorEntity::new, ATTRACT_SENSOR_BLOCK);
     public static final AdvancedGrindstoneBlock ADVANCED_GRINDSTONE_BLOCK = register("advanced_grindstone", new AdvancedGrindstoneBlock(settingCopy(Blocks.GRINDSTONE)));
     public static final VerticalRepeaterBlock VERTICAL_REPEATER_BLOCK = register("vertical_repeater", new VerticalRepeaterBlock(settingCopy(Blocks.OBSERVER)));
-    public static final CircularRepeaterBlock CIRCULAR_REPEATER_BLOCK = register("circular_repeater", new CircularRepeaterBlock(settingCopy(Blocks.REPEATER)));
-    public static final ElectromagneticRelayBlock ELECTROMAGNETIC_RELAY_BLOCK = register("electromagnetic_relay", new ElectromagneticRelayBlock(settingCopy(Blocks.COMPARATOR)));
+    public static final CircularRepeaterBlock CIRCULAR_REPEATER_BLOCK = register("circular_repeater", new CircularRepeaterBlock(settingCopyNonOpaque(Blocks.REPEATER)));
+    public static final ElectromagneticRelayBlock ELECTROMAGNETIC_RELAY_BLOCK = register("electromagnetic_relay", new ElectromagneticRelayBlock(settingCopyNonOpaque(Blocks.COMPARATOR)));
     public static final MagneticAntennaBlock MAGNETIC_ANTENNA_BLOCK = register("magnetic_antenna", new MagneticAntennaBlock(settingCopy(Blocks.LIGHTNING_ROD).luminance(MagneticAntennaBlock.getLuminance())));
     public static final Map<Item, CauldronBehavior> MAGNETIC_FLUID_CAULDRON_BEHAVIOR = CauldronBehavior.createMap();
     public static final Block MAGNETIC_FLUID_CAULDRON = registerBlock("magnetic_fluid_cauldron", new LeveledCauldronBlock(settingCopy(Blocks.CAULDRON), precipitation -> false, MAGNETIC_FLUID_CAULDRON_BEHAVIOR));

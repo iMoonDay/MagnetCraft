@@ -30,7 +30,7 @@ public class MagnetCraftClient implements ClientModInitializer {
         MineralMagnetItem.registerClient();
         CropMagnetItem.registerClient();
         ScreenRegistries.registerClient();
-        GlobalReceiverRegistries.clientPlayNetworkingRegister();
+        GlobalReceiverRegistries.registerClient();
         PortableDemagnetizerItem.registerClient();
         MagneticFluid.registerClient();
         EntityRendererRegistries.registerClient();

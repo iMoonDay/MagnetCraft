@@ -168,5 +168,4 @@ public class ItemRegistries {
     static FabricItemSettings nonStackable(int maxDamage) {
         return settings().maxCount(1).maxDamage(maxDamage);
     }
-
 }

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "121",
+    "131",
+    "141"
+  ],
+  "key": {
+    "1": {
+      "item": "magnetcraft:magnetic_iron_ingot"
+    },
+    "2": {
+      "item": "minecraft:redstone_lamp"
+    },
+    "3": {
+      "item": "minecraft:ender_pearl"
+    },
+    "4": {
+      "item": "minecraft:book"
+    }
+  },
+  "result": {
+    "item": "magnetcraft:electromagnetic_recorder",
+    "count": 1
+  }
+}

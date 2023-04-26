@@ -15,6 +15,7 @@ public class ModConfig implements ConfigData {
     public boolean displayMessageFeedback = true;
     public boolean enableSneakToSwitch = true;
     public boolean rightClickReversal = false;
+    public boolean addItemsToGroups = false;
 
     @ConfigEntry.Gui.CollapsibleObject
     public Whitelist whitelist = new Whitelist();
@@ -30,7 +31,6 @@ public class ModConfig implements ConfigData {
     public static class Blacklist {
         public boolean enable = false;
         public ArrayList<String> list = new ArrayList<>();
-
     }
 
     @ConfigEntry.Gui.CollapsibleObject

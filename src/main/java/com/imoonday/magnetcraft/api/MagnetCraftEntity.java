@@ -65,6 +65,20 @@ public interface MagnetCraftEntity {
     default void setShuttleData(NbtCompound shuttleData) {
     }
 
+    default int getLastGameMode() {
+        return 0;
+    }
+
+    default void setLastGameMode(int lastGameMode) {
+    }
+
+    default boolean wasFlying() {
+        return false;
+    }
+
+    default void setWasFlying(boolean wasFlying) {
+    }
+
     default boolean wasInvisible() {
         return false;
     }
@@ -248,11 +262,6 @@ public interface MagnetCraftEntity {
     }
 
     default void setAttractSource(Vec3d pos) {
-    }
-
-    enum DataType {
-        ATTRACT_DATA,
-        SHUTTLE_DATA
     }
 
 }

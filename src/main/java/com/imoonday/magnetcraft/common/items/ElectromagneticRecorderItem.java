@@ -1,8 +1,11 @@
 package com.imoonday.magnetcraft.common.items;
 
+import com.imoonday.magnetcraft.common.blocks.ElectromagneticShuttleBaseBlock;
 import com.imoonday.magnetcraft.common.blocks.entities.ElectromagneticShuttleBaseEntity;
 import com.imoonday.magnetcraft.common.entities.entrance.ShuttleEntranceEntity;
+import com.imoonday.magnetcraft.registries.common.BlockRegistries;
 import com.imoonday.magnetcraft.registries.common.ItemRegistries;
+import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.client.item.ModelPredicateProviderRegistry;
 import net.minecraft.entity.Entity;
@@ -95,6 +98,10 @@ public class ElectromagneticRecorderItem extends Item {
         BlockPos pos = new BlockPos(sourcePos[0], sourcePos[1], sourcePos[2]);
         BlockEntity blockEntity = world.getBlockEntity(pos);
         if (blockEntity instanceof ElectromagneticShuttleBaseEntity base) {
+            BlockState state = world.getBlockState(pos);
+            if (!state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK)) {
+                return;
+            }
             base.setConnecting(true);
             ArrayList<Vec3d> route = new ArrayList<>();
             NbtList list = stack.getOrCreateNbt().getList(POS, NbtElement.COMPOUND_TYPE);
@@ -135,7 +142,12 @@ public class ElectromagneticRecorderItem extends Item {
             }
             int[] sourcePos = stack.getOrCreateNbt().getIntArray(SOURCE_POS);
             BlockPos blockPos = new BlockPos(sourcePos[0], sourcePos[1], sourcePos[2]);
+            BlockState state = world.getBlockState(blockPos);
             BlockEntity blockEntity = world.getBlockEntity(blockPos);
+            if (!state.isOf(BlockRegistries.ELECTROMAGNETIC_SHUTTLE_BASE_BLOCK) || !state.get(ElectromagneticShuttleBaseBlock.POWERED)) {
+                initializeNbt(stack);
+                return;
+            }
             if (!(blockEntity instanceof ElectromagneticShuttleBaseEntity) || stack.isBroken()) {
                 finishRecording(stack, world, entity);
                 return;
